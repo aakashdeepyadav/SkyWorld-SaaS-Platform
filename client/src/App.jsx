@@ -15,6 +15,7 @@ import ClientDashboard from './pages/client/Dashboard';
 
 // Common pages
 import NotFound from './pages/NotFound';
+import Home from './pages/Home';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import Layout from './components/layout/Layout';
@@ -32,8 +33,8 @@ function App() {
 
   return (
     <Routes>
-      {/* Root redirect */}
-      <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
+      {/* Root — public landing page or dashboard */}
+      <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Home />} />
 
       {/* Public routes */}
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
