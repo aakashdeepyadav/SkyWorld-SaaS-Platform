@@ -10,6 +10,12 @@ export const api = axios.create({
   },
 });
 
+// Track if we're already refreshing to prevent multiple simultaneous refresh calls
+let isRefreshing = false;
+
+// Auth endpoints that should NEVER trigger the refresh interceptor
+const AUTH_ENDPOINTS = ['/auth/refresh', '/auth/login', '/auth/register', '/auth/google'];
+
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
@@ -25,17 +31,31 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const requestUrl = originalRequest?.url || '';
 
-    // If 401 and not already retried, try to refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Skip refresh logic for auth endpoints (prevents infinite loop)
+    const isAuthEndpoint = AUTH_ENDPOINTS.some(ep => requestUrl.includes(ep));
+
+    // If 401, not an auth endpoint, not already retried, and not already refreshing
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthEndpoint &&
+      !isRefreshing
+    ) {
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
         await api.post('/auth/refresh');
+        isRefreshing = false;
         return api(originalRequest);
       } catch (refreshError) {
-        // Refresh failed, redirect to login
-        window.location.href = '/login';
+        isRefreshing = false;
+        // Only redirect if not already on login page
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
         return Promise.reject(refreshError);
       }
     }
@@ -45,4 +65,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-
