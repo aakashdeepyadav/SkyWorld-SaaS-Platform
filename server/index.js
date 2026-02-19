@@ -70,8 +70,30 @@ app.use(globalRateLimiter);
 
 // ─── CORS Configuration ─────────────────────────────────────────────────────
 
+// Build allowed origins — handle both www and non-www
+const allowedOrigins = [process.env.FRONTEND_URL || 'http://localhost:5173'];
+if (process.env.FRONTEND_URL) {
+  const url = new URL(process.env.FRONTEND_URL);
+  if (url.hostname.startsWith('www.')) {
+    allowedOrigins.push(process.env.FRONTEND_URL.replace('www.', ''));
+  } else {
+    allowedOrigins.push(`${url.protocol}//www.${url.hostname}`);
+  }
+}
+// Always allow localhost in development
+if (process.env.NODE_ENV !== 'production') {
+  allowedOrigins.push('http://localhost:5173');
+}
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
