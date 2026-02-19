@@ -59,12 +59,11 @@ const paymentSchema = new mongoose.Schema({
 paymentSchema.index({ clientId: 1 });
 paymentSchema.index({ projectId: 1 });
 paymentSchema.index({ status: 1 });
-paymentSchema.index({ transactionId: 1 }, { sparse: true, unique: true });
-paymentSchema.index({ invoiceNumber: 1 }, { unique: true, sparse: true });
+// transactionId and invoiceNumber indexes auto-created by unique/sparse in schema
 paymentSchema.index({ createdAt: -1 });
 
 // Generate invoice number before saving
-paymentSchema.pre('save', async function(next) {
+paymentSchema.pre('save', async function (next) {
   if (!this.invoiceNumber && this.status === PAYMENT_STATUS.COMPLETED) {
     const count = await mongoose.model('Payment').countDocuments();
     this.invoiceNumber = `INV-${new Date().getFullYear()}-${String(count + 1).padStart(4, '0')}`;

@@ -76,7 +76,7 @@ const projectSchema = new mongoose.Schema({
 });
 
 // Indexes
-projectSchema.index({ serviceRequestId: 1 }, { unique: true });
+// serviceRequestId index auto-created by unique: true in schema
 projectSchema.index({ clientId: 1 });
 projectSchema.index({ developerIds: 1 });
 projectSchema.index({ status: 1 });

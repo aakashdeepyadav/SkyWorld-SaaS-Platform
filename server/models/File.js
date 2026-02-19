@@ -57,7 +57,7 @@ const fileSchema = new mongoose.Schema({
 fileSchema.index({ projectId: 1 });
 fileSchema.index({ uploadedBy: 1 });
 fileSchema.index({ createdAt: -1 });
-fileSchema.index({ cloudinaryPublicId: 1 }, { sparse: true });
+// cloudinaryPublicId index auto-created by sparse: true in schema
 
 const File = mongoose.model('File', fileSchema);
 

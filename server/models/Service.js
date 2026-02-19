@@ -31,7 +31,7 @@ const serviceSchema = new mongoose.Schema({
 });
 
 // Indexes
-serviceSchema.index({ name: 1 });
+// name index auto-created by unique: true in schema
 serviceSchema.index({ category: 1 });
 serviceSchema.index({ isActive: 1 });
 

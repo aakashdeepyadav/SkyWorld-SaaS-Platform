@@ -68,8 +68,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Indexes
-userSchema.index({ email: 1 });
-userSchema.index({ googleId: 1 }, { sparse: true });
+// email and googleId indexes are auto-created by unique/sparse in schema
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ createdAt: -1 });
