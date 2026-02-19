@@ -8,9 +8,7 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
-                                <span className="text-white font-bold text-sm">SW</span>
-                            </div>
+                            <img src="/logo.png" alt="SkyWorld" className="w-8 h-8 object-contain" />
                             <span className="text-xl font-bold text-gray-900">SkyWorld</span>
                         </div>
                         <div className="flex items-center space-x-4">
@@ -153,9 +151,7 @@ const Home = () => {
             <footer className="bg-gray-900 border-t border-gray-800 py-8 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-gradient-to-br from-primary-500 to-primary-700 rounded flex items-center justify-center">
-                            <span className="text-white font-bold text-xs">SW</span>
-                        </div>
+                        <img src="/logo.png" alt="SkyWorld" className="w-6 h-6 object-contain" />
                         <span className="text-gray-400 text-sm">&copy; 2026 SkyWorld Ventures. All rights reserved.</span>
                     </div>
                     <div className="flex items-center space-x-6 text-sm">
