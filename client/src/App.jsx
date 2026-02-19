@@ -30,6 +30,9 @@ function App() {
 
   return (
     <Routes>
+      {/* Root redirect */}
+      <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
+
       {/* Public routes */}
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
