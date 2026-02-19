@@ -52,8 +52,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         isRefreshing = false;
-        // Only redirect if not already on login page
-        if (!window.location.pathname.includes('/login')) {
+        // Only redirect from protected pages (dashboard), not public pages
+        if (window.location.pathname.startsWith('/dashboard')) {
           window.location.href = '/login';
         }
         return Promise.reject(refreshError);
