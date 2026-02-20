@@ -102,8 +102,12 @@ export const googleAuth = async (req, res, next) => {
       user: user.toPublicJSON()
     });
   } catch (error) {
-    logger.error('Google auth error:', error.message);
-    await createAuditLog(req, 'user_login', 'auth', null, { method: 'google', success: false, error: error.message });
+    // Log comprehensive error details for debugging
+    const errMsg = error.message || 'No message';
+    const errData = error.response?.data ? JSON.stringify(error.response.data) : 'No response data';
+    const errStatus = error.response?.status || 'No status';
+    logger.error(`Google auth error: ${errMsg} | Status: ${errStatus} | Data: ${errData}`);
+    await createAuditLog(req, 'user_login', 'auth', null, { method: 'google', success: false, error: errMsg });
 
     // Return a more specific error message for known Google OAuth errors
     const googleError = error.response?.data?.error || error.message || 'Unknown error';
@@ -112,7 +116,7 @@ export const googleAuth = async (req, res, next) => {
     res.status(401).json({
       success: false,
       message: 'Google authentication failed',
-      error: process.env.NODE_ENV !== 'production' ? `${googleError}: ${googleErrorDescription}` : 'Google authentication failed. Please try again.'
+      error: `${googleError}: ${googleErrorDescription}`.trim()
     });
   }
 };

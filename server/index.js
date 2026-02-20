@@ -85,12 +85,15 @@ if (process.env.NODE_ENV !== 'production') {
   allowedOrigins.push('http://localhost:5173');
 }
 
+logger.info(`CORS allowed origins: ${JSON.stringify(allowedOrigins)}`);
+
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      logger.warn(`CORS rejected origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
