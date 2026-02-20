@@ -1,247 +1,386 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+/* ——— Scroll-triggered fade-in ——— */
+const Reveal = ({ children, className = '', delay = 0 }) => {
+    const ref = useRef(null);
+    const [visible, setVisible] = useState(false);
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(([e]) => {
+            if (e.isIntersecting) { setVisible(true); obs.disconnect(); }
+        }, { threshold: 0.12 });
+        obs.observe(el);
+        return () => obs.disconnect();
+    }, []);
+    return (
+        <div
+            ref={ref}
+            className={`transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className}`}
+            style={{ transitionDelay: `${delay}ms` }}
+        >{children}</div>
+    );
+};
+
+/* ——— Animated number counter ——— */
+const Counter = ({ end, suffix = '', duration = 1600 }) => {
+    const ref = useRef(null);
+    const [count, setCount] = useState(0);
+    const [started, setStarted] = useState(false);
+
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(([e]) => {
+            if (e.isIntersecting) { setStarted(true); obs.disconnect(); }
+        }, { threshold: 0.5 });
+        obs.observe(el);
+        return () => obs.disconnect();
+    }, []);
+
+    useEffect(() => {
+        if (!started) return;
+        let start = null;
+        const step = (ts) => {
+            if (!start) start = ts;
+            const p = Math.min((ts - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
+            setCount(Math.floor(eased * end));
+            if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+    }, [started, end, duration]);
+
+    return <span ref={ref}>{count}{suffix}</span>;
+};
+
+/* ——— Infinite marquee ——— */
+const Marquee = ({ items }) => (
+    <div className="overflow-hidden relative">
+        <div className="flex animate-[marquee_25s_linear_infinite] whitespace-nowrap">
+            {[...items, ...items].map((item, i) => (
+                <span key={i} className="mx-8 text-sm font-medium text-gray-400/60 select-none">{item}</span>
+            ))}
+        </div>
+        {/* Fade edges */}
+        <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-surface-900 to-transparent pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-surface-900 to-transparent pointer-events-none" />
+    </div>
+);
 
 const Home = () => {
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        const fn = () => setScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', fn, { passive: true });
+        return () => window.removeEventListener('scroll', fn);
     }, []);
 
     return (
-        <div className="min-h-screen bg-surface-50">
-            {/* Navigation */}
-            <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm' : 'bg-transparent'
+        <div className="min-h-screen bg-surface-50 font-sans">
+
+            {/* ═══ NAV — clean, just logo + auth ═══ */}
+            <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm' : ''
                 }`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <div className="flex items-center space-x-2">
-                            <img src="/logo.png" alt="SkyWorld" className="w-8 h-8 object-contain" />
-                            <span className={`text-xl font-bold transition-colors ${scrolled ? 'text-gray-900' : 'text-white'}`}>
-                                SkyWorld
-                            </span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                            <Link to="/login" className={`font-medium px-4 py-2 rounded-lg transition-all ${scrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white/80 hover:text-white'
-                                }`}>
-                                Login
-                            </Link>
-                            <Link
-                                to="/register"
-                                className="btn-primary !py-2 !px-5 !text-sm"
-                            >
-                                Get Started
-                            </Link>
-                        </div>
+                <div className="max-w-6xl mx-auto px-6 lg:px-8 flex justify-between items-center h-16">
+                    <div className="flex items-center gap-2.5">
+                        <img src="/logo.png" alt="SkyWorld" className="w-7 h-7 object-contain" />
+                        <span className={`text-base font-semibold transition-colors duration-300 ${scrolled ? 'text-gray-900' : 'text-white'}`}>
+                            SkyWorld
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Link to="/login" className={`text-sm transition-colors duration-300 hidden sm:inline ${scrolled ? 'text-gray-500 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}>
+                            Sign in
+                        </Link>
+                        <Link to="/register" className="text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 px-4 py-2 rounded-lg transition-all duration-200 hover:-translate-y-px hover:shadow-lg hover:shadow-primary-500/20">
+                            Get Started
+                        </Link>
                     </div>
                 </div>
             </nav>
 
-            {/* Hero Section */}
-            <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-hero-pattern">
-                {/* Floating elements */}
-                <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute top-1/4 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-float" />
-                    <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-                    <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-primary-300/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
-                    {/* Grid pattern */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
-                </div>
+            {/* ═══ HERO ═══ */}
+            <section className="relative bg-surface-900 overflow-hidden">
+                {/* Dot grid */}
+                <div className="absolute inset-0" style={{
+                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)',
+                    backgroundSize: '28px 28px',
+                }} />
+                {/* Top accent */}
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary-400/40 to-transparent" />
+                {/* Radial glow — subtle, single, centered */}
+                <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary-500/[0.07] rounded-full blur-[120px] pointer-events-none" />
 
-                <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-20">
-                    <div className="animate-fade-in">
-                        <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-sm text-white/90 font-medium mb-8">
-                            <span className="w-2 h-2 bg-emerald-400 rounded-full mr-2 animate-pulse" />
-                            Trusted by 150+ businesses worldwide
-                        </div>
-
-                        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 text-balance">
-                            Build Your Digital
+                <div className="relative max-w-6xl mx-auto px-6 lg:px-8 pt-36 sm:pt-44 pb-20 sm:pb-28">
+                    <div className="max-w-3xl">
+                        {/* Staggered headline animation */}
+                        <h1 className="text-4xl sm:text-5xl lg:text-[3.75rem] font-bold text-white leading-[1.1] tracking-tight">
+                            <span className="inline-block animate-[slideUp_0.6s_ease-out_0.1s_both]">We craft digital</span>
                             <br />
-                            <span className="bg-gradient-to-r from-primary-200 to-accent-300 bg-clip-text text-transparent">
-                                Vision With Us
-                            </span>
+                            <span className="inline-block animate-[slideUp_0.6s_ease-out_0.25s_both]">products that</span>
+                            <br />
+                            <span className="inline-block animate-[slideUp_0.6s_ease-out_0.4s_both] text-primary-400">people love.</span>
                         </h1>
 
-                        <p className="text-lg sm:text-xl text-white/70 mb-10 max-w-2xl mx-auto">
-                            A professional services platform connecting businesses with expert developers
-                            and designers. From concept to launch, we deliver excellence.
+                        <p className="mt-7 text-lg text-gray-400 max-w-xl leading-relaxed animate-[fadeIn_0.8s_ease-out_0.6s_both]">
+                            SkyWorld is a premium digital studio. We design and build apps, websites, and brands — with a transparent process you can track every step of the way.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row justify-center gap-4">
-                            <Link
-                                to="/register"
-                                className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-600 rounded-2xl font-semibold text-lg hover:bg-primary-50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
-                            >
-                                Start a Project
-                                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
+                        <div className="mt-10 flex flex-wrap gap-4 animate-[fadeIn_0.8s_ease-out_0.8s_both]">
+                            <Link to="/register" className="group text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 pl-6 pr-5 py-3 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-500/25 inline-flex items-center gap-2">
+                                Start your project
+                                <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
                             </Link>
-                            <a
-                                href="#services"
-                                className="inline-flex items-center justify-center px-8 py-4 border-2 border-white/30 text-white rounded-2xl font-semibold text-lg hover:bg-white/10 transition-all duration-300"
-                            >
-                                Learn More
-                            </a>
+                            <Link to="/login" className="text-sm font-medium text-gray-300 border border-white/10 hover:border-white/20 hover:text-white px-6 py-3 rounded-xl transition-all duration-200">
+                                Sign in
+                            </Link>
                         </div>
                     </div>
 
-                    {/* Stats bar */}
-                    <div className="mt-20 grid grid-cols-3 gap-6 max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: '0.3s' }}>
+                    {/* Stats */}
+                    <div className="mt-24 grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8 border-t border-white/[0.06] animate-[fadeIn_1s_ease-out_1s_both]">
                         {[
-                            { value: '500+', label: 'Projects Delivered' },
-                            { value: '99%', label: 'Client Satisfaction' },
-                            { value: '24/7', label: 'Support Available' },
-                        ].map((stat) => (
-                            <div key={stat.label} className="p-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl">
-                                <p className="text-3xl sm:text-4xl font-bold text-white">{stat.value}</p>
-                                <p className="text-sm text-white/50 mt-1">{stat.label}</p>
+                            { end: 150, suffix: '+', label: 'Projects shipped' },
+                            { end: 80, suffix: '+', label: 'Clients worldwide' },
+                            { end: 99, suffix: '%', label: 'Satisfaction' },
+                            { end: 24, suffix: 'h', label: 'Avg. response' },
+                        ].map((s) => (
+                            <div key={s.label}>
+                                <p className="text-3xl sm:text-4xl font-bold text-white tabular-nums">
+                                    <Counter end={s.end} suffix={s.suffix} />
+                                </p>
+                                <p className="text-sm text-gray-500 mt-1">{s.label}</p>
                             </div>
                         ))}
                     </div>
                 </div>
+
+                {/* Tech marquee */}
+                <div className="pb-8">
+                    <Marquee items={['React', 'Node.js', 'Flutter', 'Next.js', 'AWS', 'MongoDB', 'Figma', 'TypeScript', 'Swift', 'Kubernetes']} />
+                </div>
             </section>
 
-            {/* Services Section */}
-            <section id="services" className="py-24 px-4 sm:px-6 lg:px-8">
+            {/* ═══ SERVICES ═══ */}
+            <section className="py-24 sm:py-32 px-6 lg:px-8 bg-white">
                 <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-16">
-                        <p className="text-primary-600 font-semibold text-sm uppercase tracking-wider mb-3">What We Do</p>
-                        <h2 className="section-title mb-4">Our Services</h2>
-                        <p className="section-subtitle">
-                            End-to-end digital solutions tailored to your business needs.
-                        </p>
-                    </div>
+                    <Reveal>
+                        <p className="text-sm font-semibold text-primary-500 mb-2 tracking-wide uppercase">What we do</p>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 max-w-lg leading-snug">
+                            Three things we do really, really well.
+                        </h2>
+                    </Reveal>
 
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="mt-14 grid md:grid-cols-3 gap-6">
                         {[
                             {
                                 title: 'App Development',
-                                desc: 'Custom mobile and desktop applications built with modern frameworks. iOS, Android, and cross-platform solutions.',
-                                icon: (
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                    </svg>
-                                ),
-                                gradient: 'from-blue-500 to-cyan-500',
-                                bg: 'bg-blue-50',
+                                desc: 'iOS, Android, and cross-platform apps. From MVP to enterprise scale — we ship experiences users keep coming back to.',
+                                tags: ['Flutter', 'React Native', 'Swift'],
+                                iconBg: 'bg-blue-500',
+                                hoverBorder: 'hover:border-blue-200',
+                                tagStyle: 'bg-blue-50 text-blue-600',
+                                icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />,
                             },
                             {
                                 title: 'Web Development',
-                                desc: 'Responsive websites and web applications powered by React, Node.js, and cutting-edge technologies.',
-                                icon: (
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                                    </svg>
-                                ),
-                                gradient: 'from-emerald-500 to-teal-500',
-                                bg: 'bg-emerald-50',
+                                desc: 'SaaS platforms, marketing sites, web apps. React, Node.js, and the best of modern tooling — fast, accessible, scalable.',
+                                tags: ['React', 'Node.js', 'Next.js'],
+                                iconBg: 'bg-emerald-500',
+                                hoverBorder: 'hover:border-emerald-200',
+                                tagStyle: 'bg-emerald-50 text-emerald-600',
+                                icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18zM3.6 9h16.8M3.6 15h16.8" />,
                             },
                             {
-                                title: 'Branding & Creative',
-                                desc: 'Complete brand identity, logos, marketing materials, and creative assets that make your business stand out.',
-                                icon: (
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                                    </svg>
-                                ),
-                                gradient: 'from-purple-500 to-pink-500',
-                                bg: 'bg-purple-50',
+                                title: 'Branding & Design',
+                                desc: 'Logos, identity systems, UI/UX, and creative direction. We build brands that people recognize and trust.',
+                                tags: ['Figma', 'UI/UX', 'Identity'],
+                                iconBg: 'bg-violet-500',
+                                hoverBorder: 'hover:border-violet-200',
+                                tagStyle: 'bg-violet-50 text-violet-600',
+                                icon: <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />,
                             },
-                        ].map((service, i) => (
-                            <div
-                                key={service.title}
-                                className="group card-hover p-8 animate-slide-up"
-                                style={{ animationDelay: `${i * 0.1}s` }}
-                            >
-                                <div className={`w-14 h-14 ${service.bg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                                    <div className={`bg-gradient-to-br ${service.gradient} bg-clip-text text-transparent`}>
-                                        {service.icon}
+                        ].map((s, i) => (
+                            <Reveal key={s.title} delay={i * 120}>
+                                <div className={`h-full p-8 rounded-2xl bg-white border border-gray-100 ${s.hoverBorder} hover:shadow-xl hover:shadow-gray-900/[0.06] transition-all duration-300 hover:-translate-y-1.5 group relative overflow-hidden`}>
+                                    {/* Subtle gradient on hover */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-gray-50/0 to-gray-50/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                                    <div className="relative">
+                                        <div className={`w-12 h-12 rounded-2xl ${s.iconBg} flex items-center justify-center mb-6 shadow-lg shadow-gray-900/[0.08] group-hover:scale-110 transition-transform duration-300`}>
+                                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">{s.icon}</svg>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-900 mb-3">{s.title}</h3>
+                                        <p className="text-sm text-gray-500 leading-relaxed mb-5">{s.desc}</p>
+                                        <div className="flex flex-wrap gap-2 mb-5">
+                                            {s.tags.map(tag => (
+                                                <span key={tag} className={`text-xs font-medium px-2.5 py-1 rounded-md ${s.tagStyle}`}>{tag}</span>
+                                            ))}
+                                        </div>
+                                        <div className="flex items-center text-sm font-medium text-gray-400 group-hover:text-primary-500 transition-colors duration-300">
+                                            Learn more
+                                            <svg className="w-4 h-4 ml-1.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                                        </div>
                                     </div>
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-3">{service.title}</h3>
-                                <p className="text-gray-500 leading-relaxed">{service.desc}</p>
-                            </div>
+                            </Reveal>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* How It Works */}
-            <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
-                <div className="max-w-5xl mx-auto">
-                    <div className="text-center mb-16">
-                        <p className="text-primary-600 font-semibold text-sm uppercase tracking-wider mb-3">Process</p>
-                        <h2 className="section-title mb-4">How It Works</h2>
-                        <p className="section-subtitle">Three simple steps to bring your project to life.</p>
-                    </div>
+            {/* ═══ PRODUCT PREVIEW ═══ */}
+            <section className="py-24 sm:py-32 px-6 lg:px-8 bg-surface-50 border-y border-gray-100">
+                <div className="max-w-6xl mx-auto">
+                    <Reveal>
+                        <div className="grid lg:grid-cols-2 gap-16 items-center">
+                            <div>
+                                <p className="text-sm font-semibold text-primary-500 mb-2 tracking-wide uppercase">The platform</p>
+                                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-snug mb-6">
+                                    Your project,<br />completely transparent.
+                                </h2>
+                                <p className="text-gray-500 leading-relaxed mb-8">
+                                    No black boxes. Track milestones, chat with your team, review deliverables, and manage payments — all from one clean dashboard.
+                                </p>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {[
+                                        { label: 'Real-time tracking', desc: 'See progress as it happens' },
+                                        { label: 'Team messaging', desc: 'Chat directly with devs' },
+                                        { label: 'Milestone payments', desc: 'Pay only on approval' },
+                                        { label: 'File sharing', desc: 'Assets in one place' },
+                                    ].map((f) => (
+                                        <div key={f.label} className="p-4 rounded-xl bg-white border border-gray-100">
+                                            <p className="text-sm font-semibold text-gray-900">{f.label}</p>
+                                            <p className="text-xs text-gray-400 mt-0.5">{f.desc}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
 
-                    <div className="grid sm:grid-cols-3 gap-8 relative">
+                            {/* Dashboard preview cards */}
+                            <div className="relative">
+                                <div className="absolute -inset-4 bg-gradient-to-br from-primary-50 to-accent-50 rounded-3xl" />
+                                <div className="relative space-y-3">
+                                    <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-primary-500 text-white flex items-center justify-center text-xs font-bold">NX</div>
+                                                <div><p className="text-sm font-semibold text-gray-900">Nexava Mobile App</p><p className="text-xs text-gray-400">In progress · 4 milestones</p></div>
+                                            </div>
+                                            <span className="text-xs font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">78%</span>
+                                        </div>
+                                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                            <div className="h-full bg-primary-500 rounded-full transition-all duration-1000" style={{ width: '78%' }} />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
+                                            <p className="text-2xl font-bold text-gray-900">₹10.2L</p>
+                                            <p className="text-xs text-gray-400 mt-1">Revenue this month</p>
+                                        </div>
+                                        <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
+                                            <p className="text-2xl font-bold text-gray-900">23</p>
+                                            <p className="text-xs text-gray-400 mt-1">Active projects</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">GL</div>
+                                            <div className="flex-1"><p className="text-sm font-semibold text-gray-900">GreenLeaf E-commerce</p><p className="text-xs text-gray-400">Delivered · Dec 2025</p></div>
+                                            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Complete</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Reveal>
+                </div>
+            </section>
+
+            {/* ═══ PROCESS ═══ */}
+            <section className="py-24 sm:py-32 px-6 lg:px-8 bg-white">
+                <div className="max-w-6xl mx-auto">
+                    <Reveal>
+                        <p className="text-sm font-semibold text-primary-500 mb-2 tracking-wide uppercase">How it works</p>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 max-w-lg leading-snug mb-14">
+                            Three steps. Zero guesswork.
+                        </h2>
+                    </Reveal>
+
+                    <div className="grid sm:grid-cols-3 gap-0 relative">
                         {/* Connecting line */}
-                        <div className="hidden sm:block absolute top-16 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-primary-200 via-primary-400 to-primary-200" />
+                        <div className="hidden sm:block absolute top-6 left-[calc(16.67%+20px)] right-[calc(16.67%+20px)] h-px bg-gray-200" />
 
                         {[
-                            { step: '1', title: 'Submit a Request', desc: 'Describe your project requirements and we\'ll match you with the right team.' },
-                            { step: '2', title: 'Track Progress', desc: 'Monitor milestones, communicate with developers, and share files.' },
-                            { step: '3', title: 'Launch & Grow', desc: 'Receive deliverables, make payments securely, and launch with confidence.' },
-                        ].map((item, i) => (
-                            <div key={item.step} className="text-center relative animate-slide-up" style={{ animationDelay: `${i * 0.15}s` }}>
-                                <div className="relative z-10 w-14 h-14 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center font-bold text-white text-lg mx-auto mb-6 shadow-glow">
-                                    {item.step}
+                            { n: '01', title: 'Brief', desc: 'Tell us what you need. We scope it, price it, and assign a dedicated team — usually within 24 hours.' },
+                            { n: '02', title: 'Build', desc: 'Track every milestone in your dashboard. Chat with developers, review work in progress, iterate fast.' },
+                            { n: '03', title: 'Ship', desc: 'We deliver production-ready code with docs and handover. Pay on approval. We support you post-launch.' },
+                        ].map((s, i) => (
+                            <Reveal key={s.n} delay={i * 150} className="text-center px-4">
+                                <div className="w-12 h-12 rounded-full bg-surface-900 text-white text-sm font-bold flex items-center justify-center mx-auto mb-6 relative z-10 ring-4 ring-white">
+                                    {s.n}
                                 </div>
-                                <h3 className="font-bold text-gray-900 text-lg mb-2">{item.title}</h3>
-                                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
-                            </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">{s.title}</h3>
+                                <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
+                            </Reveal>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
-                <div className="absolute inset-0 bg-hero-pattern" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+            {/* ═══ CTA ═══ */}
+            <section className="relative py-28 sm:py-36 px-6 lg:px-8 bg-surface-900 overflow-hidden">
+                <div className="absolute inset-0" style={{
+                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)',
+                    backgroundSize: '24px 24px',
+                }} />
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary-400/30 to-transparent" />
 
-                <div className="relative z-10 max-w-3xl mx-auto text-center">
-                    <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-                        Ready to Build Something
-                        <br />
-                        <span className="text-primary-200">Great?</span>
-                    </h2>
-                    <p className="text-white/60 text-lg mb-10 max-w-xl mx-auto">
-                        Join SkyWorld today and bring your digital ideas to life with our expert team.
-                    </p>
-                    <Link
-                        to="/register"
-                        className="inline-flex items-center justify-center px-10 py-4 bg-white text-primary-600 rounded-2xl font-bold text-lg hover:bg-primary-50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
-                    >
-                        Create Your Account
-                        <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                        </svg>
-                    </Link>
-                </div>
+                <Reveal>
+                    <div className="relative max-w-2xl mx-auto text-center">
+                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                            Let's build something<br /><span className="text-primary-400">together.</span>
+                        </h2>
+                        <p className="mt-5 text-gray-400 max-w-md mx-auto">
+                            No upfront fees. You pay only when milestones are delivered and approved by you.
+                        </p>
+                        <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+                            <Link to="/register" className="group text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 pl-6 pr-5 py-3.5 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-500/25 inline-flex items-center justify-center gap-2">
+                                Create your account
+                                <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                            </Link>
+                            <a href="mailto:ventures.skyworld@gmail.com" className="text-sm font-medium text-gray-300 border border-white/10 hover:border-white/20 hover:text-white px-6 py-3.5 rounded-xl transition-all duration-200">
+                                Get in touch
+                            </a>
+                        </div>
+                    </div>
+                </Reveal>
             </section>
 
-            {/* Footer */}
-            <footer className="bg-surface-900 py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-6xl mx-auto">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex items-center space-x-3">
-                            <img src="/logo.png" alt="SkyWorld" className="w-7 h-7 object-contain" />
-                            <span className="text-gray-400 text-sm">&copy; 2026 SkyWorld Ventures. All rights reserved.</span>
-                        </div>
-                        <div className="flex items-center space-x-8 text-sm">
-                            <Link to="/privacy" className="text-gray-500 hover:text-white transition-colors">Privacy</Link>
-                            <Link to="/terms" className="text-gray-500 hover:text-white transition-colors">Terms</Link>
-                            <a href="mailto:ventures.skyworld@gmail.com" className="text-gray-500 hover:text-white transition-colors">Contact</a>
-                        </div>
+            {/* ═══ FOOTER ═══ */}
+            <footer className="bg-surface-900 border-t border-white/5 py-8 px-6 lg:px-8">
+                <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <img src="/logo.png" alt="SkyWorld" className="w-5 h-5 object-contain opacity-50" />
+                        <span className="text-sm text-gray-600">&copy; 2026 SkyWorld Ventures</span>
+                    </div>
+                    <div className="flex items-center gap-6 text-sm">
+                        <Link to="/privacy" className="text-gray-500 hover:text-gray-300 transition-colors">Privacy</Link>
+                        <Link to="/terms" className="text-gray-500 hover:text-gray-300 transition-colors">Terms</Link>
+                        <a href="mailto:ventures.skyworld@gmail.com" className="text-gray-500 hover:text-gray-300 transition-colors">Contact</a>
                     </div>
                 </div>
             </footer>
+
+            {/* Marquee keyframe */}
+            <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
         </div>
     );
 };

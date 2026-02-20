@@ -21,6 +21,7 @@ import requestRoutes from './routes/requests.js';
 import paymentRoutes from './routes/payments.js';
 import messageRoutes from './routes/messages.js';
 import fileRoutes from './routes/files.js';
+import statsRoutes from './routes/stats.js';
 
 dotenv.config();
 
@@ -137,6 +138,7 @@ app.use('/api/requests', requestRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/files', fileRoutes);
+app.use('/api/admin', statsRoutes);
 
 // 404 Handler
 app.use((req, res) => {

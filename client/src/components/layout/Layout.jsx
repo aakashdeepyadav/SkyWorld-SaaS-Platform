@@ -8,7 +8,12 @@ import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
-  BellIcon
+  BellIcon,
+  ClipboardDocumentListIcon,
+  FolderIcon,
+  CreditCardIcon,
+  UsersIcon,
+  WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline';
 
 const Layout = () => {
@@ -22,32 +27,41 @@ const Layout = () => {
     navigate('/login');
   };
 
-  const navigation = [
+  const isAdmin = user?.role === 'admin';
+
+  const mainNavigation = [
     { name: 'Dashboard', href: `/dashboard/${user?.role}`, icon: HomeIcon },
+    { name: 'Requests', href: '/requests', icon: ClipboardDocumentListIcon },
+    { name: 'Projects', href: '/projects', icon: FolderIcon },
+    { name: 'Payments', href: '/payments', icon: CreditCardIcon },
+  ];
+
+  const adminNavigation = [
+    { name: 'Users', href: '/admin/users', icon: UsersIcon },
+    { name: 'Services', href: '/admin/services', icon: WrenchScrewdriverIcon },
+  ];
+
+  const accountNavigation = [
     { name: 'Profile', href: '/profile', icon: UserIcon },
     { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
   ];
 
-  const isActive = (href) => location.pathname === href;
+  const isActive = (href) => location.pathname === href || (href !== `/dashboard/${user?.role}` && location.pathname.startsWith(href));
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="flex items-center px-6 h-16 border-b border-white/10">
-        <img src="/logo.png" alt="SkyWorld" className="w-8 h-8 object-contain" />
-        <span className="ml-3 text-xl font-bold text-white tracking-tight">SkyWorld</span>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-6 space-y-1">
-        {navigation.map((item) => (
+  const NavSection = ({ label, items }) => (
+    <div className="mb-2">
+      {label && (
+        <p className="px-4 mb-2 text-[10px] font-bold uppercase tracking-widest text-gray-600">{label}</p>
+      )}
+      <div className="space-y-0.5">
+        {items.map((item) => (
           <Link
             key={item.name}
             to={item.href}
             onClick={() => setSidebarOpen(false)}
-            className={`flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${isActive(item.href)
-                ? 'bg-primary-500/20 text-primary-400 shadow-glow/20'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${isActive(item.href)
+              ? 'bg-primary-500/20 text-primary-400 shadow-glow/20'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
               }`}
           >
             <item.icon className={`w-5 h-5 mr-3 transition-colors ${isActive(item.href) ? 'text-primary-400' : 'text-gray-500 group-hover:text-gray-300'
@@ -58,6 +72,35 @@ const Layout = () => {
             )}
           </Link>
         ))}
+      </div>
+    </div>
+  );
+
+  // Get the current page title
+  const getPageTitle = () => {
+    const allItems = [...mainNavigation, ...adminNavigation, ...accountNavigation];
+    const active = allItems.find(n => isActive(n.href));
+    if (active) return active.name;
+
+    if (location.pathname.startsWith('/requests/new')) return 'New Request';
+    if (location.pathname.startsWith('/requests/')) return 'Request Detail';
+    if (location.pathname.startsWith('/projects/')) return 'Project Detail';
+    return 'Dashboard';
+  };
+
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      {/* Logo */}
+      <div className="flex items-center px-6 h-16 border-b border-white/10">
+        <img src="/logo.png" alt="SkyWorld" className="w-8 h-8 object-contain" />
+        <span className="ml-3 text-xl font-bold text-white tracking-tight">SkyWorld</span>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+        <NavSection items={mainNavigation} />
+        {isAdmin && <NavSection label="Admin" items={adminNavigation} />}
+        <NavSection label="Account" items={accountNavigation} />
       </nav>
 
       {/* User info */}
@@ -115,7 +158,7 @@ const Layout = () => {
               </button>
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  {navigation.find(n => isActive(n.href))?.name || 'Dashboard'}
+                  {getPageTitle()}
                 </h2>
               </div>
             </div>

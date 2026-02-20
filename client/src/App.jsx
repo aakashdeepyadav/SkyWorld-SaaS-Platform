@@ -13,6 +13,22 @@ import AdminDashboard from './pages/admin/Dashboard';
 import DeveloperDashboard from './pages/developer/Dashboard';
 import ClientDashboard from './pages/client/Dashboard';
 
+// Request pages
+import RequestList from './pages/requests/RequestList';
+import NewRequest from './pages/requests/NewRequest';
+import RequestDetail from './pages/requests/RequestDetail';
+
+// Project pages
+import ProjectList from './pages/projects/ProjectList';
+import ProjectDetail from './pages/projects/ProjectDetail';
+
+// Admin pages
+import UserManagement from './pages/admin/UserManagement';
+import ServiceManagement from './pages/admin/ServiceManagement';
+
+// Payment pages
+import PaymentList from './pages/payments/PaymentList';
+
 // Common pages
 import NotFound from './pages/NotFound';
 import Home from './pages/Home';
@@ -62,6 +78,32 @@ function App() {
           element={<RoleRoute allowedRoles={['client']}><ClientDashboard /></RoleRoute>}
         />
 
+        {/* Service Requests */}
+        <Route path="/requests" element={<RequestList />} />
+        <Route
+          path="/requests/new"
+          element={<RoleRoute allowedRoles={['client', 'admin']}><NewRequest /></RoleRoute>}
+        />
+        <Route path="/requests/:id" element={<RequestDetail />} />
+
+        {/* Projects */}
+        <Route path="/projects" element={<ProjectList />} />
+        <Route path="/projects/:id" element={<ProjectDetail />} />
+
+        {/* Payments */}
+        <Route path="/payments" element={<PaymentList />} />
+
+        {/* Admin Only */}
+        <Route
+          path="/admin/users"
+          element={<RoleRoute allowedRoles={['admin']}><UserManagement /></RoleRoute>}
+        />
+        <Route
+          path="/admin/services"
+          element={<RoleRoute allowedRoles={['admin']}><ServiceManagement /></RoleRoute>}
+        />
+
+        {/* Profile & Settings */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
       </Route>
@@ -73,4 +115,3 @@ function App() {
 }
 
 export default App;
-

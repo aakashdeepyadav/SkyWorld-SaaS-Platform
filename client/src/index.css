@@ -8,40 +8,46 @@
   html {
     scroll-behavior: smooth;
   }
+
   body {
     @apply bg-surface-50 text-gray-900 font-sans antialiased;
   }
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
   }
+
   ::-webkit-scrollbar-track {
     @apply bg-transparent;
   }
+
   ::-webkit-scrollbar-thumb {
     @apply bg-gray-300 rounded-full;
   }
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-400;
   }
 }
 
 @layer components {
+
   /* ─── Buttons ────────────────────────────────────────── */
   .btn-primary {
-    @apply relative overflow-hidden bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold py-2.5 px-5 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-primary-500/25 active:scale-[0.98];
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium py-2.5 px-5 rounded-xl transition-colors duration-200 active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-5 rounded-xl border border-gray-200 transition-all duration-200 hover:shadow-md active:scale-[0.98];
+    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-5 rounded-xl border border-gray-200 transition-colors duration-200 active:scale-[0.98];
   }
 
   .btn-danger {
-    @apply bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-2.5 px-5 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-red-500/25 active:scale-[0.98];
+    @apply bg-red-500 hover:bg-red-600 text-white font-medium py-2.5 px-5 rounded-xl transition-colors duration-200 active:scale-[0.98];
   }
 
   .btn-ghost {
-    @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-medium py-2.5 px-5 rounded-xl transition-all duration-200;
+    @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-medium py-2.5 px-5 rounded-xl transition-colors duration-200;
   }
 
   /* ─── Inputs ─────────────────────────────────────────── */
@@ -66,6 +72,7 @@
   .stat-card {
     @apply card relative overflow-hidden;
   }
+
   .stat-card::before {
     content: '';
     @apply absolute top-0 right-0 w-24 h-24 rounded-full opacity-10 -translate-y-1/2 translate-x-1/2;
@@ -75,15 +82,19 @@
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide;
   }
+
   .badge-primary {
     @apply badge bg-primary-50 text-primary-700 ring-1 ring-primary-200;
   }
+
   .badge-success {
     @apply badge bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200;
   }
+
   .badge-warning {
     @apply badge bg-amber-50 text-amber-700 ring-1 ring-amber-200;
   }
+
   .badge-danger {
     @apply badge bg-red-50 text-red-700 ring-1 ring-red-200;
   }
@@ -102,10 +113,21 @@
   }
 
   /* ─── Animations ─────────────────────────────────────── */
-  .stagger-1 { animation-delay: 0.1s; }
-  .stagger-2 { animation-delay: 0.2s; }
-  .stagger-3 { animation-delay: 0.3s; }
-  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-1 {
+    animation-delay: 0.1s;
+  }
+
+  .stagger-2 {
+    animation-delay: 0.2s;
+  }
+
+  .stagger-3 {
+    animation-delay: 0.3s;
+  }
+
+  .stagger-4 {
+    animation-delay: 0.4s;
+  }
 }
 
 @layer utilities {

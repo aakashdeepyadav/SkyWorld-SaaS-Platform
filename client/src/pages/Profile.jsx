@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { CameraIcon, EnvelopeIcon, PhoneIcon, BuildingOfficeIcon, CalendarIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 
 const Profile = () => {
-    const { user, setUser } = useAuth();
+    const { user, updateUser } = useAuth();
     const [editing, setEditing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -22,8 +22,8 @@ const Profile = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await api.put('/auth/profile', formData);
-            setUser(response.data.user);
+            const response = await api.put('/users/profile/me', formData);
+            updateUser(response.data.user);
             setEditing(false);
             toast.success('Profile updated successfully');
         } catch (error) {
@@ -34,22 +34,13 @@ const Profile = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+        <div className="max-w-4xl mx-auto space-y-6">
             {/* Profile Header */}
             <div className="relative">
-                <div className="h-40 bg-gradient-to-r from-primary-500 via-primary-600 to-accent-600 rounded-2xl overflow-hidden relative">
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
-                    <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-white/5 rounded-full translate-y-1/2" />
-                </div>
+                <div className="h-36 bg-primary-500 rounded-2xl" />
                 <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 px-6 -mt-12 relative z-10">
-                    <div className="relative group">
-                        <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary-400 to-accent-500 flex items-center justify-center text-white text-3xl font-bold shadow-lg border-4 border-white">
-                            {user?.name?.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="absolute inset-0 rounded-2xl bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer border-4 border-white">
-                            <CameraIcon className="w-6 h-6 text-white" />
-                        </div>
+                    <div className="w-20 h-20 rounded-xl bg-primary-600 flex items-center justify-center text-white text-2xl font-bold shadow-md border-4 border-white">
+                        {user?.name?.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 pb-1">
                         <h1 className="text-2xl font-bold text-gray-900">{user?.name}</h1>
