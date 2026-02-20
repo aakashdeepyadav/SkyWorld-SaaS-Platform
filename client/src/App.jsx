@@ -18,6 +18,8 @@ import NotFound from './pages/NotFound';
 import Home from './pages/Home';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 import Layout from './components/layout/Layout';
 
 function App() {
@@ -59,6 +61,9 @@ function App() {
           path="/dashboard/client"
           element={<RoleRoute allowedRoles={['client']}><ClientDashboard /></RoleRoute>}
         />
+
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
       </Route>
 
       {/* 404 */}
