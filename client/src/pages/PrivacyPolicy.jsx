@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 
 const PrivacyPolicy = () => {
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm p-8 sm:p-12">
-                <Link to="/" className="text-primary-500 hover:text-primary-600 text-sm mb-6 inline-block">
+        <div className="min-h-screen bg-surface-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mx-auto card sm:p-12 animate-fade-in">
+                <Link to="/" className="text-primary-500 hover:text-primary-600 text-sm font-medium mb-6 inline-flex items-center group">
                     &larr; Back to Home
                 </Link>
 
