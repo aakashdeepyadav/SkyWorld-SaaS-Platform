@@ -102,9 +102,18 @@ export const googleAuth = async (req, res, next) => {
       user: user.toPublicJSON()
     });
   } catch (error) {
-    logger.error('Google auth error:', error);
+    logger.error('Google auth error:', error.message);
     await createAuditLog(req, 'user_login', 'auth', null, { method: 'google', success: false, error: error.message });
-    next(error);
+
+    // Return a more specific error message for known Google OAuth errors
+    const googleError = error.response?.data?.error || error.message || 'Unknown error';
+    const googleErrorDescription = error.response?.data?.error_description || '';
+
+    res.status(401).json({
+      success: false,
+      message: 'Google authentication failed',
+      error: process.env.NODE_ENV !== 'production' ? `${googleError}: ${googleErrorDescription}` : 'Google authentication failed. Please try again.'
+    });
   }
 };
 
@@ -125,7 +134,7 @@ export const refresh = async (req, res, next) => {
     }
 
     const { accessToken, user } = await refreshAccessToken(refreshToken);
-    
+
     // Set new access token cookie
     const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', accessToken, {
@@ -154,7 +163,7 @@ export const logout = async (req, res, next) => {
   try {
     await createAuditLog(req, 'user_logout', 'auth', req.user?._id);
     clearTokenCookies(res);
-    
+
     res.json({
       success: true,
       message: 'Logout successful'
