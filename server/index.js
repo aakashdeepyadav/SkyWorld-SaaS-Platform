@@ -35,6 +35,7 @@ configureCloudinary();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || '0.0.0.0';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -147,12 +148,16 @@ app.get('/health', (req, res) => {
 
 // ─── API Routes ──────────────────────────────────────────────────────────────
 
+// Avoid noisy 404 logs for browser favicon probes.
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/custom-requests', customRequestRoutes);
+app.use('/api/customRequests', customRequestRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/files', fileRoutes);
@@ -173,10 +178,10 @@ app.use(errorHandler);
 
 const startServer = async () => {
   try {
-    await connectDB();
-    app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+    app.listen(PORT, HOST, () => {
+      logger.info(`Server running on ${HOST}:${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
     });
+    await connectDB();
   } catch (error) {
     logger.error('Failed to start server:', error);
     process.exit(1);

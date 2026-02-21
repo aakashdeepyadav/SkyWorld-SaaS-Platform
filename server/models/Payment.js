@@ -85,7 +85,8 @@ paymentSchema.index({ clientId: 1 });
 paymentSchema.index({ projectId: 1 });
 paymentSchema.index({ customRequestId: 1 });
 paymentSchema.index({ status: 1 });
-paymentSchema.index({ razorpayPaymentId: 1 });
+// `razorpayPaymentId` already has index options on the schema path (`sparse`),
+// so declaring it again here causes duplicate-index warnings in Mongoose.
 paymentSchema.index({ createdAt: -1 });
 
 // Generate invoice number before saving
