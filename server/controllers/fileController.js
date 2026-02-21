@@ -1,5 +1,6 @@
 import File from '../models/File.js';
 import Project from '../models/Project.js';
+import User from '../models/User.js';
 import { uploadToCloudinary, deleteFromCloudinary, uploadAvatar } from '../services/cloudinaryService.js';
 import { getFileType } from '../middleware/upload.js';
 import { createAuditLog } from '../middleware/auth.js';
@@ -112,15 +113,30 @@ export const uploadUserAvatar = async (req, res, next) => {
         }
 
         // Upload to Cloudinary with avatar-specific optimizations
-        const result = await uploadAvatar(req.file.buffer);
+        let result;
+        try {
+            result = await uploadAvatar(req.file.buffer);
+        } catch (cloudinaryError) {
+            logger.error('Cloudinary avatar upload failed:', cloudinaryError);
+            return res.status(502).json({
+                success: false,
+                message: 'Image upload service unavailable. Please try again later.'
+            });
+        }
 
-        // Update user avatar URL
-        const User = (await import('../models/User.js')).default;
+        // Update user avatar URL in MongoDB
         const user = await User.findByIdAndUpdate(
             req.user._id,
             { avatar: result.url },
             { new: true }
         );
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
 
         await createAuditLog(req, 'avatar_uploaded', 'user', req.user._id);
 
@@ -131,6 +147,7 @@ export const uploadUserAvatar = async (req, res, next) => {
             user: user.toPublicJSON()
         });
     } catch (error) {
+        logger.error('Avatar upload error:', error);
         next(error);
     }
 };
