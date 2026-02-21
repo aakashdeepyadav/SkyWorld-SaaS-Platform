@@ -36,10 +36,10 @@ const NewRequest = () => {
         if (!formData.serviceId) errs.serviceId = 'Please select a service';
         if (!formData.title.trim()) errs.title = 'Title is required';
         else if (formData.title.trim().length < 5) errs.title = 'Title must be at least 5 characters';
-        else if (formData.title.trim().length > 100) errs.title = 'Title must be under 100 characters';
+        else if (formData.title.trim().length > 200) errs.title = 'Title must be under 200 characters';
         if (!formData.description.trim()) errs.description = 'Description is required';
-        else if (formData.description.trim().length < 20) errs.description = 'Description must be at least 20 characters';
-        if (formData.requirements.length > 2000) errs.requirements = 'Requirements must be under 2000 characters';
+        else if (formData.description.trim().length < 10) errs.description = 'Description must be at least 10 characters';
+        if (formData.requirements.length > 10000) errs.requirements = 'Requirements must be under 10000 characters';
         setErrors(errs);
         return Object.keys(errs).length === 0;
     };
@@ -70,98 +70,134 @@ const NewRequest = () => {
         }
     };
 
+    const selectedService = services.find(s => s._id === formData.serviceId);
+
     return (
-        <div className="max-w-2xl mx-auto animate-fade-in">
+        <div className="max-w-5xl mx-auto animate-fade-in space-y-6">
             <button onClick={() => navigate(-1)} className="flex items-center text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
                 <ArrowLeftIcon className="w-4 h-4 mr-1.5" />
                 Back
             </button>
 
-            <div className="card">
-                <h1 className="text-2xl font-bold text-gray-900 mb-1">New Service Request</h1>
-                <p className="text-sm text-gray-500 mb-8">Describe your project and we'll match you with the right team.</p>
+            <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6">
+                <div className="card">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-1">New Service Request</h1>
+                    <p className="text-sm text-gray-500 mb-6">Describe your project and we'll match you with the right team.</p>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    {/* Service Selection */}
-                    <div>
-                        <label htmlFor="serviceId" className="block text-sm font-medium text-gray-700 mb-1.5">Service Type</label>
-                        {servicesLoading ? (
-                            <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
-                        ) : (
-                            <select
-                                id="serviceId"
-                                name="serviceId"
-                                value={formData.serviceId}
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        <div>
+                            <label htmlFor="serviceId" className="block text-sm font-medium text-gray-700 mb-1.5">Service Type</label>
+                            {servicesLoading ? (
+                                <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
+                            ) : (
+                                <select
+                                    id="serviceId"
+                                    name="serviceId"
+                                    value={formData.serviceId}
+                                    onChange={handleChange}
+                                    className={`input-field ${errors.serviceId ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
+                                >
+                                    <option value="">Select a service...</option>
+                                    {services.map(s => (
+                                        <option key={s._id} value={s._id}>{s.name} — {s.category}</option>
+                                    ))}
+                                </select>
+                            )}
+                            {errors.serviceId && <p className="mt-1 text-xs text-red-500">{errors.serviceId}</p>}
+                        </div>
+
+                        <div>
+                            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1.5">Project Title</label>
+                            <input
+                                id="title"
+                                name="title"
+                                type="text"
+                                value={formData.title}
                                 onChange={handleChange}
-                                className={`input-field ${errors.serviceId ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
-                            >
-                                <option value="">Select a service...</option>
-                                {services.map(s => (
-                                    <option key={s._id} value={s._id}>{s.name} — {s.category}</option>
-                                ))}
-                            </select>
+                                placeholder="e.g., E-commerce mobile app for organic products"
+                                className={`input-field ${errors.title ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
+                                maxLength={200}
+                            />
+                            {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
+                        </div>
+
+                        <div>
+                            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                rows={5}
+                                placeholder="Outline your goals, target audience, and must-have features."
+                                className={`input-field resize-none ${errors.description ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
+                                maxLength={5000}
+                            />
+                            {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
+                            <p className="mt-1 text-xs text-gray-400">{formData.description.length}/5000</p>
+                        </div>
+
+                        <div>
+                            <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 mb-1.5">
+                                Technical Requirements <span className="text-gray-400 font-normal">(optional)</span>
+                            </label>
+                            <textarea
+                                id="requirements"
+                                name="requirements"
+                                value={formData.requirements}
+                                onChange={handleChange}
+                                rows={4}
+                                placeholder="Preferred stack, integrations, deadlines, budget range, competitors..."
+                                className={`input-field resize-none ${errors.requirements ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
+                                maxLength={10000}
+                            />
+                            {errors.requirements && <p className="mt-1 text-xs text-red-500">{errors.requirements}</p>}
+                            <p className="mt-1 text-xs text-gray-400">{formData.requirements.length}/10000</p>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                            <button type="button" onClick={() => navigate(-1)} className="btn-secondary">Cancel</button>
+                            <button type="submit" disabled={loading} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                                {loading ? 'Submitting...' : 'Submit Request'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div className="space-y-6">
+                    <div className="card">
+                        <h2 className="text-sm font-semibold text-gray-900 mb-3">Selected Service</h2>
+                        {selectedService ? (
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <p className="text-sm font-medium text-gray-900">{selectedService.name}</p>
+                                    <span className="badge-primary capitalize">{selectedService.category?.replace('-', ' ')}</span>
+                                </div>
+                                {selectedService.description && (
+                                    <p className="text-xs text-gray-500">{selectedService.description}</p>
+                                )}
+                                <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                                    <span>Starting at</span>
+                                    <span className="text-sm font-semibold text-gray-900">
+                                        {selectedService.basePrice > 0 ? `₹${selectedService.basePrice.toLocaleString()}` : 'Custom Quote'}
+                                    </span>
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-xs text-gray-500">Choose a service to see details.</p>
                         )}
-                        {errors.serviceId && <p className="mt-1 text-xs text-red-500">{errors.serviceId}</p>}
                     </div>
 
-                    {/* Title */}
-                    <div>
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1.5">Project Title</label>
-                        <input
-                            id="title"
-                            name="title"
-                            type="text"
-                            value={formData.title}
-                            onChange={handleChange}
-                            placeholder="e.g., E-commerce mobile app for organic products"
-                            className={`input-field ${errors.title ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
-                            maxLength={100}
-                        />
-                        {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
+                    <div className="card">
+                        <h2 className="text-sm font-semibold text-gray-900 mb-3">Request Checklist</h2>
+                        <ul className="space-y-2 text-xs text-gray-500">
+                            <li>Describe the business goal and target users</li>
+                            <li>List must-have features and integrations</li>
+                            <li>Share any brand assets or references</li>
+                            <li>Add timelines or critical dates if any</li>
+                        </ul>
                     </div>
-
-                    {/* Description */}
-                    <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-                        <textarea
-                            id="description"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            rows={4}
-                            placeholder="Describe your project goals, target audience, and key features..."
-                            className={`input-field resize-none ${errors.description ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
-                            maxLength={5000}
-                        />
-                        {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
-                        <p className="mt-1 text-xs text-gray-400">{formData.description.length}/5000</p>
-                    </div>
-
-                    {/* Requirements */}
-                    <div>
-                        <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 mb-1.5">
-                            Technical Requirements <span className="text-gray-400 font-normal">(optional)</span>
-                        </label>
-                        <textarea
-                            id="requirements"
-                            name="requirements"
-                            value={formData.requirements}
-                            onChange={handleChange}
-                            rows={3}
-                            placeholder="Specific technologies, integrations, deadlines, budget range..."
-                            className={`input-field resize-none ${errors.requirements ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
-                            maxLength={2000}
-                        />
-                        {errors.requirements && <p className="mt-1 text-xs text-red-500">{errors.requirements}</p>}
-                    </div>
-
-                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-                        <button type="button" onClick={() => navigate(-1)} className="btn-secondary">Cancel</button>
-                        <button type="submit" disabled={loading} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
-                            {loading ? 'Submitting...' : 'Submit Request'}
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     );

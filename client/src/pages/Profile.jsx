@@ -61,7 +61,12 @@ const Profile = () => {
             updateUser(response.data.user);
             toast.success('Profile photo updated');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to upload photo');
+            const status = error.response?.status;
+            if (status === 503) {
+                toast.error('Image upload service unavailable. Please contact support or try again later.');
+            } else {
+                toast.error(error.response?.data?.message || 'Failed to upload photo');
+            }
         } finally {
             setAvatarLoading(false);
             // Reset file input so user can re-select the same file

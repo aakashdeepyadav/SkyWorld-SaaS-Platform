@@ -2,6 +2,7 @@ import File from '../models/File.js';
 import Project from '../models/Project.js';
 import User from '../models/User.js';
 import { uploadToCloudinary, deleteFromCloudinary, uploadAvatar } from '../services/cloudinaryService.js';
+import { isCloudinaryConfigured } from '../config/cloudinary.js';
 import { getFileType } from '../middleware/upload.js';
 import { createAuditLog } from '../middleware/auth.js';
 import { ROLES } from '../utils/constants.js';
@@ -14,6 +15,13 @@ import { logger } from '../utils/logger.js';
  */
 export const uploadFile = async (req, res, next) => {
     try {
+        if (!isCloudinaryConfigured()) {
+            return res.status(503).json({
+                success: false,
+                message: 'File upload service unavailable. Please try again later.'
+            });
+        }
+
         if (!req.file) {
             return res.status(400).json({
                 success: false,
@@ -97,6 +105,13 @@ export const uploadFile = async (req, res, next) => {
  */
 export const uploadUserAvatar = async (req, res, next) => {
     try {
+        if (!isCloudinaryConfigured()) {
+            return res.status(503).json({
+                success: false,
+                message: 'Image upload service unavailable. Please try again later.'
+            });
+        }
+
         if (!req.file) {
             return res.status(400).json({
                 success: false,

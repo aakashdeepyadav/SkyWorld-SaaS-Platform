@@ -1,6 +1,7 @@
 import CustomRequest from '../models/CustomRequest.js';
 import { CUSTOM_REQUEST_STATUS, ROLES } from '../utils/constants.js';
 import { uploadToCloudinary } from '../services/cloudinaryService.js';
+import { isCloudinaryConfigured } from '../config/cloudinary.js';
 import { createAuditLog } from '../middleware/auth.js';
 
 export const getCustomRequests = async (req, res, next) => {
@@ -81,6 +82,12 @@ export const createCustomRequest = async (req, res, next) => {
 
     let fileData = {};
     if (req.file) {
+      if (!isCloudinaryConfigured()) {
+        return res.status(503).json({
+          success: false,
+          message: 'File upload service unavailable. Please try again later.'
+        });
+      }
       const uploadResult = await uploadToCloudinary(req.file.buffer, {
         folder: 'skyworld/custom-requests',
         resourceType: 'auto'

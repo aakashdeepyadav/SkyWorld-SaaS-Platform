@@ -5,11 +5,14 @@ import { logger } from '../utils/logger.js';
  * Configure Cloudinary
  * Free tier: 25 credits/month (~25GB storage + 25GB bandwidth)
  */
+let cloudinaryConfigured = false;
+
 const configureCloudinary = () => {
     const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
 
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
         logger.warn('Cloudinary credentials not configured. File uploads will be disabled.');
+        cloudinaryConfigured = false;
         return false;
     }
 
@@ -21,7 +24,10 @@ const configureCloudinary = () => {
     });
 
     logger.info('Cloudinary configured successfully');
+    cloudinaryConfigured = true;
     return true;
 };
 
-export { cloudinary, configureCloudinary };
+const isCloudinaryConfigured = () => cloudinaryConfigured;
+
+export { cloudinary, configureCloudinary, isCloudinaryConfigured };
