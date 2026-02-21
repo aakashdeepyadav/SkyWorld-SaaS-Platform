@@ -69,6 +69,27 @@ const saveLocalFile = async (fileBuffer, options = {}) => {
     };
 };
 
+export const getCloudinaryErrorResponse = (error) => {
+    const reason = error?.message || '';
+    const statusCode = error?.http_code || 502;
+    const lower = reason.toLowerCase();
+
+    if (lower.includes('invalid signature')) {
+        return { statusCode, message: 'Cloudinary credentials rejected. Check CLOUDINARY_API_SECRET and CLOUDINARY_API_KEY.' };
+    }
+    if (lower.includes('api_key') || lower.includes('api key')) {
+        return { statusCode, message: 'Cloudinary API key is invalid or missing. Check CLOUDINARY_API_KEY.' };
+    }
+    if (lower.includes('cloud name') || lower.includes('cloud_name')) {
+        return { statusCode, message: 'Cloudinary cloud name is invalid or missing. Check CLOUDINARY_CLOUD_NAME.' };
+    }
+    if (lower.includes('timeout') || lower.includes('econnreset') || lower.includes('enotfound')) {
+        return { statusCode, message: 'Unable to reach Cloudinary from server. Check network or Cloudinary status.' };
+    }
+
+    return { statusCode, message: 'Cloudinary upload failed. Verify credentials and account status.' };
+};
+
 export const uploadToCloudinary = async (fileBuffer, options = {}) => {
     if (!isCloudinaryConfigured()) {
         return saveLocalFile(fileBuffer, options);
@@ -104,7 +125,10 @@ export const uploadToCloudinary = async (fileBuffer, options = {}) => {
             (error, result) => {
                 if (error) {
                     logger.error('Cloudinary upload error:', error);
-                    reject(new Error('File upload failed. Please try again.'));
+                    const err = new Error('Cloudinary upload failed');
+                    err.http_code = error?.http_code;
+                    err.details = error?.message;
+                    reject(err);
                 } else {
                     resolve({
                         publicId: result.public_id,
@@ -195,7 +219,10 @@ export const uploadAvatar = async (fileBuffer, options = {}) => {
             (error, result) => {
                 if (error) {
                     logger.error('Avatar upload error:', error);
-                    reject(new Error('Avatar upload failed'));
+                    const err = new Error('Cloudinary upload failed');
+                    err.http_code = error?.http_code;
+                    err.details = error?.message;
+                    reject(err);
                 } else {
                     resolve({
                         publicId: result.public_id,

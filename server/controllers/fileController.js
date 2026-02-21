@@ -1,7 +1,7 @@
 import File from '../models/File.js';
 import Project from '../models/Project.js';
 import User from '../models/User.js';
-import { uploadToCloudinary, deleteFromCloudinary, uploadAvatar } from '../services/cloudinaryService.js';
+import { uploadToCloudinary, deleteFromCloudinary, uploadAvatar, getCloudinaryErrorResponse } from '../services/cloudinaryService.js';
 import { getFileType } from '../middleware/upload.js';
 import { createAuditLog } from '../middleware/auth.js';
 import { ROLES } from '../utils/constants.js';
@@ -49,13 +49,22 @@ export const uploadFile = async (req, res, next) => {
         const fileType = getFileType(req.file.mimetype);
         const folder = projectId ? `skyworld/projects/${projectId}` : 'skyworld/general';
 
-        // Upload to Cloudinary
-        const result = await uploadToCloudinary(req.file.buffer, {
-            folder,
-            resourceType: fileType === 'document' ? 'raw' : 'auto',
-            mimetype: req.file.mimetype,
-            originalName: req.file.originalname
-        });
+        let result;
+        try {
+            result = await uploadToCloudinary(req.file.buffer, {
+                folder,
+                resourceType: fileType === 'document' ? 'raw' : 'auto',
+                mimetype: req.file.mimetype,
+                originalName: req.file.originalname
+            });
+        } catch (cloudinaryError) {
+            logger.error('Cloudinary file upload failed:', cloudinaryError);
+            const { statusCode, message } = getCloudinaryErrorResponse(cloudinaryError);
+            return res.status(statusCode).json({
+                success: false,
+                message
+            });
+        }
 
         // Save file record to database
         const file = await File.create({
@@ -123,9 +132,10 @@ export const uploadUserAvatar = async (req, res, next) => {
             });
         } catch (cloudinaryError) {
             logger.error('Cloudinary avatar upload failed:', cloudinaryError);
-            return res.status(502).json({
+            const { statusCode, message } = getCloudinaryErrorResponse(cloudinaryError);
+            return res.status(statusCode).json({
                 success: false,
-                message: 'Image upload service unavailable. Please try again later.'
+                message
             });
         }
 

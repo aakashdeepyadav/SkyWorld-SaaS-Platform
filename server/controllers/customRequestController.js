@@ -1,6 +1,6 @@
 import CustomRequest from '../models/CustomRequest.js';
 import { CUSTOM_REQUEST_STATUS, ROLES } from '../utils/constants.js';
-import { uploadToCloudinary } from '../services/cloudinaryService.js';
+import { uploadToCloudinary, getCloudinaryErrorResponse } from '../services/cloudinaryService.js';
 import { createAuditLog } from '../middleware/auth.js';
 
 export const getCustomRequests = async (req, res, next) => {
@@ -81,12 +81,21 @@ export const createCustomRequest = async (req, res, next) => {
 
     let fileData = {};
     if (req.file) {
-      const uploadResult = await uploadToCloudinary(req.file.buffer, {
-        folder: 'skyworld/custom-requests',
-        resourceType: 'auto',
-        mimetype: req.file.mimetype,
-        originalName: req.file.originalname
-      });
+      let uploadResult;
+      try {
+        uploadResult = await uploadToCloudinary(req.file.buffer, {
+          folder: 'skyworld/custom-requests',
+          resourceType: 'auto',
+          mimetype: req.file.mimetype,
+          originalName: req.file.originalname
+        });
+      } catch (cloudinaryError) {
+        const { statusCode, message } = getCloudinaryErrorResponse(cloudinaryError);
+        return res.status(statusCode).json({
+          success: false,
+          message
+        });
+      }
       fileData = {
         fileUrl: uploadResult.url,
         fileName: req.file.originalname,
