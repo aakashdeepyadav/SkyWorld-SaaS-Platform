@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 import {
   HomeIcon,
   UserIcon,
@@ -17,11 +19,28 @@ import {
   DocumentTextIcon,
 } from '@heroicons/react/24/outline';
 
+const formatRelativeTime = (timestamp) => {
+  if (!timestamp) return 'Just now';
+  const diffMs = Date.now() - new Date(timestamp).getTime();
+  if (Number.isNaN(diffMs) || diffMs < 0) return 'Just now';
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(timestamp).toLocaleDateString();
+};
+
+const prettifyStatus = (status) => status?.replace(/-/g, ' ') || 'updated';
+
 const Layout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const websiteUrl = import.meta.env.VITE_WEBSITE_URL || '/website';
 
   const handleLogout = async () => {
@@ -30,6 +49,91 @@ const Layout = () => {
   };
 
   const isAdmin = user?.role === 'admin';
+  const isDeveloper = user?.role === 'developer';
+
+  const {
+    data: notifications = [],
+    isLoading: notificationsLoading,
+    refetch: refetchNotifications
+  } = useQuery(
+    ['header-notifications', user?._id, user?.role],
+    async () => {
+      const requests = [
+        api.get('/projects?limit=5'),
+        api.get('/requests?limit=5')
+      ];
+
+      if (!isDeveloper) {
+        requests.push(api.get('/custom-requests?limit=5'));
+      }
+
+      const results = await Promise.allSettled(requests);
+      const activity = [];
+
+      const projects = results[0]?.status === 'fulfilled' ? results[0].value?.data?.projects || [] : [];
+      projects.forEach((project) => {
+        activity.push({
+          id: `project-${project._id}`,
+          title: project.title || 'Project update',
+          message: `Project is ${prettifyStatus(project.status)}`,
+          href: `/projects/${project._id}`,
+          timestamp: project.updatedAt || project.createdAt
+        });
+      });
+
+      const serviceRequests = results[1]?.status === 'fulfilled' ? results[1].value?.data?.requests || [] : [];
+      serviceRequests.forEach((request) => {
+        activity.push({
+          id: `request-${request._id}`,
+          title: request.title || request.serviceId?.name || 'Service request',
+          message: `Request is ${prettifyStatus(request.status)}`,
+          href: `/requests/${request._id}`,
+          timestamp: request.updatedAt || request.createdAt
+        });
+      });
+
+      if (!isDeveloper) {
+        const customRequests = results[2]?.status === 'fulfilled' ? results[2].value?.data?.requests || [] : [];
+        customRequests.forEach((request) => {
+          const serviceType = request.serviceType?.replace(/-/g, ' ') || 'custom';
+          activity.push({
+            id: `custom-${request._id}`,
+            title: `${serviceType} request`,
+            message: `Status is ${prettifyStatus(request.status)}`,
+            href: '/custom-requests',
+            timestamp: request.updatedAt || request.createdAt
+          });
+        });
+      }
+
+      activity.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+      return activity.slice(0, 8);
+    },
+    {
+      enabled: false,
+      staleTime: 30000
+    }
+  );
+
+  const unreadCount = useMemo(() => {
+    const now = Date.now();
+    return notifications.filter((item) => {
+      const ts = new Date(item.timestamp).getTime();
+      return !Number.isNaN(ts) && now - ts <= 24 * 60 * 60 * 1000;
+    }).length;
+  }, [notifications]);
+
+  useEffect(() => {
+    setNotificationOpen(false);
+  }, [location.pathname, location.search]);
+
+  const toggleNotifications = () => {
+    setNotificationOpen((prev) => {
+      const next = !prev;
+      if (next) refetchNotifications();
+      return next;
+    });
+  };
 
   const mainNavigation = [
     { name: 'Dashboard', href: `/dashboard/${user?.role}`, icon: HomeIcon },
@@ -177,10 +281,57 @@ const Layout = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <button className="relative p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all">
-                <BellIcon className="w-5 h-5" />
-                <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={toggleNotifications}
+                  className="relative p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all"
+                  aria-label="Open notifications"
+                  aria-expanded={notificationOpen}
+                >
+                  <BellIcon className="w-5 h-5" />
+                  {unreadCount > 0 && (
+                    <div className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] leading-[18px] text-white font-semibold text-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </div>
+                  )}
+                </button>
+
+                {notificationOpen && (
+                  <div className="absolute right-0 mt-2 w-80 max-w-[90vw] rounded-2xl border border-gray-200 bg-white shadow-xl overflow-hidden z-50">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-gray-900">Notifications</p>
+                      <Link
+                        to="/settings?tab=notifications"
+                        className="text-xs font-medium text-primary-600 hover:text-primary-500"
+                        onClick={() => setNotificationOpen(false)}
+                      >
+                        Preferences
+                      </Link>
+                    </div>
+
+                    {notificationsLoading ? (
+                      <div className="px-4 py-6 text-sm text-gray-500">Loading notifications...</div>
+                    ) : notifications.length === 0 ? (
+                      <div className="px-4 py-6 text-sm text-gray-500">No recent updates yet.</div>
+                    ) : (
+                      <div className="max-h-96 overflow-y-auto">
+                        {notifications.map((item) => (
+                          <Link
+                            key={item.id}
+                            to={item.href}
+                            onClick={() => setNotificationOpen(false)}
+                            className="block px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                          >
+                            <p className="text-sm font-medium text-gray-900 truncate">{item.title}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{item.message}</p>
+                            <p className="text-[11px] text-gray-400 mt-1">{formatRelativeTime(item.timestamp)}</p>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
               {user?.avatar ? (
                 <img
                   src={user.avatar}

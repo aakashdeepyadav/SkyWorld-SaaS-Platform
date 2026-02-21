@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
 import { LockClosedIcon, BellIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
+const VALID_TABS = ['security', 'notifications', 'danger'];
+
 const Settings = () => {
     const { user, logout, updateUser } = useAuth();
-    const [activeTab, setActiveTab] = useState('security');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const initialTab = VALID_TABS.includes(searchParams.get('tab')) ? searchParams.get('tab') : 'security';
+    const [activeTab, setActiveTab] = useState(initialTab);
     const [loading, setLoading] = useState(false);
     const [passwordData, setPasswordData] = useState({
         currentPassword: '',
@@ -76,6 +81,27 @@ const Settings = () => {
         { id: 'danger', label: 'Danger Zone', icon: ExclamationTriangleIcon },
     ];
 
+    useEffect(() => {
+        const tabParam = searchParams.get('tab');
+        if (VALID_TABS.includes(tabParam) && tabParam !== activeTab) {
+            setActiveTab(tabParam);
+        }
+        if (!tabParam && activeTab !== 'security') {
+            setActiveTab('security');
+        }
+    }, [searchParams, activeTab]);
+
+    const handleTabSelect = (tabId) => {
+        setActiveTab(tabId);
+        const params = new URLSearchParams(searchParams);
+        if (tabId === 'security') {
+            params.delete('tab');
+        } else {
+            params.set('tab', tabId);
+        }
+        setSearchParams(params, { replace: true });
+    };
+
     const Toggle = ({ checked, onChange, label, desc }) => (
         <div className="flex items-center justify-between py-3">
             <div>
@@ -105,7 +131,7 @@ const Settings = () => {
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
+                                onClick={() => handleTabSelect(tab.id)}
                                 className={`flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${activeTab === tab.id
                                     ? 'bg-primary-50 text-primary-700 shadow-sm'
                                     : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
