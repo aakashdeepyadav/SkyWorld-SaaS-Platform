@@ -39,6 +39,19 @@ const paymentSchema = new mongoose.Schema({
     sparse: true,
     unique: true
   },
+  razorpayOrderId: {
+    type: String,
+    sparse: true,
+    unique: true
+  },
+  razorpayPaymentId: {
+    type: String,
+    sparse: true
+  },
+  razorpaySignature: {
+    type: String,
+    sparse: true
+  },
   stripePaymentIntentId: {
     type: String,
     sparse: true
@@ -59,7 +72,7 @@ const paymentSchema = new mongoose.Schema({
 paymentSchema.index({ clientId: 1 });
 paymentSchema.index({ projectId: 1 });
 paymentSchema.index({ status: 1 });
-// transactionId and invoiceNumber indexes auto-created by unique/sparse in schema
+paymentSchema.index({ razorpayPaymentId: 1 });
 paymentSchema.index({ createdAt: -1 });
 
 // Generate invoice number before saving

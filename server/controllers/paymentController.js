@@ -1,6 +1,28 @@
+import crypto from 'crypto';
+import Razorpay from 'razorpay';
 import Payment from '../models/Payment.js';
+import Project from '../models/Project.js';
+import ServiceRequest from '../models/ServiceRequest.js';
 import { ROLES, PAYMENT_STATUS } from '../utils/constants.js';
 import { createAuditLog } from '../middleware/auth.js';
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
+
+const getSignature = (orderId, paymentId) => {
+  return crypto
+    .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+    .update(`${orderId}|${paymentId}`)
+    .digest('hex');
+};
+
+const isSignatureValid = (expected, provided) => {
+  if (!expected || !provided) return false;
+  if (expected.length !== provided.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(provided));
+};
 
 /**
  * @route   GET /api/payments
@@ -113,6 +135,214 @@ export const createPayment = async (req, res, next) => {
       // TODO: Return Stripe client secret for payment confirmation
       clientSecret: null
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createRazorpayOrder = async (req, res, next) => {
+  try {
+    const { projectId, serviceRequestId, amount, currency } = req.body;
+
+    let project = null;
+    let serviceRequest = null;
+
+    if (projectId) {
+      project = await Project.findById(projectId);
+      if (!project) {
+        return res.status(404).json({
+          success: false,
+          message: 'Project not found'
+        });
+      }
+      if (req.user.role === ROLES.CLIENT && project.clientId.toString() !== req.user._id.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied'
+        });
+      }
+    }
+
+    if (serviceRequestId) {
+      serviceRequest = await ServiceRequest.findById(serviceRequestId);
+      if (!serviceRequest) {
+        return res.status(404).json({
+          success: false,
+          message: 'Service request not found'
+        });
+      }
+      if (req.user.role === ROLES.CLIENT && serviceRequest.clientId.toString() !== req.user._id.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied'
+        });
+      }
+    }
+
+    const derivedAmount = amount ?? project?.budget ?? serviceRequest?.estimatedPrice;
+    const normalizedAmount = Number(derivedAmount);
+
+    if (!normalizedAmount || Number.isNaN(normalizedAmount) || normalizedAmount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid amount is required'
+      });
+    }
+
+    const normalizedCurrency = (currency || 'INR').toUpperCase();
+
+    const payment = await Payment.create({
+      clientId: project?.clientId || serviceRequest?.clientId || req.user._id,
+      projectId,
+      serviceRequestId,
+      amount: normalizedAmount,
+      currency: normalizedCurrency,
+      paymentMethod: 'razorpay',
+      status: PAYMENT_STATUS.PROCESSING
+    });
+
+    const order = await razorpay.orders.create({
+      amount: Math.round(normalizedAmount * 100),
+      currency: normalizedCurrency,
+      receipt: payment._id.toString(),
+      notes: {
+        paymentId: payment._id.toString(),
+        projectId: projectId || '',
+        serviceRequestId: serviceRequestId || ''
+      }
+    });
+
+    payment.razorpayOrderId = order.id;
+    await payment.save();
+
+    await createAuditLog(req, 'payment_created', 'payment', payment._id, { amount: normalizedAmount });
+
+    res.status(201).json({
+      success: true,
+      order,
+      keyId: process.env.RAZORPAY_KEY_ID,
+      payment
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyRazorpayPayment = async (req, res, next) => {
+  try {
+    const { paymentId, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
+
+    if (!paymentId || !razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing payment verification data'
+      });
+    }
+
+    const payment = await Payment.findById(paymentId);
+    if (!payment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Payment not found'
+      });
+    }
+
+    if (req.user.role === ROLES.CLIENT && payment.clientId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied'
+      });
+    }
+
+    const expectedSignature = getSignature(razorpayOrderId, razorpayPaymentId);
+    const verified = isSignatureValid(expectedSignature, razorpaySignature);
+
+    payment.razorpayOrderId = razorpayOrderId;
+    payment.razorpayPaymentId = razorpayPaymentId;
+    payment.razorpaySignature = razorpaySignature;
+    payment.transactionId = razorpayPaymentId;
+    payment.paymentMethod = 'razorpay';
+    payment.status = verified ? PAYMENT_STATUS.COMPLETED : PAYMENT_STATUS.FAILED;
+    if (verified) {
+      payment.paidAt = new Date();
+    }
+    await payment.save();
+
+    await createAuditLog(req, 'payment_status_updated', 'payment', payment._id, { status: payment.status, updatedBy: req.user._id });
+
+    if (!verified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Payment verification failed'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Payment verified',
+      payment
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const razorpayWebhook = async (req, res, next) => {
+  try {
+    const signature = req.headers['x-razorpay-signature'];
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    if (!secret) {
+      return res.status(400).json({
+        success: false,
+        message: 'Webhook secret not configured'
+      });
+    }
+
+    const rawBody = req.rawBody;
+    if (!rawBody) {
+      return res.status(400).json({
+        success: false,
+        message: 'Webhook body unavailable'
+      });
+    }
+
+    const payload = typeof req.body === 'string'
+      ? JSON.parse(req.body)
+      : req.body;
+
+    const expectedSignature = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+    if (!isSignatureValid(expectedSignature, signature)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid webhook signature'
+      });
+    }
+
+    const event = payload?.event;
+    const paymentEntity = payload?.payload?.payment?.entity;
+
+    if (paymentEntity) {
+      const update = {
+        razorpayOrderId: paymentEntity.order_id,
+        razorpayPaymentId: paymentEntity.id,
+        transactionId: paymentEntity.id,
+        paymentMethod: 'razorpay'
+      };
+
+      if (event === 'payment.captured') {
+        update.status = PAYMENT_STATUS.COMPLETED;
+        update.paidAt = new Date();
+      } else if (event === 'payment.failed') {
+        update.status = PAYMENT_STATUS.FAILED;
+      }
+
+      if (update.status) {
+        await Payment.findOneAndUpdate({ razorpayOrderId: paymentEntity.order_id }, update, { new: true });
+      }
+    }
+
+    res.json({ success: true });
   } catch (error) {
     next(error);
   }

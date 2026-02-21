@@ -9,11 +9,14 @@ export const validateEnv = () => {
         'MONGODB_URI',
         'JWT_ACCESS_SECRET',
         'JWT_REFRESH_SECRET',
+        'RAZORPAY_KEY_ID',
+        'RAZORPAY_KEY_SECRET',
     ];
 
     const recommended = [
         'FRONTEND_URL',
         'NODE_ENV',
+        'RAZORPAY_WEBHOOK_SECRET',
     ];
 
     const missing = required.filter(key => !process.env[key]);

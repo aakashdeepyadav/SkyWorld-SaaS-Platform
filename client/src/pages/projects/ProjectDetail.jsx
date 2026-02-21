@@ -25,6 +25,7 @@ const ProjectDetail = () => {
     const messagesEndRef = useRef(null);
     const [showMessages, setShowMessages] = useState(false);
     const [newMessage, setNewMessage] = useState('');
+    const [isPaying, setIsPaying] = useState(false);
 
     const isAdmin = user?.role === 'admin';
     const isDev = user?.role === 'developer';
@@ -89,6 +90,63 @@ const ProjectDetail = () => {
         }
     );
 
+    const handlePay = async () => {
+        if (!project?.budget || project.budget <= 0) {
+            toast.error('Payment amount unavailable');
+            return;
+        }
+        if (!window.Razorpay) {
+            toast.error('Payment service not available');
+            return;
+        }
+        setIsPaying(true);
+        try {
+            const { data } = await api.post('/payments/razorpay/order', { projectId: id });
+            const { order, keyId, payment } = data;
+            const checkout = new window.Razorpay({
+                key: keyId,
+                amount: order.amount,
+                currency: order.currency,
+                name: 'SkyWorld',
+                description: project.title,
+                order_id: order.id,
+                handler: async (response) => {
+                    try {
+                        await api.post('/payments/razorpay/verify', {
+                            paymentId: payment._id,
+                            razorpayOrderId: response.razorpay_order_id,
+                            razorpayPaymentId: response.razorpay_payment_id,
+                            razorpaySignature: response.razorpay_signature
+                        });
+                        toast.success('Payment successful');
+                        queryClient.invalidateQueries(['payments']);
+                        queryClient.invalidateQueries(['project', id]);
+                    } catch (err) {
+                        toast.error(err.response?.data?.message || 'Payment verification failed');
+                    }
+                },
+                prefill: {
+                    name: user?.name || '',
+                    email: user?.email || ''
+                },
+                notes: {
+                    projectId: project._id
+                },
+                theme: {
+                    color: '#0EA5E9'
+                }
+            });
+            checkout.on('payment.failed', (response) => {
+                toast.error(response?.error?.description || 'Payment failed');
+            });
+            checkout.open();
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to start payment');
+        } finally {
+            setIsPaying(false);
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="max-w-4xl mx-auto animate-fade-in">
@@ -109,6 +167,8 @@ const ProjectDetail = () => {
             </div>
         );
     }
+
+    const canPay = user?.role === 'client' && project?.budget > 0 && project.status !== 'cancelled';
 
     return (
         <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
@@ -177,6 +237,22 @@ const ProjectDetail = () => {
                         </div>
                     )}
                 </div>
+
+                {canPay && (
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-primary-50 rounded-xl">
+                        <div>
+                            <p className="text-sm font-semibold text-primary-700">Pay for this project</p>
+                            <p className="text-xs text-primary-600 mt-0.5">Amount: ₹{project.budget.toLocaleString()}</p>
+                        </div>
+                        <button
+                            onClick={handlePay}
+                            disabled={isPaying}
+                            className="btn-primary !py-2 !px-4 disabled:opacity-50"
+                        >
+                            {isPaying ? 'Processing...' : 'Pay Now'}
+                        </button>
+                    </div>
+                )}
 
                 {/* Developers */}
                 {project.developerIds?.length > 0 && (
