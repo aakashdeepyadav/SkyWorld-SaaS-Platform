@@ -168,7 +168,7 @@ export const validators = {
       .isLength({ min: 7, max: 20 })
       .withMessage('Phone number is required'),
     body('businessName')
-      .optional()
+      .optional({ checkFalsy: true })
       .trim()
       .isLength({ max: 200 })
       .withMessage('Business name is too long'),
@@ -177,16 +177,16 @@ export const validators = {
       .isLength({ min: 10, max: 5000 })
       .withMessage('Project description must be between 10 and 5000 characters'),
     body('requiredFeatures')
-      .optional()
+      .optional({ checkFalsy: true })
       .trim()
       .isLength({ max: 5000 })
       .withMessage('Required features cannot exceed 5000 characters'),
     body('deadline')
-      .optional()
+      .optional({ checkFalsy: true })
       .isISO8601()
       .withMessage('Deadline must be a valid date'),
     body('budgetRange')
-      .optional()
+      .optional({ checkFalsy: true })
       .trim()
       .isLength({ max: 100 })
       .withMessage('Budget range is too long')

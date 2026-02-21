@@ -8,7 +8,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const uploadsRoot = path.join(__dirname, '..', 'uploads');
 
-const getBaseUrl = () => process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`;
+const getBaseUrl = () =>
+    process.env.BACKEND_URL ||
+    process.env.RENDER_EXTERNAL_URL ||
+    `http://localhost:${process.env.PORT || 5000}`;
 
 const normalizeFolder = (folder = 'skyworld') => {
     const trimmed = folder.replace(/^skyworld\/?/, '').replace(/^\/+/, '');
@@ -70,9 +73,10 @@ const saveLocalFile = async (fileBuffer, options = {}) => {
 };
 
 export const getCloudinaryErrorResponse = (error) => {
-    const reason = error?.message || '';
-    const statusCode = error?.http_code || 502;
+    const reason = error?.details || error?.message || '';
     const lower = reason.toLowerCase();
+    const isNetworkIssue = lower.includes('timeout') || lower.includes('econnreset') || lower.includes('enotfound') || lower.includes('socket hang up');
+    const statusCode = error?.http_code || error?.statusCode || (isNetworkIssue ? 503 : 502);
 
     if (lower.includes('invalid signature')) {
         return { statusCode, message: 'Cloudinary credentials rejected. Check CLOUDINARY_API_SECRET and CLOUDINARY_API_KEY.' };
@@ -88,6 +92,19 @@ export const getCloudinaryErrorResponse = (error) => {
     }
 
     return { statusCode, message: 'Cloudinary upload failed. Verify credentials and account status.' };
+};
+
+const isTemporaryCloudinaryError = (error) => {
+    const reason = (error?.details || error?.message || '').toLowerCase();
+    const statusCode = Number(error?.http_code || error?.statusCode || 0);
+    if (statusCode >= 500) return true;
+    return (
+        reason.includes('timeout') ||
+        reason.includes('econnreset') ||
+        reason.includes('enotfound') ||
+        reason.includes('socket hang up') ||
+        reason.includes('service unavailable')
+    );
 };
 
 export const uploadToCloudinary = async (fileBuffer, options = {}) => {
@@ -125,7 +142,7 @@ export const uploadToCloudinary = async (fileBuffer, options = {}) => {
             (error, result) => {
                 if (error) {
                     logger.error('Cloudinary upload error:', error);
-                    const err = new Error('Cloudinary upload failed');
+                    const err = new Error(error?.message || 'Cloudinary upload failed');
                     err.http_code = error?.http_code;
                     err.details = error?.message;
                     reject(err);
@@ -195,43 +212,53 @@ export const getCloudinaryUrl = (publicId, transformations = {}) => {
  * Avatars are small, square-cropped, and heavily optimized
  */
 export const uploadAvatar = async (fileBuffer, options = {}) => {
+    const fallbackOptions = {
+        folder: 'skyworld/avatars',
+        resourceType: 'image',
+        mimetype: options.mimetype,
+        originalName: options.originalName
+    };
+
     if (!isCloudinaryConfigured()) {
-        return saveLocalFile(fileBuffer, {
-            folder: 'skyworld/avatars',
-            resourceType: 'image',
-            mimetype: options.mimetype,
-            originalName: options.originalName
-        });
+        return saveLocalFile(fileBuffer, fallbackOptions);
     }
 
-    return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                folder: 'skyworld/avatars',
-                resource_type: 'image',
-                allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                transformation: [
-                    { width: 256, height: 256, crop: 'fill', gravity: 'face' },
-                    { quality: 'auto', fetch_format: 'auto' }
-                ],
-                max_bytes: 5 * 1024 * 1024, // 5MB max for avatars
-            },
-            (error, result) => {
-                if (error) {
-                    logger.error('Avatar upload error:', error);
-                    const err = new Error('Cloudinary upload failed');
-                    err.http_code = error?.http_code;
-                    err.details = error?.message;
-                    reject(err);
-                } else {
-                    resolve({
-                        publicId: result.public_id,
-                        url: result.secure_url,
-                    });
+    try {
+        return await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'skyworld/avatars',
+                    resource_type: 'image',
+                    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                    transformation: [
+                        { width: 256, height: 256, crop: 'fill', gravity: 'auto' },
+                        { quality: 'auto', fetch_format: 'auto' }
+                    ],
+                    max_bytes: 5 * 1024 * 1024, // 5MB max for avatars
+                },
+                (error, result) => {
+                    if (error) {
+                        logger.error('Avatar upload error:', error);
+                        const err = new Error(error?.message || 'Cloudinary upload failed');
+                        err.http_code = error?.http_code;
+                        err.details = error?.message;
+                        reject(err);
+                    } else {
+                        resolve({
+                            publicId: result.public_id,
+                            url: result.secure_url,
+                        });
+                    }
                 }
-            }
-        );
+            );
 
-        uploadStream.end(fileBuffer);
-    });
+            uploadStream.end(fileBuffer);
+        });
+    } catch (error) {
+        if (isTemporaryCloudinaryError(error)) {
+            logger.warn(`Cloudinary avatar upload unavailable, falling back to local storage: ${error?.details || error?.message}`);
+            return saveLocalFile(fileBuffer, fallbackOptions);
+        }
+        throw error;
+    }
 };

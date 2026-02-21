@@ -44,7 +44,12 @@ const CustomRequestForm = () => {
     setLoading(true);
     try {
       const payload = new FormData();
-      Object.entries(formData).forEach(([key, value]) => payload.append(key, value));
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        const normalized = typeof value === 'string' ? value.trim() : value;
+        if (normalized === '') return;
+        payload.append(key, normalized);
+      });
       if (file) payload.append('file', file);
 
       await api.post('/custom-requests', payload, {
@@ -54,7 +59,8 @@ const CustomRequestForm = () => {
       toast.success('Request submitted');
       navigate('/custom-request/thanks');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to submit request');
+      const validationMessage = error.response?.data?.errors?.[0]?.message;
+      toast.error(validationMessage || error.response?.data?.message || 'Failed to submit request');
     } finally {
       setLoading(false);
     }
