@@ -1,17 +1,79 @@
-import { cloudinary } from '../config/cloudinary.js';
+import { cloudinary, isCloudinaryConfigured } from '../config/cloudinary.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { logger } from '../utils/logger.js';
 
-/**
- * Upload file buffer to Cloudinary
- * 
- * @param {Buffer} fileBuffer - The file buffer from multer memoryStorage
- * @param {Object} options - Upload options
- * @param {string} options.folder - Cloudinary folder to store in
- * @param {string} options.resourceType - 'image', 'video', 'raw', or 'auto'
- * @param {string} [options.publicId] - Optional custom public_id
- * @returns {Object} Cloudinary upload result
- */
-export const uploadToCloudinary = (fileBuffer, options = {}) => {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsRoot = path.join(__dirname, '..', 'uploads');
+
+const getBaseUrl = () => process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`;
+
+const normalizeFolder = (folder = 'skyworld') => {
+    const trimmed = folder.replace(/^skyworld\/?/, '').replace(/^\/+/, '');
+    return trimmed.replace(/[^a-zA-Z0-9/_-]/g, '');
+};
+
+const getExtension = (mimetype, originalName) => {
+    if (originalName && originalName.includes('.')) {
+        const ext = path.extname(originalName).replace('.', '');
+        if (ext) return ext.toLowerCase();
+    }
+    const map = {
+        'image/jpeg': 'jpg',
+        'image/png': 'png',
+        'image/gif': 'gif',
+        'image/webp': 'webp',
+        'application/pdf': 'pdf',
+        'application/msword': 'doc',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+        'application/vnd.ms-excel': 'xls',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+        'video/mp4': 'mp4',
+        'video/webm': 'webm',
+        'audio/mpeg': 'mp3',
+        'audio/wav': 'wav'
+    };
+    return map[mimetype] || 'bin';
+};
+
+const saveLocalFile = async (fileBuffer, options = {}) => {
+    const {
+        folder = 'skyworld',
+        resourceType = 'auto',
+        mimetype,
+        originalName
+    } = options;
+
+    const safeFolder = normalizeFolder(folder);
+    const targetDir = path.join(uploadsRoot, safeFolder);
+    await fs.promises.mkdir(targetDir, { recursive: true });
+
+    const ext = getExtension(mimetype, originalName);
+    const fileName = `${Date.now()}-${Math.random().toString(16).slice(2)}.${ext}`;
+    const filePath = path.join(targetDir, fileName);
+    await fs.promises.writeFile(filePath, fileBuffer);
+
+    const publicId = path.posix.join(safeFolder.replace(/\\/g, '/'), fileName);
+    const url = `${getBaseUrl()}/uploads/${publicId}`;
+
+    return {
+        publicId,
+        url,
+        format: ext,
+        bytes: fileBuffer.length,
+        width: undefined,
+        height: undefined,
+        resourceType
+    };
+};
+
+export const uploadToCloudinary = async (fileBuffer, options = {}) => {
+    if (!isCloudinaryConfigured()) {
+        return saveLocalFile(fileBuffer, options);
+    }
+
     return new Promise((resolve, reject) => {
         const {
             folder = 'skyworld',
@@ -69,6 +131,13 @@ export const uploadToCloudinary = (fileBuffer, options = {}) => {
  */
 export const deleteFromCloudinary = async (publicId, resourceType = 'image') => {
     try {
+        if (!isCloudinaryConfigured()) {
+            const filePath = path.join(uploadsRoot, publicId);
+            if (fs.existsSync(filePath)) {
+                await fs.promises.unlink(filePath);
+            }
+            return { result: 'ok' };
+        }
         const result = await cloudinary.uploader.destroy(publicId, {
             resource_type: resourceType
         });
@@ -88,6 +157,9 @@ export const deleteFromCloudinary = async (publicId, resourceType = 'image') => 
  * @returns {string} Secure URL
  */
 export const getCloudinaryUrl = (publicId, transformations = {}) => {
+    if (!isCloudinaryConfigured()) {
+        return `${getBaseUrl()}/uploads/${publicId}`;
+    }
     return cloudinary.url(publicId, {
         secure: true,
         ...transformations
@@ -98,7 +170,16 @@ export const getCloudinaryUrl = (publicId, transformations = {}) => {
  * Upload user avatar with specific optimizations
  * Avatars are small, square-cropped, and heavily optimized
  */
-export const uploadAvatar = async (fileBuffer) => {
+export const uploadAvatar = async (fileBuffer, options = {}) => {
+    if (!isCloudinaryConfigured()) {
+        return saveLocalFile(fileBuffer, {
+            folder: 'skyworld/avatars',
+            resourceType: 'image',
+            mimetype: options.mimetype,
+            originalName: options.originalName
+        });
+    }
+
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
             {
