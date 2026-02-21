@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 const NewRequest = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const isClient = user?.role === 'client';
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(false);
     const [servicesLoading, setServicesLoading] = useState(true);
@@ -35,12 +38,14 @@ const NewRequest = () => {
     const validate = () => {
         const errs = {};
         if (!formData.serviceId) errs.serviceId = 'Please select a service';
-        if (!formData.title.trim()) errs.title = 'Title is required';
-        else if (formData.title.trim().length < 5) errs.title = 'Title must be at least 5 characters';
-        else if (formData.title.trim().length > 200) errs.title = 'Title must be under 200 characters';
-        if (!formData.description.trim()) errs.description = 'Description is required';
-        else if (formData.description.trim().length < 10) errs.description = 'Description must be at least 10 characters';
-        if (formData.requirements.length > 10000) errs.requirements = 'Requirements must be under 10000 characters';
+        if (!isClient) {
+            if (!formData.title.trim()) errs.title = 'Title is required';
+            else if (formData.title.trim().length < 5) errs.title = 'Title must be at least 5 characters';
+            else if (formData.title.trim().length > 200) errs.title = 'Title must be under 200 characters';
+            if (!formData.description.trim()) errs.description = 'Description is required';
+            else if (formData.description.trim().length < 10) errs.description = 'Description must be at least 10 characters';
+            if (formData.requirements.length > 10000) errs.requirements = 'Requirements must be under 10000 characters';
+        }
         setErrors(errs);
         return Object.keys(errs).length === 0;
     };
@@ -58,6 +63,18 @@ const NewRequest = () => {
             return;
         }
         if (!validate()) return;
+
+        if (isClient) {
+            const service = services.find((s) => s._id === formData.serviceId);
+            const serviceSlug = service?.category;
+            if (!serviceSlug) {
+                toast.error('Selected service is invalid. Please try again.');
+                return;
+            }
+            navigate(`/checkout?service=${encodeURIComponent(serviceSlug)}&plan=starter`);
+            return;
+        }
+
         setLoading(true);
         try {
             await api.post('/requests', {
@@ -87,7 +104,11 @@ const NewRequest = () => {
             <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6">
                 <div className="card">
                     <h1 className="text-2xl font-bold text-gray-900 mb-1">New Service Request</h1>
-                    <p className="text-sm text-gray-500 mb-6">Describe your project and we'll match you with the right team.</p>
+                    <p className="text-sm text-gray-500 mb-6">
+                        {isClient
+                            ? 'Select a service and continue to secure payment checkout.'
+                            : 'Describe your project and we will match you with the right team.'}
+                    </p>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
@@ -119,59 +140,63 @@ const NewRequest = () => {
                             {errors.serviceId && <p className="mt-1 text-xs text-red-500">{errors.serviceId}</p>}
                         </div>
 
-                        <div>
-                            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1.5">Project Title</label>
-                            <input
-                                id="title"
-                                name="title"
-                                type="text"
-                                value={formData.title}
-                                onChange={handleChange}
-                                placeholder="e.g., E-commerce mobile app for organic products"
-                                className={`input-field ${errors.title ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
-                                maxLength={200}
-                            />
-                            {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
-                        </div>
+                        {!isClient && (
+                            <>
+                                <div>
+                                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1.5">Project Title</label>
+                                    <input
+                                        id="title"
+                                        name="title"
+                                        type="text"
+                                        value={formData.title}
+                                        onChange={handleChange}
+                                        placeholder="e.g., E-commerce mobile app for organic products"
+                                        className={`input-field ${errors.title ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
+                                        maxLength={200}
+                                    />
+                                    {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
+                                </div>
 
-                        <div>
-                            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-                            <textarea
-                                id="description"
-                                name="description"
-                                value={formData.description}
-                                onChange={handleChange}
-                                rows={5}
-                                placeholder="Outline your goals, target audience, and must-have features."
-                                className={`input-field resize-none ${errors.description ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
-                                maxLength={5000}
-                            />
-                            {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
-                            <p className="mt-1 text-xs text-gray-400">{formData.description.length}/5000</p>
-                        </div>
+                                <div>
+                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                                    <textarea
+                                        id="description"
+                                        name="description"
+                                        value={formData.description}
+                                        onChange={handleChange}
+                                        rows={5}
+                                        placeholder="Outline your goals, target audience, and must-have features."
+                                        className={`input-field resize-none ${errors.description ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
+                                        maxLength={5000}
+                                    />
+                                    {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
+                                    <p className="mt-1 text-xs text-gray-400">{formData.description.length}/5000</p>
+                                </div>
 
-                        <div>
-                            <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                Technical Requirements <span className="text-gray-400 font-normal">(optional)</span>
-                            </label>
-                            <textarea
-                                id="requirements"
-                                name="requirements"
-                                value={formData.requirements}
-                                onChange={handleChange}
-                                rows={4}
-                                placeholder="Preferred stack, integrations, deadlines, budget range, competitors..."
-                                className={`input-field resize-none ${errors.requirements ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
-                                maxLength={10000}
-                            />
-                            {errors.requirements && <p className="mt-1 text-xs text-red-500">{errors.requirements}</p>}
-                            <p className="mt-1 text-xs text-gray-400">{formData.requirements.length}/10000</p>
-                        </div>
+                                <div>
+                                    <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 mb-1.5">
+                                        Technical Requirements <span className="text-gray-400 font-normal">(optional)</span>
+                                    </label>
+                                    <textarea
+                                        id="requirements"
+                                        name="requirements"
+                                        value={formData.requirements}
+                                        onChange={handleChange}
+                                        rows={4}
+                                        placeholder="Preferred stack, integrations, deadlines, budget range, competitors..."
+                                        className={`input-field resize-none ${errors.requirements ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : ''}`}
+                                        maxLength={10000}
+                                    />
+                                    {errors.requirements && <p className="mt-1 text-xs text-red-500">{errors.requirements}</p>}
+                                    <p className="mt-1 text-xs text-gray-400">{formData.requirements.length}/10000</p>
+                                </div>
+                            </>
+                        )}
 
                         <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
                             <button type="button" onClick={() => navigate(-1)} className="btn-secondary">Cancel</button>
                             <button type="submit" disabled={loading || !hasServices} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
-                                {loading ? 'Submitting...' : 'Submit Request'}
+                                {loading ? 'Submitting...' : isClient ? 'Continue to Payment' : 'Submit Request'}
                             </button>
                         </div>
                     </form>

@@ -100,6 +100,13 @@ export const getRequest = async (req, res, next) => {
  */
 export const createRequest = async (req, res, next) => {
   try {
+    if (req.user.role === ROLES.CLIENT) {
+      return res.status(403).json({
+        success: false,
+        message: 'Direct service requests are disabled for clients. Please use Starter checkout or submit a custom request.'
+      });
+    }
+
     const { serviceId, title, description, requirements } = req.body;
 
     const service = await Service.findOne({ _id: serviceId, isActive: true });

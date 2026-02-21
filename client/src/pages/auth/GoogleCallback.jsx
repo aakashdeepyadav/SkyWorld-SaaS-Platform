@@ -27,8 +27,11 @@ const GoogleCallback = () => {
 
             try {
                 await googleLogin(code);
-                navigate('/dashboard');
+                const redirectTo = sessionStorage.getItem('postAuthRedirect') || '/dashboard';
+                sessionStorage.removeItem('postAuthRedirect');
+                navigate(redirectTo, { replace: true });
             } catch (err) {
+                sessionStorage.removeItem('postAuthRedirect');
                 setError('Google authentication failed. Please try again.');
                 setTimeout(() => navigate('/login'), 3000);
             }

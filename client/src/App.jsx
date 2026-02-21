@@ -62,6 +62,7 @@ function App() {
     <Routes>
       {/* Root — public landing page or dashboard */}
       <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Home />} />
+      <Route path="/website" element={<Home />} />
 
       {/* Public routes */}
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />

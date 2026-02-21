@@ -22,6 +22,7 @@ const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const websiteUrl = import.meta.env.VITE_WEBSITE_URL || '/website';
 
   const handleLogout = async () => {
     await logout();
@@ -95,8 +96,10 @@ const Layout = () => {
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center px-6 h-16 border-b border-white/10">
-        <img src="/logo.png" alt="SkyWorld" className="w-8 h-8 object-contain" />
-        <span className="ml-3 text-xl font-bold text-white tracking-tight">SkyWorld</span>
+        <a href={websiteUrl} className="flex items-center" title="Go to SkyWorld website">
+          <img src="/logo.png" alt="SkyWorld" className="w-8 h-8 object-contain" />
+          <span className="ml-3 text-xl font-bold text-white tracking-tight">SkyWorld</span>
+        </a>
       </div>
 
       {/* Navigation */}
