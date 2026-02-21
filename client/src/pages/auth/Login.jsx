@@ -18,7 +18,7 @@ const Login = () => {
     setLoading(true);
     try {
       await login(formData.email, formData.password);
-      const redirectTo = location.state?.from || '/dashboard';
+      const redirectTo = location.state?.from || '/';
       navigate(redirectTo);
     } catch (error) {
       // Error handled in AuthContext
@@ -28,7 +28,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    const redirectTo = location.state?.from || '/dashboard';
+    const redirectTo = location.state?.from || '/';
     sessionStorage.setItem('postAuthRedirect', redirectTo);
     const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || window.location.origin + '/auth/google/callback';
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid email profile`;
@@ -40,10 +40,10 @@ const Login = () => {
       {/* Left — Brand panel */}
       <div className="hidden lg:flex lg:w-[45%] bg-surface-900 relative">
         <div className="flex flex-col justify-between p-12 xl:p-16 w-full">
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2 w-fit" title="Go to Home">
             <img src="/logo.png" alt="SkyWorld" className="w-8 h-8 object-contain" />
             <span className="text-lg font-semibold text-white">SkyWorld</span>
-          </div>
+          </Link>
 
           <div>
             <h1 className="text-3xl xl:text-4xl font-bold text-white leading-snug">
@@ -64,10 +64,10 @@ const Login = () => {
       <div className="flex-1 flex items-center justify-center px-6 sm:px-12 bg-white">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center space-x-2 mb-10">
+          <Link to="/" className="lg:hidden flex items-center space-x-2 mb-10 w-fit" title="Go to Home">
             <img src="/logo.png" alt="SkyWorld" className="w-8 h-8 object-contain" />
             <span className="text-lg font-semibold text-gray-900">SkyWorld</span>
-          </div>
+          </Link>
 
           <h2 className="text-2xl font-bold text-gray-900">Sign in</h2>
           <p className="mt-1.5 text-sm text-gray-500">

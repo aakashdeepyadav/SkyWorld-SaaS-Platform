@@ -27,7 +27,7 @@ const GoogleCallback = () => {
 
             try {
                 await googleLogin(code);
-                const redirectTo = sessionStorage.getItem('postAuthRedirect') || '/dashboard';
+                const redirectTo = sessionStorage.getItem('postAuthRedirect') || '/';
                 sessionStorage.removeItem('postAuthRedirect');
                 navigate(redirectTo, { replace: true });
             } catch (err) {

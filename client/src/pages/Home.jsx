@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 /* ——— Scroll-triggered fade-in ——— */
 const Reveal = ({ children, className = '', delay = 0 }) => {
@@ -71,6 +72,14 @@ const Marquee = ({ items }) => (
 
 const Home = () => {
     const [scrolled, setScrolled] = useState(false);
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+    const isAuthenticated = Boolean(user);
+
+    const handleLogout = async () => {
+        await logout();
+        navigate('/', { replace: true });
+    };
 
     useEffect(() => {
         const fn = () => setScrolled(window.scrollY > 20);
@@ -85,19 +94,35 @@ const Home = () => {
             <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm' : ''
                 }`}>
                 <div className="max-w-6xl mx-auto px-6 lg:px-8 flex justify-between items-center h-16">
-                    <div className="flex items-center gap-2.5">
+                    <Link to="/" className="flex items-center gap-2.5" title="Go to Home">
                         <img src="/logo.png" alt="SkyWorld" className="w-7 h-7 object-contain" />
                         <span className={`text-base font-semibold transition-colors duration-300 ${scrolled ? 'text-gray-900' : 'text-white'}`}>
                             SkyWorld
                         </span>
-                    </div>
+                    </Link>
                     <div className="flex items-center gap-3">
-                        <Link to="/login" className={`text-sm transition-colors duration-300 hidden sm:inline ${scrolled ? 'text-gray-500 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}>
-                            Sign in
-                        </Link>
-                        <Link to="/register" className="text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 px-4 py-2 rounded-lg transition-all duration-200 hover:-translate-y-px hover:shadow-lg hover:shadow-primary-500/20">
-                            Get Started
-                        </Link>
+                        {isAuthenticated ? (
+                            <>
+                                <Link to={`/dashboard/${user?.role || 'client'}`} className={`text-sm transition-colors duration-300 hidden sm:inline ${scrolled ? 'text-gray-500 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}>
+                                    Dashboard
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 px-4 py-2 rounded-lg transition-all duration-200 hover:-translate-y-px hover:shadow-lg hover:shadow-primary-500/20"
+                                >
+                                    Sign Out
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/login" className={`text-sm transition-colors duration-300 hidden sm:inline ${scrolled ? 'text-gray-500 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}>
+                                    Sign in
+                                </Link>
+                                <Link to="/register" className="text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 px-4 py-2 rounded-lg transition-all duration-200 hover:-translate-y-px hover:shadow-lg hover:shadow-primary-500/20">
+                                    Get Started
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </nav>
@@ -130,13 +155,27 @@ const Home = () => {
                         </p>
 
                         <div className="mt-10 flex flex-wrap gap-4 animate-[fadeIn_0.8s_ease-out_0.8s_both]">
-                            <Link to="/register" className="group text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 pl-6 pr-5 py-3 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-500/25 inline-flex items-center gap-2">
-                                Start your project
-                                <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
-                            </Link>
-                            <Link to="/login" className="text-sm font-medium text-gray-300 border border-white/10 hover:border-white/20 hover:text-white px-6 py-3 rounded-xl transition-all duration-200">
-                                Sign in
-                            </Link>
+                            {isAuthenticated ? (
+                                <>
+                                    <Link to={`/dashboard/${user?.role || 'client'}`} className="group text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 pl-6 pr-5 py-3 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-500/25 inline-flex items-center gap-2">
+                                        Open Dashboard
+                                        <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                                    </Link>
+                                    <Link to="/services/web-development" className="text-sm font-medium text-gray-300 border border-white/10 hover:border-white/20 hover:text-white px-6 py-3 rounded-xl transition-all duration-200">
+                                        Browse Services
+                                    </Link>
+                                </>
+                            ) : (
+                                <>
+                                    <Link to="/register" className="group text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 pl-6 pr-5 py-3 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-500/25 inline-flex items-center gap-2">
+                                        Start your project
+                                        <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                                    </Link>
+                                    <Link to="/login" className="text-sm font-medium text-gray-300 border border-white/10 hover:border-white/20 hover:text-white px-6 py-3 rounded-xl transition-all duration-200">
+                                        Sign in
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </div>
 
@@ -350,10 +389,17 @@ const Home = () => {
                             No upfront fees. You pay only when milestones are delivered and approved by you.
                         </p>
                         <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-                            <Link to="/register" className="group text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 pl-6 pr-5 py-3.5 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-500/25 inline-flex items-center justify-center gap-2">
-                                Create your account
-                                <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
-                            </Link>
+                            {isAuthenticated ? (
+                                <Link to={`/dashboard/${user?.role || 'client'}`} className="group text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 pl-6 pr-5 py-3.5 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-500/25 inline-flex items-center justify-center gap-2">
+                                    Go to dashboard
+                                    <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                                </Link>
+                            ) : (
+                                <Link to="/register" className="group text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 pl-6 pr-5 py-3.5 rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-500/25 inline-flex items-center justify-center gap-2">
+                                    Create your account
+                                    <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                                </Link>
+                            )}
                             <a href="mailto:ventures.skyworld@gmail.com" className="text-sm font-medium text-gray-300 border border-white/10 hover:border-white/20 hover:text-white px-6 py-3.5 rounded-xl transition-all duration-200">
                                 Get in touch
                             </a>
