@@ -89,6 +89,12 @@ const CustomRequestList = () => {
         customRequestId: request._id
       });
       const { order, keyId, payment } = orderData;
+      const phone = typeof user?.phone === 'string' ? user.phone.trim() : '';
+      const prefill = {
+        name: user?.name || '',
+        email: user?.email || '',
+        ...(phone ? { contact: phone } : {})
+      };
 
       const checkout = new window.Razorpay({
         key: keyId,
@@ -113,10 +119,7 @@ const CustomRequestList = () => {
             toast.error(error.response?.data?.message || 'Payment verification failed');
           }
         },
-        prefill: {
-          name: user?.name || '',
-          email: user?.email || ''
-        },
+        prefill,
         notes: {
           customRequestId: request._id
         },

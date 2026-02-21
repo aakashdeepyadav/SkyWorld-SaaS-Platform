@@ -1,5 +1,53 @@
 import Service from '../models/Service.js';
 import { createAuditLog } from '../middleware/auth.js';
+import { SERVICE_CATEGORIES } from '../utils/constants.js';
+import { logger } from '../utils/logger.js';
+
+const DEFAULT_SERVICES = [
+  {
+    name: 'Web Development',
+    description: 'High-converting websites built for speed and clarity.',
+    category: SERVICE_CATEGORIES.WEB_DEVELOPMENT,
+    basePrice: 1499,
+    isActive: true
+  },
+  {
+    name: 'App Development',
+    description: 'Clean, intuitive apps with robust architecture.',
+    category: SERVICE_CATEGORIES.APP_DEVELOPMENT,
+    basePrice: 2999,
+    isActive: true
+  },
+  {
+    name: 'Branding & Creative',
+    description: 'Brand identity, design systems, and creative assets.',
+    category: SERVICE_CATEGORIES.BRANDING_CREATIVE,
+    basePrice: 799,
+    isActive: true
+  }
+];
+
+const ensureActiveServices = async () => {
+  const activeCount = await Service.countDocuments({ isActive: true });
+  if (activeCount > 0) return;
+
+  const defaultNames = DEFAULT_SERVICES.map((service) => service.name);
+  try {
+    await Service.insertMany(DEFAULT_SERVICES, { ordered: false });
+  } catch (error) {
+    const duplicateOnly =
+      error?.code === 11000 ||
+      (Array.isArray(error?.writeErrors) && error.writeErrors.every((entry) => entry?.code === 11000));
+    if (!duplicateOnly) throw error;
+  }
+
+  await Service.updateMany(
+    { name: { $in: defaultNames } },
+    { $set: { isActive: true } }
+  );
+
+  logger.warn('No active services were found. Default services were initialized or reactivated.');
+};
 
 /**
  * @route   GET /api/services
@@ -8,6 +56,8 @@ import { createAuditLog } from '../middleware/auth.js';
  */
 export const getServices = async (req, res, next) => {
   try {
+    await ensureActiveServices();
+
     const { category, isActive = true } = req.query;
     const query = { isActive: isActive === 'true' || isActive === true };
 

@@ -7,19 +7,52 @@ import { logger } from '../utils/logger.js';
  */
 let cloudinaryConfigured = false;
 
-const configureCloudinary = () => {
-    const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
+const cleanEnvValue = (value) => {
+    if (typeof value !== 'string') return value;
+    return value.trim().replace(/^['"]|['"]$/g, '');
+};
 
-    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-        logger.warn('Cloudinary credentials not configured. File uploads will be disabled.');
+const parseCloudinaryUrl = (cloudinaryUrl) => {
+    try {
+        const parsed = new URL(cloudinaryUrl);
+        if (parsed.protocol !== 'cloudinary:') return null;
+        return {
+            cloudName: parsed.hostname,
+            apiKey: decodeURIComponent(parsed.username || ''),
+            apiSecret: decodeURIComponent(parsed.password || '')
+        };
+    } catch {
+        return null;
+    }
+};
+
+const configureCloudinary = () => {
+    let cloudName = cleanEnvValue(process.env.CLOUDINARY_CLOUD_NAME);
+    let apiKey = cleanEnvValue(process.env.CLOUDINARY_API_KEY);
+    let apiSecret = cleanEnvValue(process.env.CLOUDINARY_API_SECRET);
+    const cloudinaryUrl = cleanEnvValue(process.env.CLOUDINARY_URL);
+
+    if ((!cloudName || !apiKey || !apiSecret) && cloudinaryUrl) {
+        const parsed = parseCloudinaryUrl(cloudinaryUrl);
+        if (parsed) {
+            cloudName = cloudName || parsed.cloudName;
+            apiKey = apiKey || parsed.apiKey;
+            apiSecret = apiSecret || parsed.apiSecret;
+        } else {
+            logger.warn('CLOUDINARY_URL is present but invalid. Expected: cloudinary://<api_key>:<api_secret>@<cloud_name>');
+        }
+    }
+
+    if (!cloudName || !apiKey || !apiSecret) {
+        logger.warn('Cloudinary credentials not configured. Set CLOUDINARY_CLOUD_NAME/CLOUDINARY_API_KEY/CLOUDINARY_API_SECRET or CLOUDINARY_URL.');
         cloudinaryConfigured = false;
         return false;
     }
 
     cloudinary.config({
-        cloud_name: CLOUDINARY_CLOUD_NAME,
-        api_key: CLOUDINARY_API_KEY,
-        api_secret: CLOUDINARY_API_SECRET,
+        cloud_name: cloudName,
+        api_key: apiKey,
+        api_secret: apiSecret,
         secure: true // Always use HTTPS
     });
 

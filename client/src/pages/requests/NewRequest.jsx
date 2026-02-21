@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import toast from 'react-hot-toast';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
@@ -16,6 +16,7 @@ const NewRequest = () => {
         requirements: '',
     });
     const [errors, setErrors] = useState({});
+    const hasServices = services.length > 0;
 
     useEffect(() => {
         const fetchServices = async () => {
@@ -52,6 +53,10 @@ const NewRequest = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!hasServices) {
+            toast.error('No active services available right now. Please use custom request.');
+            return;
+        }
         if (!validate()) return;
         setLoading(true);
         try {
@@ -89,6 +94,14 @@ const NewRequest = () => {
                             <label htmlFor="serviceId" className="block text-sm font-medium text-gray-700 mb-1.5">Service Type</label>
                             {servicesLoading ? (
                                 <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
+                            ) : !hasServices ? (
+                                <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                                    No active services are available right now.
+                                    <Link to="/custom-request" className="ml-1 font-semibold underline underline-offset-2">
+                                        Submit a custom request instead
+                                    </Link>
+                                    .
+                                </div>
                             ) : (
                                 <select
                                     id="serviceId"
@@ -157,7 +170,7 @@ const NewRequest = () => {
 
                         <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
                             <button type="button" onClick={() => navigate(-1)} className="btn-secondary">Cancel</button>
-                            <button type="submit" disabled={loading} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                            <button type="submit" disabled={loading || !hasServices} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
                                 {loading ? 'Submitting...' : 'Submit Request'}
                             </button>
                         </div>

@@ -46,6 +46,12 @@ const Checkout = () => {
       });
 
       const { order, keyId, payment } = data;
+      const phone = typeof user?.phone === 'string' ? user.phone.trim() : '';
+      const prefill = {
+        name: user?.name || '',
+        email: user?.email || '',
+        ...(phone ? { contact: phone } : {})
+      };
 
       const checkout = new window.Razorpay({
         key: keyId,
@@ -68,10 +74,7 @@ const Checkout = () => {
             toast.error(error.response?.data?.message || 'Payment verification failed');
           }
         },
-        prefill: {
-          name: user?.name || '',
-          email: user?.email || ''
-        },
+        prefill,
         notes: {
           serviceType: serviceSlug,
           plan: 'starter'

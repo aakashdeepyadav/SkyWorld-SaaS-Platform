@@ -103,6 +103,12 @@ const ProjectDetail = () => {
         try {
             const { data } = await api.post('/payments/razorpay/order', { projectId: id });
             const { order, keyId, payment } = data;
+            const phone = typeof user?.phone === 'string' ? user.phone.trim() : '';
+            const prefill = {
+                name: user?.name || '',
+                email: user?.email || '',
+                ...(phone ? { contact: phone } : {})
+            };
             const checkout = new window.Razorpay({
                 key: keyId,
                 amount: order.amount,
@@ -125,10 +131,7 @@ const ProjectDetail = () => {
                         toast.error(err.response?.data?.message || 'Payment verification failed');
                     }
                 },
-                prefill: {
-                    name: user?.name || '',
-                    email: user?.email || ''
-                },
+                prefill,
                 notes: {
                     projectId: project._id
                 },
