@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import User from '../models/User.js';
 import { ROLES, LOCKOUT_POLICY } from '../utils/constants.js';
 import { logger } from '../utils/logger.js';
@@ -285,13 +286,13 @@ export const requestPasswordReset = async (email) => {
 
     // Send reset email
     const emailSent = await emailService.sendPasswordResetEmail(user, resetToken);
-    
+
     if (!emailSent) {
       throw new Error('Failed to send reset email. Please try again.');
     }
 
     logger.info(`Password reset requested for email: ${email}`);
-    
+
     return { success: true, message: 'Password reset link sent to your email' };
   } catch (error) {
     logger.error('Password reset request error:', error);
@@ -305,7 +306,6 @@ export const requestPasswordReset = async (email) => {
 export const resetPassword = async (token, newPassword) => {
   try {
     // Hash the token to compare with stored hash
-    const crypto = require('crypto');
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
     // Find user with valid reset token
@@ -337,15 +337,14 @@ export const resetPassword = async (token, newPassword) => {
     await emailService.sendPasswordChangeEmail(user);
 
     logger.info(`Password reset completed for user: ${user.email}`);
-    
+
     return { success: true, message: 'Password reset successful' };
   } catch (error) {
     logger.error('Password reset error:', error);
-    
+
     // Increment reset attempts on failure
     if (error.message.includes('Invalid or expired') || error.message.includes('Too many reset')) {
       try {
-        const crypto = require('crypto');
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
         await User.findOneAndUpdate(
           { passwordResetToken: hashedToken },
@@ -355,7 +354,7 @@ export const resetPassword = async (token, newPassword) => {
         logger.error('Failed to increment reset attempts:', updateError);
       }
     }
-    
+
     throw error;
   }
 };

@@ -24,7 +24,7 @@ const ClientDashboard = () => {
   ];
 
   const getStatusBadge = (status) => {
-    const map = { 'completed': 'badge-success', 'in-progress': 'badge-primary', 'pending': 'badge-warning', 'approved': 'badge-primary', 'rejected': 'badge-danger' };
+    const map = { 'completed': 'badge-success', 'in-progress': 'badge-primary', 'pending': 'badge-warning', 'approved': 'badge-primary', 'cancelled': 'badge-danger' };
     return map[status] || 'badge-primary';
   };
 

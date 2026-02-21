@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { ROLES } from '../utils/constants.js';
 
 const userSchema = new mongoose.Schema({
@@ -30,6 +31,11 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     trim: true
+  },
+  company: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Company name cannot exceed 100 characters']
   },
   avatar: {
     type: String,
@@ -76,6 +82,11 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     select: false
+  },
+  notificationPreferences: {
+    email: { type: Boolean, default: true },
+    projectUpdates: { type: Boolean, default: true },
+    marketing: { type: Boolean, default: false }
   }
 }, {
   timestamps: true
@@ -142,17 +153,16 @@ userSchema.methods.resetFailedAttempts = async function () {
 
 // Method to generate password reset token
 userSchema.methods.createPasswordResetToken = function () {
-  const crypto = require('crypto');
   const resetToken = crypto.randomBytes(32).toString('hex');
-  
+
   this.passwordResetToken = crypto
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
-  
+
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
   this.passwordResetAttempts = 0;
-  
+
   return resetToken; // Return unhashed token for email
 };
 
@@ -166,12 +176,12 @@ userSchema.methods.clearPasswordResetFields = function () {
 // Method to increment password reset attempts
 userSchema.methods.incrementPasswordResetAttempts = async function () {
   this.passwordResetAttempts += 1;
-  
+
   // Lock password reset after 2 attempts for 24 hours
   if (this.passwordResetAttempts >= 2) {
     this.passwordResetExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
   }
-  
+
   return this.save();
 };
 
@@ -182,9 +192,13 @@ userSchema.methods.toPublicJSON = function () {
     email: this.email,
     name: this.name,
     phone: this.phone,
+    company: this.company,
     avatar: this.avatar,
     role: this.role,
+    isActive: this.isActive,
+    authMethod: this.googleId ? 'google' : 'email',
     emailVerified: this.emailVerified,
+    notificationPreferences: this.notificationPreferences,
     createdAt: this.createdAt
   };
 };

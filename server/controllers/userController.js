@@ -89,12 +89,14 @@ export const getMyProfile = async (req, res, next) => {
  */
 export const updateMyProfile = async (req, res, next) => {
   try {
-    const { name, phone, avatar } = req.body;
+    const { name, phone, avatar, company, notificationPreferences } = req.body;
     const updates = {};
 
     if (name) updates.name = name;
     if (phone !== undefined) updates.phone = phone;
     if (avatar !== undefined) updates.avatar = avatar;
+    if (company !== undefined) updates.company = company;
+    if (notificationPreferences !== undefined) updates.notificationPreferences = notificationPreferences;
 
     const user = await User.findByIdAndUpdate(
       req.user._id,

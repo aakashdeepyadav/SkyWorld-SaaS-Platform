@@ -8,7 +8,8 @@ import {
   getMe,
   changeUserPassword,
   forgotPassword,
-  resetUserPassword
+  resetUserPassword,
+  deleteAccount
 } from '../controllers/authController.js';
 import { authenticate } from '../middleware/auth.js';
 import { authRateLimiter, apiRateLimiter, sensitiveRateLimiter } from '../middleware/rateLimiter.js';
@@ -28,6 +29,7 @@ router.post('/reset-password', authRateLimiter, validators.resetPassword, handle
 router.post('/logout', authenticate, logout);
 router.get('/me', authenticate, getMe);
 router.post('/change-password', authenticate, sensitiveRateLimiter, validators.changePassword, handleValidationErrors, changeUserPassword);
+router.delete('/account', authenticate, sensitiveRateLimiter, deleteAccount);
 
 export default router;
 

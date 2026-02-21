@@ -2,6 +2,7 @@ import { registerUser, loginUser, verifyGoogleToken, generateTokens, setTokenCoo
 import { createAuditLog } from '../middleware/auth.js';
 import { OAuth2Client } from 'google-auth-library';
 import { logger } from '../utils/logger.js';
+import User from '../models/User.js';
 
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
@@ -253,3 +254,29 @@ export const resetUserPassword = async (req, res, next) => {
   }
 };
 
+/**
+ * @route   DELETE /api/auth/account
+ * @desc    Soft-delete user account (deactivate)
+ * @access  Private
+ */
+export const deleteAccount = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Soft-delete: deactivate instead of removing to preserve data integrity
+    user.isActive = false;
+    await user.save();
+
+    await createAuditLog(req, 'account_deleted', 'user', user._id, { email: user.email });
+
+    clearTokenCookies(res);
+
+    res.json({ success: true, message: 'Account deleted successfully' });
+  } catch (error) {
+    logger.error('Delete account error:', error);
+    next(error);
+  }
+};

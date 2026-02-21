@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
@@ -8,6 +8,8 @@ const Profile = () => {
     const { user, updateUser } = useAuth();
     const [editing, setEditing] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [avatarLoading, setAvatarLoading] = useState(false);
+    const fileInputRef = useRef(null);
     const [formData, setFormData] = useState({
         name: user?.name || '',
         phone: user?.phone || '',
@@ -33,14 +35,78 @@ const Profile = () => {
         }
     };
 
+    const handleAvatarChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
+            toast.error('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+            return;
+        }
+
+        // Validate file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error('Image must be smaller than 5MB');
+            return;
+        }
+
+        setAvatarLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('avatar', file);
+            const response = await api.post('/files/avatar', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            updateUser(response.data.user);
+            toast.success('Profile photo updated');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to upload photo');
+        } finally {
+            setAvatarLoading(false);
+            // Reset file input so user can re-select the same file
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             {/* Profile Header */}
             <div className="relative">
                 <div className="h-36 bg-primary-500 rounded-2xl" />
                 <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 px-6 -mt-12 relative z-10">
-                    <div className="w-20 h-20 rounded-xl bg-primary-600 flex items-center justify-center text-white text-2xl font-bold shadow-md border-4 border-white">
-                        {user?.name?.charAt(0).toUpperCase()}
+                    {/* Avatar with upload */}
+                    <div className="relative group">
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/jpeg,image/png,image/gif,image/webp"
+                            onChange={handleAvatarChange}
+                            className="hidden"
+                        />
+                        {user?.avatar ? (
+                            <img
+                                src={user.avatar}
+                                alt={user.name}
+                                className="w-20 h-20 rounded-xl object-cover shadow-md border-4 border-white"
+                            />
+                        ) : (
+                            <div className="w-20 h-20 rounded-xl bg-primary-600 flex items-center justify-center text-white text-2xl font-bold shadow-md border-4 border-white">
+                                {user?.name?.charAt(0).toUpperCase()}
+                            </div>
+                        )}
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={avatarLoading}
+                            className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all duration-200 cursor-pointer"
+                            title="Change photo"
+                        >
+                            {avatarLoading ? (
+                                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <CameraIcon className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                            )}
+                        </button>
                     </div>
                     <div className="flex-1 pb-1">
                         <h1 className="text-2xl font-bold text-gray-900">{user?.name}</h1>
@@ -133,10 +199,10 @@ const Profile = () => {
                             </div>
                         </div>
                         <div className="flex items-center p-3 bg-gray-50 rounded-xl">
-                            <div className={`w-2.5 h-2.5 rounded-full mr-3 ${user?.status === 'active' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                            <div className={`w-2.5 h-2.5 rounded-full mr-3 ${user?.isActive !== false ? 'bg-emerald-500' : 'bg-gray-400'}`} />
                             <div>
                                 <p className="text-xs text-gray-500">Status</p>
-                                <p className="font-semibold text-gray-900 capitalize">{user?.status || 'Active'}</p>
+                                <p className="font-semibold text-gray-900 capitalize">{user?.isActive !== false ? 'Active' : 'Inactive'}</p>
                             </div>
                         </div>
                         <div className="flex items-center p-3 bg-gray-50 rounded-xl">
@@ -174,3 +240,4 @@ const Profile = () => {
 };
 
 export default Profile;
+
