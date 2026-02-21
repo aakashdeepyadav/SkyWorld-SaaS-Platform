@@ -7,6 +7,8 @@ import RoleRoute from './components/common/RoleRoute';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import GoogleCallback from './pages/auth/GoogleCallback';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 
 // Dashboard pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -58,6 +60,8 @@ function App() {
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
+      <Route path="/forgot-password" element={user ? <Navigate to="/dashboard" /> : <ForgotPassword />} />
+      <Route path="/reset-password" element={user ? <Navigate to="/dashboard" /> : <ResetPassword />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
 

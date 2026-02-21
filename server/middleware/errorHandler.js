@@ -58,6 +58,13 @@ export const errorHandler = (err, req, res, next) => {
     isKnownError = true;
   }
 
+  // Use statusCode from our app errors (e.g. authService.appError)
+  if (err.statusCode && err.statusCode >= 400 && err.statusCode < 500) {
+    statusCode = err.statusCode;
+    message = err.message;
+    isKnownError = true;
+  }
+
   // Application-level errors (thrown with new Error('message'))
   // These are errors we explicitly throw in our code — safe to expose
   if (!isKnownError && statusCode < 500) {

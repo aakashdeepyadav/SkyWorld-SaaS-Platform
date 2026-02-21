@@ -25,6 +25,7 @@ export const handleValidationErrors = (req, res, next) => {
  */
 const passwordValidation = (fieldName = 'password') => [
   body(fieldName)
+    .trim()
     .isLength({ min: PASSWORD_POLICY.minLength })
     .withMessage(`Password must be at least ${PASSWORD_POLICY.minLength} characters`)
     .matches(/[A-Z]/)
@@ -77,8 +78,24 @@ export const validators = {
   changePassword: [
     body('currentPassword')
       .notEmpty()
+      .withMessage('Current password is required')
+      .trim()
+      .isLength({ min: 1 })
       .withMessage('Current password is required'),
     ...passwordValidation('newPassword')
+  ],
+
+  forgotPassword: [
+    ...emailValidation
+  ],
+
+  resetPassword: [
+    body('token')
+      .notEmpty()
+      .withMessage('Reset token is required')
+      .isLength({ min: 32, max: 64 })
+      .withMessage('Invalid reset token'),
+    ...passwordValidation('password')
   ],
 
   // User validators

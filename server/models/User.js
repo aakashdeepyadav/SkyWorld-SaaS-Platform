@@ -62,6 +62,20 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null,
     select: false
+  },
+  // ─── Password Reset Fields ───────────────────────────────────────────────
+  passwordResetToken: {
+    type: String,
+    select: false // Don't expose in queries by default
+  },
+  passwordResetExpires: {
+    type: Date,
+    select: false
+  },
+  passwordResetAttempts: {
+    type: Number,
+    default: 0,
+    select: false
   }
 }, {
   timestamps: true
@@ -124,6 +138,41 @@ userSchema.methods.resetFailedAttempts = async function () {
       $set: { failedLoginAttempts: 0, lockUntil: null }
     });
   }
+};
+
+// Method to generate password reset token
+userSchema.methods.createPasswordResetToken = function () {
+  const crypto = require('crypto');
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  this.passwordResetAttempts = 0;
+  
+  return resetToken; // Return unhashed token for email
+};
+
+// Method to clear password reset fields
+userSchema.methods.clearPasswordResetFields = function () {
+  this.passwordResetToken = undefined;
+  this.passwordResetExpires = undefined;
+  this.passwordResetAttempts = 0;
+};
+
+// Method to increment password reset attempts
+userSchema.methods.incrementPasswordResetAttempts = async function () {
+  this.passwordResetAttempts += 1;
+  
+  // Lock password reset after 2 attempts for 24 hours
+  if (this.passwordResetAttempts >= 2) {
+    this.passwordResetExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+  }
+  
+  return this.save();
 };
 
 // Method to get public profile

@@ -22,19 +22,36 @@ const Settings = () => {
     const handlePasswordChange = async (e) => {
         e.preventDefault();
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            toast.error('Passwords do not match');
+            toast.error('New password and confirmation do not match');
+            return;
+        }
+        if (passwordData.newPassword.length < 8) {
+            toast.error('New password must be at least 8 characters');
+            return;
+        }
+        if (!/[A-Z]/.test(passwordData.newPassword) || !/[a-z]/.test(passwordData.newPassword) || !/[0-9]/.test(passwordData.newPassword) || !/[!@#$%^&*(),.?":{}|<>]/.test(passwordData.newPassword)) {
+            toast.error('New password must include uppercase, lowercase, number, and special character');
+            return;
+        }
+        if (passwordData.currentPassword === passwordData.newPassword) {
+            toast.error('New password must be different from current password');
             return;
         }
         setLoading(true);
         try {
-            await api.put('/auth/change-password', {
-                currentPassword: passwordData.currentPassword,
-                newPassword: passwordData.newPassword,
+            await api.post('/auth/change-password', {
+                currentPassword: passwordData.currentPassword.trim(),
+                newPassword: passwordData.newPassword.trim(),
             });
             toast.success('Password changed successfully');
             setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to change password');
+            const data = error.response?.data;
+            const msg =
+                data?.message ||
+                (Array.isArray(data?.errors) && data.errors[0]?.message) ||
+                'Failed to change password';
+            toast.error(msg);
         } finally {
             setLoading(false);
         }

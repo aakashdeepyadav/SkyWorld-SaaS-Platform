@@ -81,7 +81,7 @@ const Login = () => {
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                <a href="#" className="text-xs text-primary-600 hover:text-primary-500">Forgot?</a>
+                <Link to="/forgot-password" className="text-xs text-primary-600 hover:text-primary-500">Forgot?</Link>
               </div>
               <input id="password" name="password" type="password" autoComplete="current-password" required
                 className="input-field" placeholder="••••••••"

@@ -79,11 +79,28 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./client
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci
+      
+      - name: Build
+        working-directory: ./client
+        run: npm run build
+      
+      - name: Build Summary
+        run: |
+          echo "## 🚀 Frontend Build Complete" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Build successful" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Ready for Vercel deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Connect Vercel to this GitHub repository" >> $GITHUB_STEP_SUMMARY
+          echo "2. Deploy automatically on push to main" >> $GITHUB_STEP_SUMMARY
 

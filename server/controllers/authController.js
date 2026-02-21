@@ -1,4 +1,4 @@
-import { registerUser, loginUser, verifyGoogleToken, generateTokens, setTokenCookies, clearTokenCookies, refreshAccessToken, changePassword } from '../services/authService.js';
+import { registerUser, loginUser, verifyGoogleToken, generateTokens, setTokenCookies, clearTokenCookies, refreshAccessToken, changePassword, requestPasswordReset, resetPassword } from '../services/authService.js';
 import { createAuditLog } from '../middleware/auth.js';
 import { OAuth2Client } from 'google-auth-library';
 import { logger } from '../utils/logger.js';
@@ -200,7 +200,8 @@ export const getMe = async (req, res, next) => {
  */
 export const changeUserPassword = async (req, res, next) => {
   try {
-    const { currentPassword, newPassword } = req.body;
+    const currentPassword = req.body.currentPassword != null ? String(req.body.currentPassword).trim() : '';
+    const newPassword = req.body.newPassword != null ? String(req.body.newPassword).trim() : '';
 
     await changePassword(req.user._id, currentPassword, newPassword);
     await createAuditLog(req, 'password_changed', 'user', req.user._id);
@@ -210,6 +211,44 @@ export const changeUserPassword = async (req, res, next) => {
       message: 'Password changed successfully'
     });
   } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @route   POST /api/auth/forgot-password
+ * @desc    Request password reset
+ * @access  Public
+ */
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    const result = await requestPasswordReset(email);
+    await createAuditLog(req, 'password_reset_requested', 'auth', null, { email });
+
+    res.json(result);
+  } catch (error) {
+    await createAuditLog(req, 'password_reset_requested', 'auth', null, { email, success: false, error: error.message });
+    next(error);
+  }
+};
+
+/**
+ * @route   POST /api/auth/reset-password
+ * @desc    Reset password with token
+ * @access  Public
+ */
+export const resetUserPassword = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+
+    const result = await resetPassword(token, password);
+    await createAuditLog(req, 'password_reset_completed', 'auth', null, { success: true });
+
+    res.json(result);
+  } catch (error) {
+    await createAuditLog(req, 'password_reset_completed', 'auth', null, { success: false, error: error.message });
     next(error);
   }
 };

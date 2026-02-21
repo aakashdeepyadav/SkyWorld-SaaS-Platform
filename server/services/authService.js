@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { ROLES, LOCKOUT_POLICY } from '../utils/constants.js';
 import { logger } from '../utils/logger.js';
+import { emailService } from './emailService.js';
 
 /**
  * Generate JWT tokens
@@ -203,33 +204,158 @@ export const refreshAccessToken = async (refreshToken) => {
 };
 
 /**
- * Change password
+ * Attach status code to error for HTTP response
+ */
+function appError(message, statusCode = 400) {
+  const err = new Error(message);
+  err.statusCode = statusCode;
+  return err;
+}
+
+/**
+ * Change password — production-grade: trim input, validate, hash, audit, optional email.
  */
 export const changePassword = async (userId, currentPassword, newPassword) => {
+  const cur = typeof currentPassword === 'string' ? currentPassword.trim() : '';
+  const neu = typeof newPassword === 'string' ? newPassword.trim() : '';
+
+  if (!cur || !neu) {
+    throw appError('Current password and new password are required', 400);
+  }
+
+  const user = await User.findById(userId).select('+password');
+  if (!user || !user.password) {
+    throw appError('Password change not available for this account', 403);
+  }
+
+  const isPasswordValid = await user.comparePassword(cur);
+  if (!isPasswordValid) {
+    throw appError('Current password is incorrect', 400);
+  }
+
+  const isSamePassword = await user.comparePassword(neu);
+  if (isSamePassword) {
+    throw appError('New password must be different from current password', 400);
+  }
+
+  user.password = neu;
+  await user.save();
+
+  // Send confirmation email (non-blocking: do not fail password change if email fails)
+  emailService.sendPasswordChangeEmail(user).catch((err) => {
+    logger.warn('Password change confirmation email failed:', err.message);
+  });
+
+  return user;
+};
+
+/**
+ * Request password reset
+ */
+export const requestPasswordReset = async (email) => {
   try {
-    const user = await User.findById(userId).select('+password');
+    // Find user with password reset fields
+    const user = await User.findOne({ email })
+      .select('+passwordResetToken +passwordResetExpires +passwordResetAttempts');
 
-    if (!user || !user.password) {
-      throw new Error('Password change not available for this account');
+    if (!user) {
+      // Don't reveal if user exists for security
+      return { success: true, message: 'If an account exists, a reset link has been sent' };
     }
 
-    const isPasswordValid = await user.comparePassword(currentPassword);
-    if (!isPasswordValid) {
-      throw new Error('Current password is incorrect');
+    // Check if user has password (Google OAuth users don't)
+    if (!user.password) {
+      return { success: true, message: 'Please login with Google to access this account' };
     }
 
-    // Prevent reusing the same password
-    const isSamePassword = await user.comparePassword(newPassword);
-    if (isSamePassword) {
-      throw new Error('New password must be different from current password');
+    // Check if password reset is locked
+    if (user.passwordResetExpires && user.passwordResetExpires > Date.now()) {
+      const minutesLeft = Math.ceil((user.passwordResetExpires - Date.now()) / (60 * 1000));
+      throw new Error(`Password reset is locked. Try again in ${minutesLeft} minutes.`);
     }
 
-    user.password = newPassword;
+    // Check reset attempts
+    if (user.passwordResetAttempts >= 2) {
+      throw new Error('Too many password reset attempts. Please try again tomorrow.');
+    }
+
+    // Generate reset token
+    const resetToken = user.createPasswordResetToken();
     await user.save();
 
-    return user;
+    // Send reset email
+    const emailSent = await emailService.sendPasswordResetEmail(user, resetToken);
+    
+    if (!emailSent) {
+      throw new Error('Failed to send reset email. Please try again.');
+    }
+
+    logger.info(`Password reset requested for email: ${email}`);
+    
+    return { success: true, message: 'Password reset link sent to your email' };
   } catch (error) {
-    logger.error('Password change error:', error);
+    logger.error('Password reset request error:', error);
+    throw error;
+  }
+};
+
+/**
+ * Reset password with token
+ */
+export const resetPassword = async (token, newPassword) => {
+  try {
+    // Hash the token to compare with stored hash
+    const crypto = require('crypto');
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with valid reset token
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() }
+    }).select('+passwordResetToken +passwordResetExpires +passwordResetAttempts');
+
+    if (!user) {
+      throw new Error('Invalid or expired reset token');
+    }
+
+    // Check reset attempts
+    if (user.passwordResetAttempts >= 2) {
+      throw new Error('Too many reset attempts. Please request a new reset link tomorrow.');
+    }
+
+    // Validate new password
+    if (newPassword.length < 8) {
+      throw new Error('Password must be at least 8 characters long');
+    }
+
+    // Update password
+    user.password = newPassword;
+    user.clearPasswordResetFields();
+    await user.save();
+
+    // Send confirmation email
+    await emailService.sendPasswordChangeEmail(user);
+
+    logger.info(`Password reset completed for user: ${user.email}`);
+    
+    return { success: true, message: 'Password reset successful' };
+  } catch (error) {
+    logger.error('Password reset error:', error);
+    
+    // Increment reset attempts on failure
+    if (error.message.includes('Invalid or expired') || error.message.includes('Too many reset')) {
+      try {
+        const crypto = require('crypto');
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+        await User.findOneAndUpdate(
+          { passwordResetToken: hashedToken },
+          { $inc: { passwordResetAttempts: 1 } }
+        );
+      } catch (updateError) {
+        logger.error('Failed to increment reset attempts:', updateError);
+      }
+    }
+    
     throw error;
   }
 };
