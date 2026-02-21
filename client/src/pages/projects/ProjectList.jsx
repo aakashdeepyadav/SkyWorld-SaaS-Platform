@@ -15,6 +15,23 @@ const getStatusBadge = (status) => {
     return map[status] || 'badge-primary';
 };
 
+const getPaymentBadge = (status) => {
+    const map = {
+        completed: 'badge-success',
+        processing: 'badge-primary',
+        pending: 'badge-warning',
+        failed: 'badge-danger',
+        refunded: 'badge-danger',
+    };
+    return map[status] || 'badge-primary';
+};
+
+const serviceLabels = {
+    'web-development': 'Web Development',
+    'app-development': 'App Development',
+    'branding-creative': 'Branding',
+};
+
 const ProjectList = () => {
     const [page, setPage] = useState(1);
 
@@ -69,6 +86,17 @@ const ProjectList = () => {
                             {project.description && (
                                 <p className="text-xs text-gray-500 line-clamp-2 mb-4">{project.description}</p>
                             )}
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mb-4">
+                                {project.serviceType && (
+                                    <span className="badge-primary">{serviceLabels[project.serviceType] || project.serviceType}</span>
+                                )}
+                                {project.plan && (
+                                    <span className="badge bg-gray-50 text-gray-600 ring-1 ring-gray-200 capitalize">{project.plan}</span>
+                                )}
+                                {project.paymentStatus && (
+                                    <span className={`${getPaymentBadge(project.paymentStatus)} capitalize`}>{project.paymentStatus}</span>
+                                )}
+                            </div>
                             {/* Progress bar */}
                             <div>
                                 <div className="flex items-center justify-between text-xs mb-1.5">

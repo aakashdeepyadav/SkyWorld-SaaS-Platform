@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const Register = () => {
@@ -7,6 +7,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,7 +19,8 @@ const Register = () => {
     setLoading(true);
     try {
       await register(formData.email, formData.password, formData.name);
-      navigate('/dashboard');
+      const redirectTo = location.state?.from || '/dashboard';
+      navigate(redirectTo);
     } catch (error) {
       // Error handled in AuthContext
     } finally {

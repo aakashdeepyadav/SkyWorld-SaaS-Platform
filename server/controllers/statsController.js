@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import Project from '../models/Project.js';
 import ServiceRequest from '../models/ServiceRequest.js';
+import CustomRequest from '../models/CustomRequest.js';
 import Payment from '../models/Payment.js';
 import { PAYMENT_STATUS } from '../utils/constants.js';
 
@@ -16,6 +17,8 @@ export const getAdminStats = async (req, res, next) => {
             totalProjects,
             totalRequests,
             pendingRequests,
+            totalCustomRequests,
+            pendingCustomRequests,
             recentUsers,
             recentProjects,
             revenueAgg
@@ -24,6 +27,8 @@ export const getAdminStats = async (req, res, next) => {
             Project.countDocuments(),
             ServiceRequest.countDocuments(),
             ServiceRequest.countDocuments({ status: 'pending' }),
+            CustomRequest.countDocuments(),
+            CustomRequest.countDocuments({ status: 'pending' }),
             User.find()
                 .select('-password')
                 .sort({ createdAt: -1 })
@@ -49,6 +54,8 @@ export const getAdminStats = async (req, res, next) => {
                 totalProjects,
                 totalRequests,
                 pendingRequests,
+                totalCustomRequests,
+                pendingCustomRequests,
                 totalRevenue,
                 recentUsers,
                 recentProjects

@@ -180,6 +180,7 @@ const Home = () => {
                                 title: 'App Development',
                                 desc: 'iOS, Android, and cross-platform apps. From MVP to enterprise scale — we ship experiences users keep coming back to.',
                                 tags: ['Flutter', 'React Native', 'Swift'],
+                                slug: 'app-development',
                                 iconBg: 'bg-blue-500',
                                 hoverBorder: 'hover:border-blue-200',
                                 tagStyle: 'bg-blue-50 text-blue-600',
@@ -189,6 +190,7 @@ const Home = () => {
                                 title: 'Web Development',
                                 desc: 'SaaS platforms, marketing sites, web apps. React, Node.js, and the best of modern tooling — fast, accessible, scalable.',
                                 tags: ['React', 'Node.js', 'Next.js'],
+                                slug: 'web-development',
                                 iconBg: 'bg-emerald-500',
                                 hoverBorder: 'hover:border-emerald-200',
                                 tagStyle: 'bg-emerald-50 text-emerald-600',
@@ -198,6 +200,7 @@ const Home = () => {
                                 title: 'Branding & Design',
                                 desc: 'Logos, identity systems, UI/UX, and creative direction. We build brands that people recognize and trust.',
                                 tags: ['Figma', 'UI/UX', 'Identity'],
+                                slug: 'branding-creative',
                                 iconBg: 'bg-violet-500',
                                 hoverBorder: 'hover:border-violet-200',
                                 tagStyle: 'bg-violet-50 text-violet-600',
@@ -205,7 +208,7 @@ const Home = () => {
                             },
                         ].map((s, i) => (
                             <Reveal key={s.title} delay={i * 120}>
-                                <div className={`h-full p-8 rounded-2xl bg-white border border-gray-100 ${s.hoverBorder} hover:shadow-xl hover:shadow-gray-900/[0.06] transition-all duration-300 hover:-translate-y-1.5 group relative overflow-hidden`}>
+                                <Link to={`/services/${s.slug}`} className={`h-full p-8 rounded-2xl bg-white border border-gray-100 ${s.hoverBorder} hover:shadow-xl hover:shadow-gray-900/[0.06] transition-all duration-300 hover:-translate-y-1.5 group relative overflow-hidden block`}>
                                     {/* Subtle gradient on hover */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-gray-50/0 to-gray-50/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                                     <div className="relative">
@@ -224,7 +227,7 @@ const Home = () => {
                                             <svg className="w-4 h-4 ml-1.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
                                         </div>
                                     </div>
-                                </div>
+                                </Link>
                             </Reveal>
                         ))}
                     </div>

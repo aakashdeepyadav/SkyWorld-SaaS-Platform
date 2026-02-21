@@ -8,6 +8,7 @@ import {
   CurrencyDollarIcon,
   ClipboardDocumentListIcon,
   ArrowRightIcon,
+  DocumentTextIcon,
 } from '@heroicons/react/24/outline';
 
 const AdminDashboard = () => {
@@ -21,8 +22,9 @@ const AdminDashboard = () => {
   const statCards = [
     { name: 'Total Users', value: stats?.totalUsers || 0, icon: UsersIcon, bg: 'bg-blue-50', color: 'text-blue-600', link: '/admin/users' },
     { name: 'Active Projects', value: stats?.totalProjects || 0, icon: BriefcaseIcon, bg: 'bg-emerald-50', color: 'text-emerald-600', link: '/projects' },
-    { name: 'Revenue', value: `$${(stats?.totalRevenue || 0).toLocaleString()}`, icon: CurrencyDollarIcon, bg: 'bg-amber-50', color: 'text-amber-600', link: '/payments' },
+    { name: 'Revenue', value: `₹${(stats?.totalRevenue || 0).toLocaleString()}`, icon: CurrencyDollarIcon, bg: 'bg-amber-50', color: 'text-amber-600', link: '/payments' },
     { name: 'Pending Requests', value: stats?.pendingRequests || 0, icon: ClipboardDocumentListIcon, bg: 'bg-violet-50', color: 'text-violet-600', link: '/requests' },
+    { name: 'Pending Custom', value: stats?.pendingCustomRequests || 0, icon: DocumentTextIcon, bg: 'bg-sky-50', color: 'text-sky-600', link: '/custom-requests' },
   ];
 
   return (
@@ -40,7 +42,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {statCards.map((stat) => (
           <Link key={stat.name} to={stat.link} className="card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 group">
             <div className="flex items-center justify-between">

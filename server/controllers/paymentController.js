@@ -3,7 +3,8 @@ import Razorpay from 'razorpay';
 import Payment from '../models/Payment.js';
 import Project from '../models/Project.js';
 import ServiceRequest from '../models/ServiceRequest.js';
-import { ROLES, PAYMENT_STATUS } from '../utils/constants.js';
+import CustomRequest from '../models/CustomRequest.js';
+import { CUSTOM_REQUEST_STATUS, DELIVERY_STATUS, PAYMENT_STATUS, PROJECT_STATUS, ROLES, SERVICE_CATEGORIES } from '../utils/constants.js';
 import { createAuditLog } from '../middleware/auth.js';
 
 const razorpay = new Razorpay({
@@ -47,6 +48,7 @@ export const getPayments = async (req, res, next) => {
     const payments = await Payment.find(query)
       .populate('clientId', 'name email')
       .populate('projectId', 'title')
+      .populate('customRequestId', 'serviceType fullName')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
@@ -142,10 +144,13 @@ export const createPayment = async (req, res, next) => {
 
 export const createRazorpayOrder = async (req, res, next) => {
   try {
-    const { projectId, serviceRequestId, amount, currency } = req.body;
+    const { projectId, serviceRequestId, customRequestId, serviceType, plan, amount, currency } = req.body;
 
     let project = null;
     let serviceRequest = null;
+    let customRequest = null;
+    let resolvedServiceType = serviceType;
+    let resolvedPlan = plan;
 
     if (projectId) {
       project = await Project.findById(projectId);
@@ -179,7 +184,43 @@ export const createRazorpayOrder = async (req, res, next) => {
       }
     }
 
-    const derivedAmount = amount ?? project?.budget ?? serviceRequest?.estimatedPrice;
+    if (customRequestId) {
+      customRequest = await CustomRequest.findById(customRequestId);
+      if (!customRequest) {
+        return res.status(404).json({
+          success: false,
+          message: 'Custom request not found'
+        });
+      }
+      if (req.user.role === ROLES.CLIENT && customRequest.clientId.toString() !== req.user._id.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied'
+        });
+      }
+      if (customRequest.status !== CUSTOM_REQUEST_STATUS.QUOTED || !customRequest.quotedPrice) {
+        return res.status(400).json({
+          success: false,
+          message: 'Custom request is not ready for payment'
+        });
+      }
+      resolvedServiceType = customRequest.serviceType;
+      resolvedPlan = 'custom';
+    }
+
+    const starterPrices = {
+      [SERVICE_CATEGORIES.WEB_DEVELOPMENT]: 1499,
+      [SERVICE_CATEGORIES.APP_DEVELOPMENT]: 2999,
+      [SERVICE_CATEGORIES.BRANDING_CREATIVE]: 799
+    };
+
+    let derivedAmount = amount ?? project?.budget ?? serviceRequest?.estimatedPrice;
+    if (resolvedPlan === 'starter' && resolvedServiceType) {
+      derivedAmount = starterPrices[resolvedServiceType];
+    } else if (customRequest) {
+      derivedAmount = customRequest.quotedPrice;
+    }
+
     const normalizedAmount = Number(derivedAmount);
 
     if (!normalizedAmount || Number.isNaN(normalizedAmount) || normalizedAmount <= 0) {
@@ -195,6 +236,9 @@ export const createRazorpayOrder = async (req, res, next) => {
       clientId: project?.clientId || serviceRequest?.clientId || req.user._id,
       projectId,
       serviceRequestId,
+      customRequestId,
+      serviceType: resolvedServiceType,
+      plan: resolvedPlan,
       amount: normalizedAmount,
       currency: normalizedCurrency,
       paymentMethod: 'razorpay',
@@ -208,7 +252,10 @@ export const createRazorpayOrder = async (req, res, next) => {
       notes: {
         paymentId: payment._id.toString(),
         projectId: projectId || '',
-        serviceRequestId: serviceRequestId || ''
+        serviceRequestId: serviceRequestId || '',
+        customRequestId: customRequestId || '',
+        serviceType: resolvedServiceType || '',
+        plan: resolvedPlan || ''
       }
     });
 
@@ -275,6 +322,84 @@ export const verifyRazorpayPayment = async (req, res, next) => {
         success: false,
         message: 'Payment verification failed'
       });
+    }
+
+    if (verified) {
+      let projectIdToAttach = payment.projectId;
+
+      if (!projectIdToAttach && payment.serviceRequestId) {
+        const serviceRequest = await ServiceRequest.findById(payment.serviceRequestId);
+        if (serviceRequest) {
+          const existingProject = await Project.findOne({ serviceRequestId: serviceRequest._id });
+          if (existingProject) {
+            projectIdToAttach = existingProject._id;
+          } else {
+            const project = await Project.create({
+              serviceRequestId: serviceRequest._id,
+              title: serviceRequest.title,
+              description: serviceRequest.description,
+              clientId: serviceRequest.clientId,
+              status: PROJECT_STATUS.PLANNING,
+              deliveryStatus: DELIVERY_STATUS.PENDING,
+              paymentStatus: PAYMENT_STATUS.COMPLETED,
+              serviceType: payment.serviceType,
+              plan: payment.plan,
+              budget: payment.amount
+            });
+            projectIdToAttach = project._id;
+          }
+        }
+      }
+
+      if (!projectIdToAttach && payment.customRequestId) {
+        const customRequest = await CustomRequest.findById(payment.customRequestId);
+        if (customRequest) {
+          const existingProject = await Project.findOne({ customRequestId: customRequest._id });
+          if (existingProject) {
+            projectIdToAttach = existingProject._id;
+          } else {
+            const project = await Project.create({
+              customRequestId: customRequest._id,
+              title: `${customRequest.serviceType.replace('-', ' ')} custom project`,
+              description: customRequest.projectDescription,
+              clientId: customRequest.clientId,
+              status: PROJECT_STATUS.PLANNING,
+              deliveryStatus: DELIVERY_STATUS.PENDING,
+              paymentStatus: PAYMENT_STATUS.COMPLETED,
+              serviceType: customRequest.serviceType,
+              plan: 'custom',
+              budget: payment.amount
+            });
+            projectIdToAttach = project._id;
+            await CustomRequest.findByIdAndUpdate(customRequest._id, {
+              status: CUSTOM_REQUEST_STATUS.APPROVED,
+              approvedAt: new Date()
+            });
+          }
+        }
+      }
+
+      if (!projectIdToAttach && payment.serviceType && payment.plan === 'starter') {
+        const title = `${payment.serviceType.replace('-', ' ')} starter plan`;
+        const project = await Project.create({
+          title,
+          description: 'Starter plan purchase',
+          clientId: payment.clientId,
+          status: PROJECT_STATUS.PLANNING,
+          deliveryStatus: DELIVERY_STATUS.PENDING,
+          paymentStatus: PAYMENT_STATUS.COMPLETED,
+          serviceType: payment.serviceType,
+          plan: payment.plan,
+          budget: payment.amount
+        });
+        projectIdToAttach = project._id;
+      }
+
+      if (projectIdToAttach) {
+        payment.projectId = projectIdToAttach;
+        await payment.save();
+        await Project.findByIdAndUpdate(projectIdToAttach, { paymentStatus: PAYMENT_STATUS.COMPLETED });
+      }
     }
 
     res.json({
@@ -388,4 +513,3 @@ export const updatePaymentStatus = async (req, res, next) => {
     next(error);
   }
 };
-

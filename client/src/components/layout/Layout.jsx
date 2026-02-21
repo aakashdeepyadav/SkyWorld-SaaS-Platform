@@ -14,6 +14,7 @@ import {
   CreditCardIcon,
   UsersIcon,
   WrenchScrewdriverIcon,
+  DocumentTextIcon,
 } from '@heroicons/react/24/outline';
 
 const Layout = () => {
@@ -31,6 +32,7 @@ const Layout = () => {
 
   const mainNavigation = [
     { name: 'Dashboard', href: `/dashboard/${user?.role}`, icon: HomeIcon },
+    ...(user?.role !== 'developer' ? [{ name: 'Custom Requests', href: '/custom-requests', icon: DocumentTextIcon }] : []),
     { name: 'Requests', href: '/requests', icon: ClipboardDocumentListIcon },
     { name: 'Projects', href: '/projects', icon: FolderIcon },
     { name: 'Payments', href: '/payments', icon: CreditCardIcon },
@@ -84,6 +86,7 @@ const Layout = () => {
 
     if (location.pathname.startsWith('/requests/new')) return 'New Request';
     if (location.pathname.startsWith('/requests/')) return 'Request Detail';
+    if (location.pathname.startsWith('/custom-requests')) return 'Custom Requests';
     if (location.pathname.startsWith('/projects/')) return 'Project Detail';
     return 'Dashboard';
   };

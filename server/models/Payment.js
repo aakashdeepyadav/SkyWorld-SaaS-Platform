@@ -11,9 +11,21 @@ const paymentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project'
   },
+  customRequestId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CustomRequest'
+  },
   serviceRequestId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'ServiceRequest'
+  },
+  serviceType: {
+    type: String,
+    trim: true
+  },
+  plan: {
+    type: String,
+    enum: ['starter', 'custom']
   },
   amount: {
     type: Number,
@@ -22,7 +34,7 @@ const paymentSchema = new mongoose.Schema({
   },
   currency: {
     type: String,
-    default: 'USD',
+    default: 'INR',
     uppercase: true
   },
   status: {
@@ -71,6 +83,7 @@ const paymentSchema = new mongoose.Schema({
 // Indexes
 paymentSchema.index({ clientId: 1 });
 paymentSchema.index({ projectId: 1 });
+paymentSchema.index({ customRequestId: 1 });
 paymentSchema.index({ status: 1 });
 paymentSchema.index({ razorpayPaymentId: 1 });
 paymentSchema.index({ createdAt: -1 });

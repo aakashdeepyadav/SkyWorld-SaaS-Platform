@@ -19,10 +19,16 @@ import ClientDashboard from './pages/client/Dashboard';
 import RequestList from './pages/requests/RequestList';
 import NewRequest from './pages/requests/NewRequest';
 import RequestDetail from './pages/requests/RequestDetail';
+import CustomRequestList from './pages/requests/CustomRequestList';
+import CustomRequestForm from './pages/requests/CustomRequestForm';
+import CustomRequestThankYou from './pages/requests/CustomRequestThankYou';
 
 // Project pages
 import ProjectList from './pages/projects/ProjectList';
 import ProjectDetail from './pages/projects/ProjectDetail';
+
+// Service pages
+import ServiceDetail from './pages/services/ServiceDetail';
 
 // Admin pages
 import UserManagement from './pages/admin/UserManagement';
@@ -30,6 +36,7 @@ import ServiceManagement from './pages/admin/ServiceManagement';
 
 // Payment pages
 import PaymentList from './pages/payments/PaymentList';
+import Checkout from './pages/checkout/Checkout';
 
 // Common pages
 import NotFound from './pages/NotFound';
@@ -64,6 +71,7 @@ function App() {
       <Route path="/reset-password" element={user ? <Navigate to="/dashboard" /> : <ResetPassword />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/services/:slug" element={<ServiceDetail />} />
 
       {/* Protected routes */}
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
@@ -89,6 +97,7 @@ function App() {
           element={<RoleRoute allowedRoles={['client', 'admin']}><NewRequest /></RoleRoute>}
         />
         <Route path="/requests/:id" element={<RequestDetail />} />
+        <Route path="/custom-requests" element={<CustomRequestList />} />
 
         {/* Projects */}
         <Route path="/projects" element={<ProjectList />} />
@@ -96,6 +105,7 @@ function App() {
 
         {/* Payments */}
         <Route path="/payments" element={<PaymentList />} />
+        <Route path="/checkout" element={<Checkout />} />
 
         {/* Admin Only */}
         <Route
@@ -110,6 +120,8 @@ function App() {
         {/* Profile & Settings */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/custom-request" element={<CustomRequestForm />} />
+        <Route path="/custom-request/thanks" element={<CustomRequestThankYou />} />
       </Route>
 
       {/* 404 */}

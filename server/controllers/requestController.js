@@ -1,4 +1,5 @@
 import ServiceRequest from '../models/ServiceRequest.js';
+import Service from '../models/Service.js';
 import Project from '../models/Project.js';
 import { ROLES, REQUEST_STATUS } from '../utils/constants.js';
 import { createAuditLog } from '../middleware/auth.js';
@@ -99,9 +100,23 @@ export const getRequest = async (req, res, next) => {
  */
 export const createRequest = async (req, res, next) => {
   try {
+    const { serviceId, title, description, requirements } = req.body;
+
+    const service = await Service.findOne({ _id: serviceId, isActive: true });
+    if (!service) {
+      return res.status(404).json({
+        success: false,
+        message: 'Service not found or inactive'
+      });
+    }
+
     const request = await ServiceRequest.create({
-      ...req.body,
-      clientId: req.user._id
+      serviceId,
+      title,
+      description,
+      requirements,
+      clientId: req.user._id,
+      status: REQUEST_STATUS.PENDING
     });
 
     const populatedRequest = await ServiceRequest.findById(request._id)

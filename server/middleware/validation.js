@@ -140,10 +140,56 @@ export const validators = {
       .optional()
       .isIn(['planning', 'in-progress', 'review', 'completed', 'cancelled'])
       .withMessage('Invalid project status'),
+    body('deliveryStatus')
+      .optional()
+      .isIn(['pending', 'in-progress', 'completed', 'delivered'])
+      .withMessage('Invalid delivery status'),
     body('progress')
       .optional()
       .isInt({ min: 0, max: 100 })
       .withMessage('Progress must be between 0 and 100')
+  ],
+
+  createCustomRequest: [
+    body('serviceType')
+      .isString()
+      .isLength({ min: 2, max: 50 })
+      .withMessage('Valid service type is required'),
+    body('fullName')
+      .trim()
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Full name must be between 2 and 100 characters'),
+    body('email')
+      .isEmail()
+      .withMessage('Please provide a valid email')
+      .normalizeEmail(),
+    body('phone')
+      .trim()
+      .isLength({ min: 7, max: 20 })
+      .withMessage('Phone number is required'),
+    body('businessName')
+      .optional()
+      .trim()
+      .isLength({ max: 200 })
+      .withMessage('Business name is too long'),
+    body('projectDescription')
+      .trim()
+      .isLength({ min: 10, max: 5000 })
+      .withMessage('Project description must be between 10 and 5000 characters'),
+    body('requiredFeatures')
+      .optional()
+      .trim()
+      .isLength({ max: 5000 })
+      .withMessage('Required features cannot exceed 5000 characters'),
+    body('deadline')
+      .optional()
+      .isISO8601()
+      .withMessage('Deadline must be a valid date'),
+    body('budgetRange')
+      .optional()
+      .trim()
+      .isLength({ max: 100 })
+      .withMessage('Budget range is too long')
   ],
 
   // Message validators

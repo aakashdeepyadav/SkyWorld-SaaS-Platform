@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { PROJECT_STATUS } from '../utils/constants.js';
+import { DELIVERY_STATUS, PAYMENT_STATUS, PROJECT_STATUS, SERVICE_CATEGORIES } from '../utils/constants.js';
 
 const milestoneSchema = new mongoose.Schema({
   title: {
@@ -26,9 +26,11 @@ const milestoneSchema = new mongoose.Schema({
 const projectSchema = new mongoose.Schema({
   serviceRequestId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'ServiceRequest',
-    required: [true, 'Service request ID is required'],
-    unique: true
+    ref: 'ServiceRequest'
+  },
+  customRequestId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CustomRequest'
   },
   title: {
     type: String,
@@ -48,10 +50,28 @@ const projectSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+  serviceType: {
+    type: String,
+    enum: Object.values(SERVICE_CATEGORIES)
+  },
+  plan: {
+    type: String,
+    enum: ['starter', 'custom']
+  },
+  paymentStatus: {
+    type: String,
+    enum: Object.values(PAYMENT_STATUS),
+    default: PAYMENT_STATUS.PENDING
+  },
   status: {
     type: String,
     enum: Object.values(PROJECT_STATUS),
     default: PROJECT_STATUS.PLANNING
+  },
+  deliveryStatus: {
+    type: String,
+    enum: Object.values(DELIVERY_STATUS),
+    default: DELIVERY_STATUS.PENDING
   },
   startDate: {
     type: Date
@@ -76,7 +96,8 @@ const projectSchema = new mongoose.Schema({
 });
 
 // Indexes
-// serviceRequestId index auto-created by unique: true in schema
+projectSchema.index({ serviceRequestId: 1 }, { unique: true, sparse: true });
+projectSchema.index({ customRequestId: 1 }, { sparse: true });
 projectSchema.index({ clientId: 1 });
 projectSchema.index({ developerIds: 1 });
 projectSchema.index({ status: 1 });

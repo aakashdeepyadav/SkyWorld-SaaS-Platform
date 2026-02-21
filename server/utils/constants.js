@@ -30,6 +30,20 @@ export const PROJECT_STATUS = {
   CANCELLED: 'cancelled'
 };
 
+export const DELIVERY_STATUS = {
+  PENDING: 'pending',
+  IN_PROGRESS: 'in-progress',
+  COMPLETED: 'completed',
+  DELIVERED: 'delivered'
+};
+
+export const CUSTOM_REQUEST_STATUS = {
+  PENDING: 'pending',
+  QUOTED: 'quoted',
+  APPROVED: 'approved',
+  CANCELLED: 'cancelled'
+};
+
 // Payment Status
 export const PAYMENT_STATUS = {
   PENDING: 'pending',
