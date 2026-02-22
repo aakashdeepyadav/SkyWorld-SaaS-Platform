@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { api } from '../../services/api';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -38,15 +39,7 @@ const ResetPassword = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token, password }),
-      });
-
-      const data = await response.json();
+      const { data } = await api.post('/auth/reset-password', { token, password });
 
       if (data.success) {
         setSuccess(true);
@@ -58,7 +51,7 @@ const ResetPassword = () => {
         toast.error(data.message || 'Failed to reset password');
       }
     } catch (error) {
-      toast.error('Network error. Please try again.');
+      toast.error(error.response?.data?.message || 'Network error. Please try again.');
     } finally {
       setLoading(false);
     }

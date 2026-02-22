@@ -8,6 +8,7 @@ import { emailService } from './emailService.js';
 const AUTH_OTP_EXPIRY_MS = 10 * 60 * 1000;
 const AUTH_OTP_MAX_ATTEMPTS = 5;
 const AUTH_OTP_RESEND_COOLDOWN_MS = 30 * 1000;
+const AUTH_OTP_EMAIL_SEND_TIMEOUT_MS = 20 * 1000;
 
 /**
  * Generate JWT tokens
@@ -224,6 +225,15 @@ const isHashEqual = (expected, provided) => {
   return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(provided));
 };
 
+const withTimeout = (promise, timeoutMs, timeoutMessage) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      setTimeout(() => reject(appError(timeoutMessage, 503)), timeoutMs);
+    })
+  ]);
+};
+
 export const sendEmailOtpChallenge = async (user, purpose) => {
   if (!user) throw appError('User not found', 404);
   if (purpose !== 'register') throw appError('Invalid OTP purpose', 400);
@@ -241,13 +251,31 @@ export const sendEmailOtpChallenge = async (user, purpose) => {
   user.emailOtpPurpose = purpose;
   user.emailOtpExpiresAt = new Date(now + AUTH_OTP_EXPIRY_MS);
   user.emailOtpAttempts = 0;
-  user.emailOtpLastSentAt = new Date(now);
   await user.save({ validateBeforeSave: false });
 
-  const sent = await emailService.sendAuthOtpEmail(user, otp, purpose);
-  if (!sent) {
-    throw appError('Failed to send OTP email. Please try again.', 503);
+  try {
+    const sent = await withTimeout(
+      emailService.sendAuthOtpEmail(user, otp, purpose),
+      AUTH_OTP_EMAIL_SEND_TIMEOUT_MS,
+      'OTP email service timed out. Please try again shortly.'
+    );
+    if (!sent) {
+      throw appError('Failed to send OTP email. Please try again.', 503);
+    }
+  } catch (error) {
+    // Reset OTP challenge state if delivery failed, so users can retry immediately.
+    user.emailOtpCodeHash = undefined;
+    user.emailOtpPurpose = undefined;
+    user.emailOtpExpiresAt = undefined;
+    user.emailOtpAttempts = 0;
+    user.emailOtpLastSentAt = undefined;
+    await user.save({ validateBeforeSave: false });
+    throw error;
   }
+
+  // Cooldown starts only after successful delivery.
+  user.emailOtpLastSentAt = new Date(now);
+  await user.save({ validateBeforeSave: false });
 
   return {
     email: user.email,

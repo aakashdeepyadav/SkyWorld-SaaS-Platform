@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { api } from '../../services/api';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -12,15 +13,7 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
+      const { data } = await api.post('/auth/forgot-password', { email });
 
       if (data.success) {
         setSubmitted(true);
@@ -29,7 +22,7 @@ const ForgotPassword = () => {
         toast.error(data.message || 'Failed to send reset email');
       }
     } catch (error) {
-      toast.error('Network error. Please try again.');
+      toast.error(error.response?.data?.message || 'Network error. Please try again.');
     } finally {
       setLoading(false);
     }

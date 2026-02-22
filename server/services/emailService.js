@@ -2,21 +2,31 @@ import nodemailer from 'nodemailer';
 import { logger } from '../utils/logger.js';
 
 const OTP_EXPIRY_MINUTES = 10;
+const SMTP_CONNECTION_TIMEOUT_MS = 15000;
+const SMTP_GREETING_TIMEOUT_MS = 15000;
+const SMTP_SOCKET_TIMEOUT_MS = 20000;
 
 class EmailService {
   constructor() {
     this.transporter = null;
+    this.fallbackTransports = [];
     this.fromEmail = process.env.FROM_EMAIL || 'noreply@skyworld.com';
     this.fromName = process.env.FROM_NAME || 'SkyWorld Platform';
     this.initializeTransporter();
   }
 
+  cleanEnvValue(value) {
+    if (typeof value !== 'string') return value;
+    return value.trim().replace(/^['"]|['"]$/g, '');
+  }
+
   getSmtpConfig() {
-    const host = process.env.BREVO_SMTP_HOST || process.env.SMTP_HOST;
+    const host = this.cleanEnvValue(process.env.BREVO_SMTP_HOST || process.env.SMTP_HOST);
     const port = Number(process.env.BREVO_SMTP_PORT || process.env.SMTP_PORT || 587);
-    const user = process.env.BREVO_SMTP_USER || process.env.SMTP_USER;
-    const pass = process.env.BREVO_SMTP_PASS || process.env.SMTP_PASS;
-    const secure = String(process.env.SMTP_SECURE || 'false') === 'true';
+    const user = this.cleanEnvValue(process.env.BREVO_SMTP_USER || process.env.SMTP_USER);
+    const pass = this.cleanEnvValue(process.env.BREVO_SMTP_PASS || process.env.SMTP_PASS);
+    const secure =
+      String(process.env.BREVO_SMTP_SECURE || process.env.SMTP_SECURE || 'false').toLowerCase() === 'true';
 
     if (!host || !user || !pass) return null;
 
@@ -24,8 +34,49 @@ class EmailService {
       host,
       port,
       secure,
+      requireTLS: !secure && port === 587,
+      connectionTimeout: SMTP_CONNECTION_TIMEOUT_MS,
+      greetingTimeout: SMTP_GREETING_TIMEOUT_MS,
+      socketTimeout: SMTP_SOCKET_TIMEOUT_MS,
       auth: { user, pass }
     };
+  }
+
+  getFallbackSmtpConfig(primaryConfig) {
+    if (!primaryConfig) return [];
+    const host = String(primaryConfig.host || '').toLowerCase();
+    if (host !== 'smtp-relay.brevo.com') return [];
+
+    const candidates = [
+      { port: 465, secure: true, requireTLS: false },
+      { port: 2525, secure: false, requireTLS: true }
+    ];
+
+    return candidates
+      .filter((candidate) => !(candidate.port === primaryConfig.port && candidate.secure === primaryConfig.secure))
+      .map((candidate) => ({
+        ...primaryConfig,
+        port: candidate.port,
+        secure: candidate.secure,
+        requireTLS: candidate.requireTLS
+      }));
+  }
+
+  createTransporter(config) {
+    return nodemailer.createTransport(config);
+  }
+
+  isRetryableSmtpError(error) {
+    if (!error) return false;
+    const code = String(error.code || '');
+    const message = String(error.message || '').toLowerCase();
+    return (
+      code === 'ETIMEDOUT' ||
+      code === 'ECONNECTION' ||
+      code === 'ESOCKET' ||
+      message.includes('connection timeout') ||
+      message.includes('connection closed')
+    );
   }
 
   initializeTransporter() {
@@ -46,7 +97,26 @@ class EmailService {
       }
 
       if (smtpConfig) {
-        this.transporter = nodemailer.createTransport(smtpConfig);
+        this.transporter = this.createTransporter(smtpConfig);
+        this.transporter.verify().then(() => {
+          logger.info(`Email transporter ready (${smtpConfig.host}:${smtpConfig.port})`);
+        }).catch((error) => {
+          logger.error(`Email transporter verification failed (${smtpConfig.host}:${smtpConfig.port}):`, error);
+        });
+
+        const fallbackConfigs = this.getFallbackSmtpConfig(smtpConfig);
+        this.fallbackTransports = fallbackConfigs.map((config) => ({
+          config,
+          transporter: this.createTransporter(config)
+        }));
+
+        this.fallbackTransports.forEach(({ config, transporter }) => {
+          transporter.verify().then(() => {
+            logger.info(`Email fallback transporter ready (${config.host}:${config.port})`);
+          }).catch((error) => {
+            logger.warn(`Email fallback transporter verification failed (${config.host}:${config.port}): ${error.message}`);
+          });
+        });
         return;
       }
 
@@ -75,6 +145,23 @@ class EmailService {
       logger.info(`Email sent to ${to}: ${info.messageId}`);
       return true;
     } catch (error) {
+      if (this.isRetryableSmtpError(error) && this.fallbackTransports.length > 0) {
+        for (const { config, transporter } of this.fallbackTransports) {
+          logger.warn(`Primary SMTP failed. Retrying with fallback transport (${config.host}:${config.port})`);
+          try {
+            const info = await transporter.sendMail({
+              from: `${this.fromName} <${this.fromEmail}>`,
+              to,
+              subject,
+              html
+            });
+            logger.info(`Email sent via fallback transport to ${to}: ${info.messageId}`);
+            return true;
+          } catch (fallbackError) {
+            logger.error(`Fallback email send failed (${config.host}:${config.port}):`, fallbackError);
+          }
+        }
+      }
       logger.error('Failed to send email:', error);
       return false;
     }

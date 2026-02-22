@@ -1,6 +1,59 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const cleanEnvValue = (value) => {
+  if (typeof value !== 'string') return value;
+  return value.trim().replace(/^['"]|['"]$/g, '');
+};
+
+const isLocalhost = (hostname) => hostname === 'localhost' || hostname === '127.0.0.1';
+
+const resolveApiUrl = () => {
+  const configured = cleanEnvValue(import.meta.env.VITE_API_URL);
+  const hasWindow = typeof window !== 'undefined';
+  const origin = hasWindow ? window.location.origin.toLowerCase() : '';
+  const host = hasWindow ? window.location.hostname.toLowerCase() : '';
+
+  // Production safety fallback for the live website when VITE_API_URL is misconfigured as "/api".
+  const skyworldProdApi = 'https://skyworld-backend.onrender.com/api';
+  const isSkyworldWebHost = host === 'skyworld.buzz' || host === 'www.skyworld.buzz';
+
+  if (configured) {
+    if (/^https?:\/\//i.test(configured)) {
+      try {
+        const parsed = new URL(configured);
+        const parsedOrigin = parsed.origin.toLowerCase();
+        const parsedPath = parsed.pathname || '';
+
+        // If frontend is on skyworld.buzz and API URL accidentally points back to the same website origin,
+        // force backend origin to avoid 405 on website hosting.
+        if (
+          isSkyworldWebHost &&
+          parsedOrigin === origin &&
+          parsedPath.startsWith('/api')
+        ) {
+          return skyworldProdApi;
+        }
+      } catch {
+        // Fall through and return configured as-is
+      }
+      return configured;
+    }
+
+    if (configured.startsWith('/')) {
+      if (isSkyworldWebHost) return skyworldProdApi;
+      return configured;
+    }
+
+    return `https://${configured}`;
+  }
+
+  if (isSkyworldWebHost) return skyworldProdApi;
+  if (hasWindow && isLocalhost(host)) return '/api';
+
+  return 'http://localhost:5000/api';
+};
+
+const API_URL = resolveApiUrl();
 
 export const api = axios.create({
   baseURL: API_URL,

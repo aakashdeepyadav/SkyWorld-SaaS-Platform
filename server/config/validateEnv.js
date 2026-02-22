@@ -6,6 +6,10 @@ import { logger } from '../utils/logger.js';
  */
 export const validateEnv = () => {
     const isProduction = process.env.NODE_ENV === 'production';
+    const cleanEnvValue = (value) => {
+        if (typeof value !== 'string') return value;
+        return value.trim().replace(/^['"]|['"]$/g, '');
+    };
     const required = [
         'MONGODB_URI',
         'JWT_ACCESS_SECRET',
@@ -80,6 +84,27 @@ export const validateEnv = () => {
 
     if (!isProduction && !hasBrevo && !hasGenericSmtp && !(process.env.ETHEREAL_USER && process.env.ETHEREAL_PASS)) {
         logger.warn('Warning: No email provider configured. OTP/password reset emails will fail.');
+    }
+
+    const smtpHost = cleanEnvValue(process.env.BREVO_SMTP_HOST || process.env.SMTP_HOST || '');
+    if (smtpHost) {
+        if (/^https?:\/\//i.test(smtpHost)) {
+            const message = 'SMTP host must not include protocol. Example: smtp-relay.brevo.com';
+            if (isProduction) {
+                logger.error(`FATAL: ${message}`);
+                process.exit(1);
+            }
+            logger.warn(`Warning: ${message}`);
+        }
+
+        if (smtpHost.toLowerCase() === 'serversmtp-relay.brevo.com') {
+            const message = 'Invalid BREVO_SMTP_HOST detected: "serversmtp-relay.brevo.com". Use "smtp-relay.brevo.com".';
+            if (isProduction) {
+                logger.error(`FATAL: ${message}`);
+                process.exit(1);
+            }
+            logger.warn(`Warning: ${message}`);
+        }
     }
 
     logger.info('Environment variables validated successfully');
