@@ -43,6 +43,7 @@ import NotFound from './pages/NotFound';
 import Home from './pages/Home';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import FAQ from './pages/FAQ';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Layout from './components/layout/Layout';
@@ -72,6 +73,7 @@ function App() {
       <Route path="/reset-password" element={user ? <Navigate to="/" /> : <ResetPassword />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/faq" element={<FAQ />} />
       <Route path="/services/:slug" element={<ServiceDetail />} />
 
       {/* Protected routes */}

@@ -463,6 +463,7 @@ const Home = () => {
                         <span className="text-sm text-gray-600">&copy; 2026 SkyWorld Ventures</span>
                     </div>
                     <div className="flex items-center gap-6 text-sm">
+                        <Link to="/faq" className="text-gray-500 hover:text-gray-300 transition-colors">FAQ</Link>
                         <Link to="/privacy" className="text-gray-500 hover:text-gray-300 transition-colors">Privacy</Link>
                         <Link to="/terms" className="text-gray-500 hover:text-gray-300 transition-colors">Terms</Link>
                         <a href="mailto:ventures.skyworld@gmail.com" className="text-gray-500 hover:text-gray-300 transition-colors">Contact</a>
