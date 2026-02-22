@@ -18,7 +18,7 @@ const Login = () => {
     setLoading(true);
     try {
       await login(formData.email, formData.password);
-      const redirectTo = location.state?.from || '/';
+      const redirectTo = location.state?.from || '/dashboard';
       navigate(redirectTo);
     } catch {
       // handled in context
@@ -28,7 +28,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    const redirectTo = location.state?.from || '/';
+    const redirectTo = location.state?.from || '/dashboard';
     sessionStorage.setItem('postAuthRedirect', redirectTo);
     const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || `${window.location.origin}/auth/google/callback`;
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid email profile`;

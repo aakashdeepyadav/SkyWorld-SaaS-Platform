@@ -66,11 +66,11 @@ function App() {
       <Route path="/website" element={<Home />} />
 
       {/* Public routes */}
-      <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
-      <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
+      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+      <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
-      <Route path="/forgot-password" element={user ? <Navigate to="/" /> : <ForgotPassword />} />
-      <Route path="/reset-password" element={user ? <Navigate to="/" /> : <ResetPassword />} />
+      <Route path="/forgot-password" element={user ? <Navigate to="/dashboard" /> : <ForgotPassword />} />
+      <Route path="/reset-password" element={user ? <Navigate to="/dashboard" /> : <ResetPassword />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/faq" element={<FAQ />} />
