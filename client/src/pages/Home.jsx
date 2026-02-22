@@ -119,7 +119,21 @@ const Home = () => {
 
     const services = useMemo(() => {
         const order = ['app-development', 'web-development', 'branding-creative'];
-        const liveByCategory = new Map(liveServices.map((item) => [item.category, item]));
+        const liveByCategory = liveServices.reduce((acc, item) => {
+            const existing = acc.get(item.category);
+            if (!existing) {
+                acc.set(item.category, item);
+                return acc;
+            }
+
+            const existingUpdatedAt = new Date(existing.updatedAt || 0).getTime();
+            const itemUpdatedAt = new Date(item.updatedAt || 0).getTime();
+            if (itemUpdatedAt >= existingUpdatedAt) {
+                acc.set(item.category, item);
+            }
+
+            return acc;
+        }, new Map());
 
         return order.map((slug) => {
             const content = SERVICE_CARD_CONTENT[slug];

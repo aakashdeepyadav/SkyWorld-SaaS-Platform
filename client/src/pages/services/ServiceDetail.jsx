@@ -120,7 +120,9 @@ const ServiceDetail = () => {
   );
 
   const dbService = useMemo(
-    () => services.find((item) => item.category === slug),
+    () => [...services]
+      .filter((item) => item.category === slug)
+      .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime())[0],
     [services, slug]
   );
 
@@ -141,7 +143,14 @@ const ServiceDetail = () => {
   const starterPrice = Number(dbService?.basePrice ?? content.starterPrice ?? 0);
 
   const handleStarter = () => {
-    const target = `/checkout?service=${slug}&plan=starter`;
+    const params = new URLSearchParams({
+      service: slug,
+      plan: 'starter'
+    });
+    if (dbService?._id) {
+      params.set('serviceId', dbService._id);
+    }
+    const target = `/checkout?${params.toString()}`;
     if (!user) {
       navigate('/login', { state: { from: target } });
       return;

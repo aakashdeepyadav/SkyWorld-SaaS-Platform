@@ -20,6 +20,7 @@ const Checkout = () => {
   const [isPaying, setIsPaying] = useState(false);
 
   const serviceSlug = searchParams.get('service');
+  const serviceId = searchParams.get('serviceId');
   const plan = searchParams.get('plan');
 
   const { data: services = [], isLoading: servicesLoading } = useQuery(
@@ -31,12 +32,22 @@ const Checkout = () => {
     { staleTime: 30 * 1000 }
   );
 
-  const service = useMemo(
-    () => services.find((item) => item.category === serviceSlug),
-    [services, serviceSlug]
-  );
+  const service = useMemo(() => {
+    if (serviceId) {
+      const exactMatch = services.find((item) => item._id === serviceId);
+      if (exactMatch) return exactMatch;
+    }
+
+    const candidates = services.filter((item) => item.category === serviceSlug);
+    if (!candidates.length) return undefined;
+
+    return [...candidates].sort(
+      (a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
+    )[0];
+  }, [services, serviceId, serviceSlug]);
 
   const serviceName = service?.name || formatCategory(serviceSlug || '');
+  const resolvedServiceSlug = service?.category || serviceSlug;
   const serviceAmount = Number(service?.basePrice || 0);
 
   if (plan !== 'starter') {
@@ -94,7 +105,8 @@ const Checkout = () => {
     setIsPaying(true);
     try {
       const { data } = await api.post('/payments/razorpay/order', {
-        serviceType: serviceSlug,
+        serviceType: resolvedServiceSlug,
+        serviceId: service?._id,
         plan: 'starter'
       });
 
@@ -129,7 +141,8 @@ const Checkout = () => {
         },
         prefill,
         notes: {
-          serviceType: serviceSlug,
+          serviceType: resolvedServiceSlug,
+          serviceId: service?._id || '',
           plan: 'starter'
         },
         theme: {
@@ -152,7 +165,7 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-surface-50">
       <div className="max-w-3xl mx-auto px-6 py-16">
-        <Link to={`/services/${serviceSlug}`} className="text-sm text-primary-600 hover:text-primary-500">Back to service</Link>
+        <Link to={resolvedServiceSlug ? `/services/${resolvedServiceSlug}` : '/'} className="text-sm text-primary-600 hover:text-primary-500">Back to service</Link>
         <div className="card mt-4">
           <h1 className="text-2xl font-bold text-gray-900">Checkout</h1>
           <p className="text-sm text-gray-500 mt-1">Complete your starter plan payment securely.</p>

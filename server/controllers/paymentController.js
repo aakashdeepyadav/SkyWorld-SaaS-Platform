@@ -26,6 +26,8 @@ const isSignatureValid = (expected, provided) => {
   return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(provided));
 };
 
+const isMongoObjectId = (value) => typeof value === 'string' && /^[a-fA-F0-9]{24}$/.test(value);
+
 /**
  * @route   GET /api/payments
  * @desc    Get payments
@@ -145,11 +147,12 @@ export const createPayment = async (req, res, next) => {
 
 export const createRazorpayOrder = async (req, res, next) => {
   try {
-    const { projectId, serviceRequestId, customRequestId, serviceType, plan, amount, currency } = req.body;
+    const { projectId, serviceRequestId, customRequestId, serviceType, serviceId, plan, amount, currency } = req.body;
 
     let project = null;
     let serviceRequest = null;
     let customRequest = null;
+    let starterService = null;
     let resolvedServiceType = serviceType;
     let resolvedPlan = plan;
 
@@ -210,24 +213,56 @@ export const createRazorpayOrder = async (req, res, next) => {
     }
 
     let derivedAmount = amount ?? project?.budget ?? serviceRequest?.estimatedPrice;
-    if (resolvedPlan === 'starter' && !resolvedServiceType) {
+    if (resolvedPlan === 'starter' && !serviceId && !resolvedServiceType) {
       return res.status(400).json({
         success: false,
-        message: 'Service type is required for starter checkout'
+        message: 'Service selection is required for starter checkout'
       });
     }
 
-    if (resolvedPlan === 'starter' && resolvedServiceType) {
-      const starterService = await Service.findOne({
-        category: resolvedServiceType,
-        isActive: true
-      }).select('basePrice');
+    if (resolvedPlan === 'starter') {
+      if (serviceId) {
+        if (!isMongoObjectId(serviceId)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid service ID'
+          });
+        }
 
-      if (!starterService) {
-        return res.status(404).json({
-          success: false,
-          message: 'Selected service is unavailable for starter checkout'
-        });
+        starterService = await Service.findOne({
+          _id: serviceId,
+          isActive: true
+        }).select('category basePrice');
+
+        if (!starterService) {
+          return res.status(404).json({
+            success: false,
+            message: 'Selected service is unavailable for starter checkout'
+          });
+        }
+
+        if (resolvedServiceType && starterService.category !== resolvedServiceType) {
+          return res.status(400).json({
+            success: false,
+            message: 'Starter checkout service does not match selected category'
+          });
+        }
+
+        resolvedServiceType = starterService.category;
+      } else {
+        starterService = await Service.findOne({
+          category: resolvedServiceType,
+          isActive: true
+        })
+          .sort({ updatedAt: -1, _id: -1 })
+          .select('category basePrice');
+
+        if (!starterService) {
+          return res.status(404).json({
+            success: false,
+            message: 'Selected service is unavailable for starter checkout'
+          });
+        }
       }
 
       derivedAmount = starterService.basePrice;
@@ -268,6 +303,7 @@ export const createRazorpayOrder = async (req, res, next) => {
         projectId: projectId || '',
         serviceRequestId: serviceRequestId || '',
         customRequestId: customRequestId || '',
+        serviceId: serviceId || starterService?._id?.toString() || '',
         serviceType: resolvedServiceType || '',
         plan: resolvedPlan || ''
       }
