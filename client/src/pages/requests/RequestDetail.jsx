@@ -5,6 +5,7 @@ import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { ArrowLeftIcon, UserIcon } from '@heroicons/react/24/outline';
+import { formatINR } from '../../utils/currency';
 
 const getStatusBadge = (status) => {
     const map = {
@@ -122,7 +123,7 @@ const RequestDetail = () => {
                     {data.estimatedPrice > 0 && (
                         <div className="p-3 bg-gray-50 rounded-xl">
                             <p className="text-xs text-gray-400 mb-0.5">Estimated Price</p>
-                            <p className="text-sm font-medium text-gray-900">${data.estimatedPrice.toLocaleString()}</p>
+                            <p className="text-sm font-medium text-gray-900">{formatINR(data.estimatedPrice)}</p>
                         </div>
                     )}
                     {data.assignedDeveloperId && (
@@ -168,7 +169,7 @@ const RequestDetail = () => {
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="estPrice" className="block text-sm font-medium text-gray-700 mb-1.5">Estimated Price ($)</label>
+                            <label htmlFor="estPrice" className="block text-sm font-medium text-gray-700 mb-1.5">Estimated Price (INR)</label>
                             <input
                                 id="estPrice"
                                 type="number"

@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import { formatINR } from '../../utils/currency';
 
 const STATUS_TABS = [
   { key: '', label: 'All' },
@@ -210,7 +211,7 @@ const CustomRequestList = () => {
                   <div className="p-3 rounded-xl bg-gray-50 text-xs text-gray-500">
                     <p>Quote</p>
                     <p className="text-sm font-semibold text-gray-900 mt-1">
-                      {request.quotedPrice ? `₹${Number(request.quotedPrice).toLocaleString()}` : 'Pending'}
+                      {request.quotedPrice ? formatINR(Number(request.quotedPrice)) : 'Pending'}
                     </p>
                   </div>
                   {isAdmin ? (
@@ -260,7 +261,7 @@ const CustomRequestList = () => {
             <h2 className="text-lg font-bold text-gray-900 mb-4">Update Quote</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Quoted price (₹)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Quoted price (INR)</label>
                 <input
                   type="number"
                   min="0"

@@ -2,6 +2,7 @@ import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { formatINR } from '../../utils/currency';
 import {
   UsersIcon,
   BriefcaseIcon,
@@ -22,7 +23,7 @@ const AdminDashboard = () => {
   const statCards = [
     { name: 'Total Users', value: stats?.totalUsers || 0, icon: UsersIcon, bg: 'bg-blue-50', color: 'text-blue-600', link: '/admin/users' },
     { name: 'Active Projects', value: stats?.totalProjects || 0, icon: BriefcaseIcon, bg: 'bg-emerald-50', color: 'text-emerald-600', link: '/projects' },
-    { name: 'Revenue', value: `₹${(stats?.totalRevenue || 0).toLocaleString()}`, icon: CurrencyDollarIcon, bg: 'bg-amber-50', color: 'text-amber-600', link: '/payments' },
+    { name: 'Revenue', value: formatINR(stats?.totalRevenue || 0), icon: CurrencyDollarIcon, bg: 'bg-amber-50', color: 'text-amber-600', link: '/payments' },
     { name: 'Pending Requests', value: stats?.pendingRequests || 0, icon: ClipboardDocumentListIcon, bg: 'bg-violet-50', color: 'text-violet-600', link: '/requests' },
     { name: 'Pending Custom', value: stats?.pendingCustomRequests || 0, icon: DocumentTextIcon, bg: 'bg-sky-50', color: 'text-sky-600', link: '/custom-requests' },
   ];
@@ -148,3 +149,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+

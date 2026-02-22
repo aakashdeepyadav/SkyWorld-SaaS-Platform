@@ -5,6 +5,7 @@ import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { ArrowLeftIcon, ChatBubbleLeftRightIcon, PaperAirplaneIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { formatINR } from '../../utils/currency';
 
 const getStatusBadge = (status) => {
     const map = {
@@ -201,7 +202,7 @@ const ProjectDetail = () => {
                     </div>
                     <div className="p-3 bg-gray-50 rounded-xl">
                         <p className="text-xs text-gray-400">Budget</p>
-                        <p className="text-sm font-medium text-gray-900">{project.budget ? `$${project.budget.toLocaleString()}` : 'TBD'}</p>
+                        <p className="text-sm font-medium text-gray-900">{project.budget ? formatINR(project.budget) : 'TBD'}</p>
                     </div>
                     <div className="p-3 bg-gray-50 rounded-xl">
                         <p className="text-xs text-gray-400">Start</p>
@@ -245,7 +246,7 @@ const ProjectDetail = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-primary-50 rounded-xl">
                         <div>
                             <p className="text-sm font-semibold text-primary-700">Pay for this project</p>
-                            <p className="text-xs text-primary-600 mt-0.5">Amount: ₹{project.budget.toLocaleString()}</p>
+                            <p className="text-xs text-primary-600 mt-0.5">Amount: {formatINR(project.budget)}</p>
                         </div>
                         <button
                             onClick={handlePay}

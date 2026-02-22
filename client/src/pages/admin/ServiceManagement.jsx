@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { api } from '../../services/api';
 import toast from 'react-hot-toast';
 import { PlusIcon, PencilSquareIcon, TrashIcon, XMarkIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/outline';
+import { formatINR } from '../../utils/currency';
 
 const CATEGORIES = [
     { value: 'app-development', label: 'App Development' },
@@ -151,7 +152,7 @@ const ServiceManagement = () => {
                             )}
                             <div className="flex items-center justify-between text-xs">
                                 <span className="badge-primary capitalize">{service.category?.replace('-', ' ')}</span>
-                                {service.basePrice > 0 && <span className="font-medium text-gray-600">${service.basePrice}</span>}
+                                {service.basePrice > 0 && <span className="font-medium text-gray-600">{formatINR(service.basePrice)}</span>}
                             </div>
                         </div>
                     ))}
@@ -211,7 +212,7 @@ const ServiceManagement = () => {
                                 {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category}</p>}
                             </div>
                             <div>
-                                <label htmlFor="svcPrice" className="block text-sm font-medium text-gray-700 mb-1.5">Base Price ($)</label>
+                                <label htmlFor="svcPrice" className="block text-sm font-medium text-gray-700 mb-1.5">Base Price (INR)</label>
                                 <input
                                     id="svcPrice"
                                     type="number"

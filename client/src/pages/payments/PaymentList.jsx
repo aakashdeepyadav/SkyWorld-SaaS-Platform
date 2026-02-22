@@ -3,6 +3,7 @@ import { useQuery } from 'react-query';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { CreditCardIcon } from '@heroicons/react/24/outline';
+import { formatINR } from '../../utils/currency';
 
 const getStatusBadge = (status) => {
     const map = {
@@ -96,7 +97,7 @@ const PaymentList = () => {
                                             <p className="text-sm font-medium text-gray-900">{payment.projectId?.title || 'N/A'}</p>
                                         </td>
                                         <td className="px-5 py-3.5">
-                                            <p className="text-sm font-semibold text-gray-900">${payment.amount?.toLocaleString()}</p>
+                                            <p className="text-sm font-semibold text-gray-900">{formatINR(payment.amount)}</p>
                                         </td>
                                         <td className="px-5 py-3.5">
                                             <span className={`${getStatusBadge(payment.status)} capitalize`}>{payment.status}</span>

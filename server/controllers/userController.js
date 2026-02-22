@@ -133,27 +133,11 @@ export const updateUserRole = async (req, res, next) => {
       });
     }
 
-    // Prevent changing admin role
     const targetUser = await User.findById(userId);
     if (!targetUser) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
-      });
-    }
-
-    if (targetUser.role === ROLES.ADMIN && role !== ROLES.ADMIN) {
-      return res.status(403).json({
-        success: false,
-        message: 'Cannot change admin role'
-      });
-    }
-
-    // Prevent creating admin via API
-    if (role === ROLES.ADMIN && targetUser.role !== ROLES.ADMIN) {
-      return res.status(403).json({
-        success: false,
-        message: 'Admin role can only be assigned manually'
       });
     }
 

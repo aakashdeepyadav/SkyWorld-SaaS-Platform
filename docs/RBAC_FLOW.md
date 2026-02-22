@@ -41,6 +41,7 @@
 
 - Can:
   - Full access to users, services, stats, requests, projects, payments
+  - Change any user role (`client`, `developer`, `admin`)
   - Assign developers to requests
   - Update any request status
   - Manually create direct service requests (`POST /api/requests`)
