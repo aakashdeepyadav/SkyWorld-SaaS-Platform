@@ -48,8 +48,8 @@ class EmailService {
     if (host !== 'smtp-relay.brevo.com') return [];
 
     const candidates = [
-      { port: 465, secure: true, requireTLS: false },
-      { port: 2525, secure: false, requireTLS: true }
+      { port: 2525, secure: false, requireTLS: true },
+      { port: 465, secure: true, requireTLS: false }
     ];
 
     return candidates
