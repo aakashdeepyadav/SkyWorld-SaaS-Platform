@@ -394,7 +394,7 @@ export const requestPasswordReset = async (email) => {
 
     // Find user with password reset fields
     const user = await User.findOne({ email })
-      .select('+passwordResetToken +passwordResetExpires +passwordResetAttempts');
+      .select('+password +passwordResetToken +passwordResetExpires +passwordResetAttempts');
 
     if (!user) {
       // Don't reveal if user exists for security
