@@ -386,18 +386,24 @@ export const changePassword = async (userId, currentPassword, newPassword) => {
  */
 export const requestPasswordReset = async (email) => {
   try {
+    const genericResponse = {
+      success: true,
+      message: 'If an account exists and supports password login, a reset link has been sent.',
+      emailSent: false
+    };
+
     // Find user with password reset fields
     const user = await User.findOne({ email })
       .select('+passwordResetToken +passwordResetExpires +passwordResetAttempts');
 
     if (!user) {
       // Don't reveal if user exists for security
-      return { success: true, message: 'If an account exists, a reset link has been sent' };
+      return genericResponse;
     }
 
     // Check if user has password (Google OAuth users don't)
     if (!user.password) {
-      return { success: true, message: 'Please login with Google to access this account' };
+      return genericResponse;
     }
 
     // Check if password reset is locked
@@ -424,7 +430,7 @@ export const requestPasswordReset = async (email) => {
 
     logger.info(`Password reset requested for email: ${email}`);
 
-    return { success: true, message: 'Password reset link sent to your email' };
+    return { success: true, message: 'Password reset link sent to your email', emailSent: true };
   } catch (error) {
     logger.error('Password reset request error:', error);
     throw error;
