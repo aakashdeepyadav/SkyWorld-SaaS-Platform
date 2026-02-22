@@ -57,8 +57,21 @@ const CustomRequestList = () => {
   const updateMutation = useMutation(
     async () => {
       const payload = {};
-      if (quotedPrice) payload.quotedPrice = Number(quotedPrice);
+      const normalizedQuote = quotedPrice?.trim();
+
+      if (normalizedQuote) payload.quotedPrice = Number(normalizedQuote);
       if (status) payload.status = status;
+
+      const hasExistingQuote = Number(selected?.quotedPrice) > 0;
+      const hasNewQuote = Number(payload.quotedPrice) > 0;
+      if (payload.status === 'quoted' && !hasNewQuote && !hasExistingQuote) {
+        throw new Error('Enter an approved amount before marking as quoted');
+      }
+
+      if (payload.quotedPrice !== undefined && payload.status === 'pending') {
+        payload.status = 'quoted';
+      }
+
       return api.put(`/custom-requests/${selected._id}`, payload);
     },
     {
@@ -75,7 +88,7 @@ const CustomRequestList = () => {
   const openModal = (request) => {
     setSelected(request);
     setQuotedPrice(request.quotedPrice ? String(request.quotedPrice) : '');
-    setStatus(request.status || 'quoted');
+    setStatus(request.status === 'pending' ? 'quoted' : (request.status || 'quoted'));
     setIsModalOpen(true);
   };
 
@@ -201,6 +214,18 @@ const CustomRequestList = () => {
                   {request.projectDescription && (
                     <p className="text-sm text-gray-600 mt-3 line-clamp-3">{request.projectDescription}</p>
                   )}
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {Number(request.expectedPrice) > 0 && (
+                      <span className="text-xs font-medium text-amber-700 bg-amber-50 px-2 py-1 rounded-full">
+                        Client offer: {formatINR(Number(request.expectedPrice))}
+                      </span>
+                    )}
+                    {request.budgetRange && (
+                      <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                        Budget range: {request.budgetRange}
+                      </span>
+                    )}
+                  </div>
                   {request.fileUrl && (
                     <a href={request.fileUrl} target="_blank" rel="noreferrer" className="text-xs text-primary-600 hover:text-primary-500 mt-2 inline-block">
                       View attachment
@@ -260,6 +285,24 @@ const CustomRequestList = () => {
           <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-scale-in">
             <h2 className="text-lg font-bold text-gray-900 mb-4">Update Quote</h2>
             <div className="space-y-4">
+              {Number(selected.expectedPrice) > 0 && (
+                <div className="rounded-xl bg-amber-50 border border-amber-200 p-3">
+                  <p className="text-xs text-amber-700">Client offered amount</p>
+                  <div className="mt-1 flex items-center justify-between gap-3">
+                    <p className="text-base font-semibold text-amber-900">{formatINR(Number(selected.expectedPrice))}</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setQuotedPrice(String(Number(selected.expectedPrice)));
+                        setStatus('quoted');
+                      }}
+                      className="text-xs font-semibold text-amber-700 hover:text-amber-800"
+                    >
+                      Use this amount
+                    </button>
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Quoted price (INR)</label>
                 <input
@@ -269,13 +312,13 @@ const CustomRequestList = () => {
                   onChange={(e) => setQuotedPrice(e.target.value)}
                   className="input-field"
                 />
+                <p className="text-xs text-gray-400 mt-1">This amount will be used for client payment once status is quoted.</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <select value={status} onChange={(e) => setStatus(e.target.value)} className="input-field">
                   <option value="pending">Pending</option>
                   <option value="quoted">Quoted</option>
-                  <option value="approved">Approved</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
               </div>

@@ -189,7 +189,11 @@ export const validators = {
       .optional({ checkFalsy: true })
       .trim()
       .isLength({ max: 100 })
-      .withMessage('Budget range is too long')
+      .withMessage('Budget range is too long'),
+    body('expectedPrice')
+      .optional({ checkFalsy: true })
+      .isFloat({ min: 0, max: 1000000000 })
+      .withMessage('Expected price must be a valid non-negative amount')
   ],
 
   // Message validators

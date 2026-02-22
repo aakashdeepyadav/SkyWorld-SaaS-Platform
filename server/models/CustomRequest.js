@@ -48,6 +48,10 @@ const customRequestSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  expectedPrice: {
+    type: Number,
+    min: 0
+  },
   fileUrl: {
     type: String,
     trim: true

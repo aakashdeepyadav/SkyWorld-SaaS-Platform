@@ -26,7 +26,8 @@ const CustomRequestForm = () => {
     projectDescription: '',
     requiredFeatures: '',
     deadline: '',
-    budgetRange: ''
+    budgetRange: '',
+    expectedPrice: ''
   });
   const [file, setFile] = useState(null);
 
@@ -127,6 +128,21 @@ const CustomRequestForm = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Budget range</label>
             <input name="budgetRange" value={formData.budgetRange} onChange={handleChange} className="input-field" placeholder="e.g. ₹50,000 – ₹1,00,000" />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Your expected price (INR)</label>
+          <input
+            name="expectedPrice"
+            type="number"
+            min="0"
+            step="1"
+            value={formData.expectedPrice}
+            onChange={handleChange}
+            className="input-field"
+            placeholder="e.g. 75000"
+          />
+          <p className="text-xs text-gray-400 mt-1">This is your offer. Admin will review and approve a final payable amount.</p>
         </div>
 
         <div>

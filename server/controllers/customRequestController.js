@@ -76,7 +76,8 @@ export const createCustomRequest = async (req, res, next) => {
       projectDescription,
       requiredFeatures,
       deadline,
-      budgetRange
+      budgetRange,
+      expectedPrice
     } = req.body;
 
     let fileData = {};
@@ -115,6 +116,7 @@ export const createCustomRequest = async (req, res, next) => {
       requiredFeatures,
       deadline,
       budgetRange,
+      expectedPrice: expectedPrice !== undefined && expectedPrice !== '' ? Number(expectedPrice) : undefined,
       ...fileData
     });
 
@@ -145,16 +147,45 @@ export const updateCustomRequest = async (req, res, next) => {
     const updateData = {};
 
     if (quotedPrice !== undefined) {
-      updateData.quotedPrice = quotedPrice;
+      const normalizedQuote = Number(quotedPrice);
+      if (!Number.isFinite(normalizedQuote) || normalizedQuote <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Quoted price must be greater than 0'
+        });
+      }
+
+      updateData.quotedPrice = normalizedQuote;
       updateData.status = CUSTOM_REQUEST_STATUS.QUOTED;
       updateData.quotedAt = new Date();
     }
 
     if (status) {
-      updateData.status = status;
       if (status === CUSTOM_REQUEST_STATUS.APPROVED) {
-        updateData.approvedAt = new Date();
+        return res.status(400).json({
+          success: false,
+          message: 'Custom request is approved automatically after successful payment'
+        });
       }
+
+      if (status === CUSTOM_REQUEST_STATUS.QUOTED) {
+        const existingQuote = Number(request.quotedPrice);
+        const incomingQuote = quotedPrice !== undefined ? Number(quotedPrice) : NaN;
+        const resolvedQuote = Number.isFinite(incomingQuote) ? incomingQuote : existingQuote;
+
+        if (!Number.isFinite(resolvedQuote) || resolvedQuote <= 0) {
+          return res.status(400).json({
+            success: false,
+            message: 'Set an approved amount before marking as quoted'
+          });
+        }
+
+        if (!request.quotedAt && !updateData.quotedAt) {
+          updateData.quotedAt = new Date();
+        }
+      }
+
+      updateData.status = status;
     }
 
     const updatedRequest = await CustomRequest.findByIdAndUpdate(
