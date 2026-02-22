@@ -9,7 +9,9 @@ import {
   changeUserPassword,
   forgotPassword,
   resetUserPassword,
-  deleteAccount
+  deleteAccount,
+  verifyAuthOtp,
+  resendAuthOtp
 } from '../controllers/authController.js';
 import { authenticate } from '../middleware/auth.js';
 import {
@@ -20,7 +22,11 @@ import {
   registerEmailRateLimiter,
   forgotPasswordIpRateLimiter,
   forgotPasswordEmailRateLimiter,
-  resetPasswordRateLimiter
+  resetPasswordRateLimiter,
+  otpSendIpRateLimiter,
+  otpSendEmailRateLimiter,
+  otpVerifyIpRateLimiter,
+  otpVerifyEmailRateLimiter
 } from '../middleware/rateLimiter.js';
 import { validators, handleValidationErrors } from '../middleware/validation.js';
 
@@ -37,6 +43,8 @@ router.post(
 );
 router.post('/login', authRateLimiter, validators.login, handleValidationErrors, login);
 router.post('/google', authRateLimiter, googleAuth);
+router.post('/verify-otp', otpVerifyIpRateLimiter, otpVerifyEmailRateLimiter, validators.verifyAuthOtp, handleValidationErrors, verifyAuthOtp);
+router.post('/resend-otp', otpSendIpRateLimiter, otpSendEmailRateLimiter, validators.resendAuthOtp, handleValidationErrors, resendAuthOtp);
 router.post('/refresh', apiRateLimiter, refresh);
 router.post('/forgot-password', forgotPasswordIpRateLimiter, forgotPasswordEmailRateLimiter, validators.forgotPassword, handleValidationErrors, forgotPassword);
 router.post('/reset-password', resetPasswordRateLimiter, validators.resetPassword, handleValidationErrors, resetUserPassword);

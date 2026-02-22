@@ -124,6 +124,22 @@ export const RATE_LIMITS = {
     windowMs: 60 * 60 * 1000, // 1 hour
     max: 10 // 10 reset-password attempts per IP per hour
   },
+  otpSend: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5 // 5 OTP send/resend attempts per IP
+  },
+  otpSendEmail: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5 // 5 OTP send/resend attempts per email
+  },
+  otpVerify: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10 // 10 OTP verification attempts per IP
+  },
+  otpVerifyEmail: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10 // 10 OTP verification attempts per email
+  },
   sensitive: {
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 3 // 3 requests per window (password change)

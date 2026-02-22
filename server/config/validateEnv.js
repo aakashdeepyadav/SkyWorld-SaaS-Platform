@@ -62,5 +62,25 @@ export const validateEnv = () => {
         process.exit(1);
     }
 
+    const hasBrevo = Boolean(
+        process.env.BREVO_SMTP_HOST &&
+        process.env.BREVO_SMTP_USER &&
+        process.env.BREVO_SMTP_PASS
+    );
+    const hasGenericSmtp = Boolean(
+        process.env.SMTP_HOST &&
+        process.env.SMTP_USER &&
+        process.env.SMTP_PASS
+    );
+
+    if (isProduction && !hasBrevo && !hasGenericSmtp) {
+        logger.error('FATAL: Configure BREVO_SMTP_* or SMTP_* variables for OTP and password reset emails');
+        process.exit(1);
+    }
+
+    if (!isProduction && !hasBrevo && !hasGenericSmtp && !(process.env.ETHEREAL_USER && process.env.ETHEREAL_PASS)) {
+        logger.warn('Warning: No email provider configured. OTP/password reset emails will fail.');
+    }
+
     logger.info('Environment variables validated successfully');
 };

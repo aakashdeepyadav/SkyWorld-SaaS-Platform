@@ -120,6 +120,70 @@ export const resetPasswordRateLimiter = rateLimit({
 });
 
 /**
+ * OTP send/resend limiter by IP.
+ */
+export const otpSendIpRateLimiter = rateLimit({
+  windowMs: RATE_LIMITS.otpSend.windowMs,
+  max: RATE_LIMITS.otpSend.max,
+  message: {
+    success: false,
+    message: 'Too many OTP requests from this IP. Please try again later.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+/**
+ * OTP send/resend limiter by email.
+ */
+export const otpSendEmailRateLimiter = rateLimit({
+  windowMs: RATE_LIMITS.otpSendEmail.windowMs,
+  max: RATE_LIMITS.otpSendEmail.max,
+  keyGenerator: (req) => {
+    const email = normalizeEmail(req.body?.email);
+    return email ? `otp-send-email:${email}` : `otp-send-ip:${req.ip}`;
+  },
+  message: {
+    success: false,
+    message: 'Too many OTP requests for this email. Please try again later.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+/**
+ * OTP verification limiter by IP.
+ */
+export const otpVerifyIpRateLimiter = rateLimit({
+  windowMs: RATE_LIMITS.otpVerify.windowMs,
+  max: RATE_LIMITS.otpVerify.max,
+  message: {
+    success: false,
+    message: 'Too many OTP verification attempts. Please try again later.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+/**
+ * OTP verification limiter by email.
+ */
+export const otpVerifyEmailRateLimiter = rateLimit({
+  windowMs: RATE_LIMITS.otpVerifyEmail.windowMs,
+  max: RATE_LIMITS.otpVerifyEmail.max,
+  keyGenerator: (req) => {
+    const email = normalizeEmail(req.body?.email);
+    return email ? `otp-verify-email:${email}` : `otp-verify-ip:${req.ip}`;
+  },
+  message: {
+    success: false,
+    message: 'Too many OTP verification attempts for this email. Please try again later.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+/**
  * Rate limiter for sensitive operations (password change, etc.)
  */
 export const sensitiveRateLimiter = rateLimit({

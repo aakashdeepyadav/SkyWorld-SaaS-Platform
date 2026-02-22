@@ -5,6 +5,10 @@ import { ROLES, LOCKOUT_POLICY } from '../utils/constants.js';
 import { logger } from '../utils/logger.js';
 import { emailService } from './emailService.js';
 
+const AUTH_OTP_EXPIRY_MS = 10 * 60 * 1000;
+const AUTH_OTP_MAX_ATTEMPTS = 5;
+const AUTH_OTP_RESEND_COOLDOWN_MS = 30 * 1000;
+
 /**
  * Generate JWT tokens
  */
@@ -128,8 +132,6 @@ export const loginUser = async (email, password) => {
     await user.resetFailedAttempts();
 
     // Update last login
-    user.lastLogin = new Date();
-    await user.save();
 
     return user;
   } catch (error) {
@@ -212,6 +214,107 @@ function appError(message, statusCode = 400) {
   err.statusCode = statusCode;
   return err;
 }
+
+const generateSixDigitOtp = () => String(Math.floor(100000 + Math.random() * 900000));
+
+const hashOtp = (otp) => crypto.createHash('sha256').update(String(otp)).digest('hex');
+
+const isHashEqual = (expected, provided) => {
+  if (!expected || !provided || expected.length !== provided.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(provided));
+};
+
+export const sendEmailOtpChallenge = async (user, purpose) => {
+  if (!user) throw appError('User not found', 404);
+  if (purpose !== 'register') throw appError('Invalid OTP purpose', 400);
+  if (!user.isActive) throw appError('Account is deactivated. Contact support.', 403);
+
+  const now = Date.now();
+  const lastSentAt = user.emailOtpLastSentAt ? new Date(user.emailOtpLastSentAt).getTime() : 0;
+  if (lastSentAt && now - lastSentAt < AUTH_OTP_RESEND_COOLDOWN_MS) {
+    const seconds = Math.ceil((AUTH_OTP_RESEND_COOLDOWN_MS - (now - lastSentAt)) / 1000);
+    throw appError(`Please wait ${seconds}s before requesting another OTP`, 429);
+  }
+
+  const otp = generateSixDigitOtp();
+  user.emailOtpCodeHash = hashOtp(otp);
+  user.emailOtpPurpose = purpose;
+  user.emailOtpExpiresAt = new Date(now + AUTH_OTP_EXPIRY_MS);
+  user.emailOtpAttempts = 0;
+  user.emailOtpLastSentAt = new Date(now);
+  await user.save({ validateBeforeSave: false });
+
+  const sent = await emailService.sendAuthOtpEmail(user, otp, purpose);
+  if (!sent) {
+    throw appError('Failed to send OTP email. Please try again.', 503);
+  }
+
+  return {
+    email: user.email,
+    purpose,
+    expiresInSeconds: Math.floor(AUTH_OTP_EXPIRY_MS / 1000)
+  };
+};
+
+export const verifyEmailOtpChallenge = async (email, otp, purpose) => {
+  if (purpose !== 'register') {
+    throw appError('Invalid OTP purpose', 400);
+  }
+
+  const user = await User.findOne({ email })
+    .select('+emailOtpCodeHash +emailOtpPurpose +emailOtpExpiresAt +emailOtpAttempts +emailOtpLastSentAt');
+
+  if (!user) {
+    throw appError('Invalid or expired OTP', 400);
+  }
+
+  if (!user.isActive) {
+    throw appError('Account is deactivated. Contact support.', 403);
+  }
+
+  if (!user.emailOtpCodeHash || !user.emailOtpPurpose || !user.emailOtpExpiresAt) {
+    throw appError('No OTP challenge found. Please request a new OTP.', 400);
+  }
+
+  if (user.emailOtpPurpose !== purpose) {
+    throw appError('OTP purpose mismatch. Please request a new OTP.', 400);
+  }
+
+  if (new Date(user.emailOtpExpiresAt).getTime() < Date.now()) {
+    throw appError('OTP expired. Please request a new OTP.', 400);
+  }
+
+  if ((user.emailOtpAttempts || 0) >= AUTH_OTP_MAX_ATTEMPTS) {
+    throw appError('Too many invalid OTP attempts. Please request a new OTP.', 429);
+  }
+
+  const providedOtpHash = hashOtp(String(otp).trim());
+  const valid = isHashEqual(user.emailOtpCodeHash, providedOtpHash);
+
+  if (!valid) {
+    user.emailOtpAttempts = (user.emailOtpAttempts || 0) + 1;
+    await user.save({ validateBeforeSave: false });
+    throw appError('Invalid OTP', 400);
+  }
+
+  user.emailOtpCodeHash = undefined;
+  user.emailOtpPurpose = undefined;
+  user.emailOtpExpiresAt = undefined;
+  user.emailOtpAttempts = 0;
+  user.emailOtpLastSentAt = undefined;
+
+  if (purpose === 'register') {
+    user.emailVerified = true;
+  }
+
+  await user.save({ validateBeforeSave: false });
+  return user;
+};
+
+export const getUserForOtp = async (email) => {
+  return User.findOne({ email })
+    .select('+password +emailOtpCodeHash +emailOtpPurpose +emailOtpExpiresAt +emailOtpAttempts +emailOtpLastSentAt');
+};
 
 /**
  * Change password — production-grade: trim input, validate, hash, audit, optional email.

@@ -55,12 +55,40 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password, name) => {
     try {
       const response = await api.post('/auth/register', { email, password, name });
+      if (response.data?.requiresOtp) {
+        toast.success(response.data.message || 'OTP sent to your email');
+        return response.data;
+      }
       setUser(response.data.user);
       localStorage.setItem('hasSession', 'true');
       toast.success('Registration successful');
       return response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed');
+      throw error;
+    }
+  };
+
+  const verifyOtp = async (email, otp, purpose) => {
+    try {
+      const response = await api.post('/auth/verify-otp', { email, otp, purpose });
+      setUser(response.data.user);
+      localStorage.setItem('hasSession', 'true');
+      toast.success(response.data.message || 'Verification successful');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'OTP verification failed');
+      throw error;
+    }
+  };
+
+  const resendOtp = async (email, purpose) => {
+    try {
+      const response = await api.post('/auth/resend-otp', { email, purpose });
+      toast.success(response.data.message || 'OTP resent');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to resend OTP');
       throw error;
     }
   };
@@ -98,6 +126,8 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    verifyOtp,
+    resendOtp,
     googleLogin,
     logout,
     updateUser,

@@ -14,7 +14,14 @@ export const api = axios.create({
 let isRefreshing = false;
 
 // Auth endpoints that should NEVER trigger the refresh interceptor
-const AUTH_ENDPOINTS = ['/auth/refresh', '/auth/login', '/auth/register', '/auth/google'];
+const AUTH_ENDPOINTS = [
+  '/auth/refresh',
+  '/auth/login',
+  '/auth/register',
+  '/auth/google',
+  '/auth/verify-otp',
+  '/auth/resend-otp'
+];
 
 // Request interceptor
 api.interceptors.request.use(

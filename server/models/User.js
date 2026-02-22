@@ -83,6 +83,28 @@ const userSchema = new mongoose.Schema({
     default: 0,
     select: false
   },
+  emailOtpCodeHash: {
+    type: String,
+    select: false
+  },
+  emailOtpPurpose: {
+    type: String,
+    enum: ['register', 'login'],
+    select: false
+  },
+  emailOtpExpiresAt: {
+    type: Date,
+    select: false
+  },
+  emailOtpAttempts: {
+    type: Number,
+    default: 0,
+    select: false
+  },
+  emailOtpLastSentAt: {
+    type: Date,
+    select: false
+  },
   notificationPreferences: {
     email: { type: Boolean, default: true },
     projectUpdates: { type: Boolean, default: true },

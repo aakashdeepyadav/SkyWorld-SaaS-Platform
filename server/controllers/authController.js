@@ -1,8 +1,23 @@
-import { registerUser, loginUser, verifyGoogleToken, generateTokens, setTokenCookies, clearTokenCookies, refreshAccessToken, changePassword, requestPasswordReset, resetPassword } from '../services/authService.js';
+import {
+  registerUser,
+  loginUser,
+  verifyGoogleToken,
+  generateTokens,
+  setTokenCookies,
+  clearTokenCookies,
+  refreshAccessToken,
+  changePassword,
+  requestPasswordReset,
+  resetPassword,
+  sendEmailOtpChallenge,
+  verifyEmailOtpChallenge,
+  getUserForOtp
+} from '../services/authService.js';
 import { createAuditLog } from '../middleware/auth.js';
 import { OAuth2Client } from 'google-auth-library';
 import { logger } from '../utils/logger.js';
 import User from '../models/User.js';
+import { ROLES } from '../utils/constants.js';
 
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
@@ -18,17 +33,40 @@ const googleClient = new OAuth2Client(
 export const register = async (req, res, next) => {
   try {
     const { email, password, name } = req.body;
+    let user = await getUserForOtp(email);
 
-    const user = await registerUser(email, password, name);
-    const { accessToken, refreshToken } = generateTokens(user._id);
-    setTokenCookies(res, accessToken, refreshToken);
+    if (user?.googleId && !user.password) {
+      return res.status(400).json({
+        success: false,
+        message: 'This account uses Google login. Please continue with Google.'
+      });
+    }
 
-    await createAuditLog(req, 'user_registered', 'user', user._id, { method: 'email' });
+    if (user?.emailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
 
-    res.status(201).json({
+    if (!user) {
+      user = await registerUser(email, password, name);
+    } else {
+      user.name = name;
+      user.password = password;
+      user.role = ROLES.CLIENT;
+      user.isActive = true;
+      await user.save();
+    }
+
+    const challenge = await sendEmailOtpChallenge(user, 'register');
+    await createAuditLog(req, 'email_otp_sent', 'auth', user._id, { purpose: 'register' });
+
+    res.status(200).json({
       success: true,
-      message: 'Registration successful',
-      user: user.toPublicJSON()
+      message: 'OTP sent to your email. Verify to complete registration.',
+      requiresOtp: true,
+      ...challenge
     });
   } catch (error) {
     next(error);
@@ -45,6 +83,17 @@ export const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     const user = await loginUser(email, password);
+
+    if (!user.emailVerified) {
+      return res.status(403).json({
+        success: false,
+        message: 'Email not verified. Complete signup OTP verification first.'
+      });
+    }
+
+    user.lastLogin = new Date();
+    await user.save({ validateBeforeSave: false });
+
     const { accessToken, refreshToken } = generateTokens(user._id);
     setTokenCookies(res, accessToken, refreshToken);
 
@@ -57,6 +106,90 @@ export const login = async (req, res, next) => {
     });
   } catch (error) {
     await createAuditLog(req, 'user_login', 'auth', null, { method: 'email', success: false, error: error.message });
+    next(error);
+  }
+};
+
+/**
+ * @route   POST /api/auth/verify-otp
+ * @desc    Verify signup OTP and complete registration
+ * @access  Public
+ */
+export const verifyAuthOtp = async (req, res, next) => {
+  try {
+    const { email, otp, purpose } = req.body;
+    if (purpose !== 'register') {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP verification is only available for signup'
+      });
+    }
+
+    const user = await verifyEmailOtpChallenge(email, otp, purpose);
+
+    user.lastLogin = new Date();
+    await user.save({ validateBeforeSave: false });
+
+    const { accessToken, refreshToken } = generateTokens(user._id);
+    setTokenCookies(res, accessToken, refreshToken);
+
+    if (purpose === 'register') {
+      await createAuditLog(req, 'user_registered', 'user', user._id, { method: 'email_otp' });
+    }
+    await createAuditLog(req, 'user_login', 'auth', user._id, { method: 'email_otp', success: true });
+
+    res.json({
+      success: true,
+      message: 'Registration successful',
+      user: user.toPublicJSON()
+    });
+  } catch (error) {
+    await createAuditLog(req, 'email_otp_verify', 'auth', null, { success: false, error: error.message });
+    next(error);
+  }
+};
+
+/**
+ * @route   POST /api/auth/resend-otp
+ * @desc    Resend OTP for signup verification
+ * @access  Public
+ */
+export const resendAuthOtp = async (req, res, next) => {
+  try {
+    const { email, purpose } = req.body;
+    if (purpose && purpose !== 'register') {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP resend is only available for signup verification'
+      });
+    }
+
+    const user = await getUserForOtp(email);
+
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message: 'If an account exists, OTP has been sent.'
+      });
+    }
+
+    if (user.emailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Account already verified. You can log in directly.'
+      });
+    }
+
+    const challenge = await sendEmailOtpChallenge(user, 'register');
+    await createAuditLog(req, 'email_otp_sent', 'auth', user._id, { purpose: 'register', resend: true });
+
+    res.json({
+      success: true,
+      message: 'OTP resent successfully',
+      requiresOtp: true,
+      ...challenge
+    });
+  } catch (error) {
     next(error);
   }
 };
@@ -229,9 +362,8 @@ export const changeUserPassword = async (req, res, next) => {
  * @access  Public
  */
 export const forgotPassword = async (req, res, next) => {
+  const { email } = req.body;
   try {
-    const { email } = req.body;
-
     const result = await requestPasswordReset(email);
     await createAuditLog(req, 'password_reset_requested', 'auth', null, { email });
 

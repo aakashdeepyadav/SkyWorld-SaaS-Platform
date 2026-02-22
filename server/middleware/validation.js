@@ -98,6 +98,25 @@ export const validators = {
     ...passwordValidation('password')
   ],
 
+  verifyAuthOtp: [
+    ...emailValidation,
+    body('otp')
+      .trim()
+      .matches(/^\d{6}$/)
+      .withMessage('OTP must be a 6-digit code'),
+    body('purpose')
+      .equals('register')
+      .withMessage('Invalid OTP purpose')
+  ],
+
+  resendAuthOtp: [
+    ...emailValidation,
+    body('purpose')
+      .optional()
+      .equals('register')
+      .withMessage('Invalid OTP purpose')
+  ],
+
   // User validators
   updateProfile: [
     body('name')
