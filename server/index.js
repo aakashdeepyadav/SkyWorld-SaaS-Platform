@@ -15,6 +15,7 @@ import { validateEnv } from './config/validateEnv.js';
 import { configureCloudinary } from './config/cloudinary.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { globalRateLimiter } from './middleware/rateLimiter.js';
+import { csrfProtection } from './middleware/csrfProtection.js';
 import { logger } from './utils/logger.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
@@ -36,6 +37,7 @@ configureCloudinary();
 const app = express();
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || '0.0.0.0';
+app.disable('x-powered-by');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -127,6 +129,7 @@ app.use(express.json({
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(cookieParser());
 app.use('/uploads', express.static(uploadsDir));
+app.use(csrfProtection(allowedOrigins));
 
 // ─── Logging ─────────────────────────────────────────────────────────────────
 

@@ -5,6 +5,7 @@ import { logger } from '../utils/logger.js';
  * Fails fast with clear error messages instead of cryptic runtime crashes.
  */
 export const validateEnv = () => {
+    const isProduction = process.env.NODE_ENV === 'production';
     const required = [
         'MONGODB_URI',
         'JWT_ACCESS_SECRET',
@@ -34,15 +35,30 @@ export const validateEnv = () => {
 
     // Validate JWT secrets are strong enough (at least 32 chars)
     if (process.env.JWT_ACCESS_SECRET.length < 32) {
-        logger.warn('Warning: JWT_ACCESS_SECRET should be at least 32 characters for security');
+        const message = 'JWT_ACCESS_SECRET should be at least 32 characters for security';
+        if (isProduction) {
+            logger.error(`FATAL: ${message}`);
+            process.exit(1);
+        }
+        logger.warn(`Warning: ${message}`);
     }
     if (process.env.JWT_REFRESH_SECRET.length < 32) {
-        logger.warn('Warning: JWT_REFRESH_SECRET should be at least 32 characters for security');
+        const message = 'JWT_REFRESH_SECRET should be at least 32 characters for security';
+        if (isProduction) {
+            logger.error(`FATAL: ${message}`);
+            process.exit(1);
+        }
+        logger.warn(`Warning: ${message}`);
     }
 
     // Ensure JWT secrets are different
     if (process.env.JWT_ACCESS_SECRET === process.env.JWT_REFRESH_SECRET) {
         logger.error('FATAL: JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be different');
+        process.exit(1);
+    }
+
+    if (isProduction && process.env.FRONTEND_URL && !/^https:\/\//i.test(process.env.FRONTEND_URL)) {
+        logger.error('FATAL: FRONTEND_URL must use HTTPS in production');
         process.exit(1);
     }
 

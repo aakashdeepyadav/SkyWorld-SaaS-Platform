@@ -320,69 +320,46 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* --- PRODUCT PREVIEW --- */}
+            {/* --- VALUE --- */}
             <section className="py-24 sm:py-32 px-6 lg:px-8 bg-surface-50 border-y border-gray-100">
                 <div className="max-w-6xl mx-auto">
                     <Reveal>
-                        <div className="grid lg:grid-cols-2 gap-16 items-center">
-                            <div>
-                                <p className="text-sm font-semibold text-primary-500 mb-2 tracking-wide uppercase">The platform</p>
-                                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-snug mb-6">
-                                    Your project,<br />completely transparent.
-                                </h2>
-                                <p className="text-gray-500 leading-relaxed mb-8">
-                                    No black boxes. Track milestones, chat with your team, review deliverables, and manage payments — all from one clean dashboard.
-                                </p>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {[
-                                        { label: 'Real-time tracking', desc: 'See progress as it happens' },
-                                        { label: 'Team messaging', desc: 'Chat directly with devs' },
-                                        { label: 'Milestone payments', desc: 'Pay only on approval' },
-                                        { label: 'File sharing', desc: 'Assets in one place' },
-                                    ].map((f) => (
-                                        <div key={f.label} className="p-4 rounded-xl bg-white border border-gray-100">
-                                            <p className="text-sm font-semibold text-gray-900">{f.label}</p>
-                                            <p className="text-xs text-gray-400 mt-0.5">{f.desc}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                        <p className="text-sm font-semibold text-primary-500 mb-2 tracking-wide uppercase">Why SkyWorld</p>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 max-w-2xl leading-snug">
+                            Built for clarity, speed, and accountable delivery.
+                        </h2>
+                        <p className="text-gray-500 mt-4 max-w-3xl">
+                            We focus on practical execution: clear scope, visible progress, and handovers you can actually use.
+                        </p>
+                    </Reveal>
 
-                            {/* Dashboard preview cards */}
-                            <div className="relative">
-                                <div className="absolute -inset-4 bg-gradient-to-br from-primary-50 to-accent-50 rounded-3xl" />
-                                <div className="relative space-y-3">
-                                    <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-primary-500 text-white flex items-center justify-center text-xs font-bold">NX</div>
-                                                <div><p className="text-sm font-semibold text-gray-900">Nexava Mobile App</p><p className="text-xs text-gray-400">In progress · 4 milestones</p></div>
-                                            </div>
-                                            <span className="text-xs font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">78%</span>
-                                        </div>
-                                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                            <div className="h-full bg-primary-500 rounded-full transition-all duration-1000" style={{ width: '78%' }} />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
-                                            <p className="text-2xl font-bold text-gray-900">?10.2L</p>
-                                            <p className="text-xs text-gray-400 mt-1">Revenue this month</p>
-                                        </div>
-                                        <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
-                                            <p className="text-2xl font-bold text-gray-900">23</p>
-                                            <p className="text-xs text-gray-400 mt-1">Active projects</p>
-                                        </div>
-                                    </div>
-                                    <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">GL</div>
-                                            <div className="flex-1"><p className="text-sm font-semibold text-gray-900">GreenLeaf E-commerce</p><p className="text-xs text-gray-400">Delivered · Dec 2025</p></div>
-                                            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Complete</span>
-                                        </div>
-                                    </div>
+                    <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {[
+                            { title: 'Clear Scope', desc: 'Requirements, deliverables, and timelines are defined before work starts.' },
+                            { title: 'Weekly Progress', desc: 'You get regular updates with concrete milestone status and next actions.' },
+                            { title: 'Fast Communication', desc: 'Direct client-team communication keeps decisions quick and traceable.' },
+                            { title: 'Quality First', desc: 'Every delivery goes through QA checks before review and approval.' },
+                            { title: 'Secure Payments', desc: 'Payments are processed through verified flow with server-side signature checks.' },
+                            { title: 'Structured Handover', desc: 'We provide organized assets, docs, and launch support at completion.' },
+                        ].map((item, i) => (
+                            <Reveal key={item.title} delay={i * 80}>
+                                <div className="h-full rounded-2xl border border-gray-200 bg-white p-6 hover:border-primary-200 transition-colors duration-200">
+                                    <div className="w-2 h-2 rounded-full bg-primary-500 mb-4" />
+                                    <h3 className="text-base font-semibold text-gray-900">{item.title}</h3>
+                                    <p className="text-sm text-gray-500 mt-2 leading-relaxed">{item.desc}</p>
                                 </div>
-                            </div>
+                            </Reveal>
+                        ))}
+                    </div>
+
+                    <Reveal delay={120}>
+                        <div className="mt-10 flex flex-wrap items-center gap-4">
+                            <Link to="/faq" className="text-sm font-semibold text-primary-600 hover:text-primary-500">
+                                Read FAQs
+                            </Link>
+                            <Link to="/services/web-development" className="text-sm font-semibold text-gray-600 hover:text-gray-900">
+                                Explore services
+                            </Link>
                         </div>
                     </Reveal>
                 </div>

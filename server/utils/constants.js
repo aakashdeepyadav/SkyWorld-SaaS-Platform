@@ -100,9 +100,29 @@ export const RATE_LIMITS = {
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 200 // 200 requests per window per IP
   },
+  register: {
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5 // 5 signup attempts per IP per hour
+  },
+  registerEmail: {
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 3 // 3 signup attempts per email per hour
+  },
   auth: {
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5 // 5 requests per window (login/register)
+  },
+  forgotPassword: {
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5 // 5 forgot-password attempts per IP per hour
+  },
+  forgotPasswordEmail: {
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 3 // 3 forgot-password attempts per email per hour
+  },
+  resetPassword: {
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 10 // 10 reset-password attempts per IP per hour
   },
   sensitive: {
     windowMs: 15 * 60 * 1000, // 15 minutes

@@ -88,7 +88,14 @@ export const googleAuth = async (req, res, next) => {
     });
 
     const payload = ticket.getPayload();
-    const { sub: googleId, email, name, picture: avatar } = payload;
+    const { sub: googleId, email, name, picture: avatar, email_verified: emailVerified } = payload;
+
+    if (!emailVerified) {
+      return res.status(401).json({
+        success: false,
+        message: 'Google account email is not verified'
+      });
+    }
 
     // Verify and get/create user
     const user = await verifyGoogleToken(googleId, email, name, avatar);
