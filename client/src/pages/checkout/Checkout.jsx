@@ -1,14 +1,17 @@
 import { useMemo, useState } from 'react';
+import { useQuery } from 'react-query';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
+import { formatINR } from '../../utils/currency';
 
-const SERVICES = {
-  'web-development': { name: 'Web Development', price: 1499 },
-  'app-development': { name: 'App Development', price: 2999 },
-  'branding-creative': { name: 'Branding', price: 799 }
-};
+const formatCategory = (value = '') => (
+  value
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+);
 
 const Checkout = () => {
   const [searchParams] = useSearchParams();
@@ -19,9 +22,24 @@ const Checkout = () => {
   const serviceSlug = searchParams.get('service');
   const plan = searchParams.get('plan');
 
-  const service = useMemo(() => SERVICES[serviceSlug], [serviceSlug]);
+  const { data: services = [], isLoading: servicesLoading } = useQuery(
+    ['checkout-services'],
+    async () => {
+      const response = await api.get('/services');
+      return response.data?.services || [];
+    },
+    { staleTime: 30 * 1000 }
+  );
 
-  if (!service || plan !== 'starter') {
+  const service = useMemo(
+    () => services.find((item) => item.category === serviceSlug),
+    [services, serviceSlug]
+  );
+
+  const serviceName = service?.name || formatCategory(serviceSlug || '');
+  const serviceAmount = Number(service?.basePrice || 0);
+
+  if (plan !== 'starter') {
     return (
       <div className="min-h-screen bg-surface-50 px-6 py-20">
         <div className="max-w-2xl mx-auto card text-center">
@@ -33,11 +51,46 @@ const Checkout = () => {
     );
   }
 
+  if (servicesLoading) {
+    return (
+      <div className="min-h-screen bg-surface-50 px-6 py-20">
+        <div className="max-w-3xl mx-auto card animate-pulse">
+          <div className="h-6 bg-gray-100 rounded w-1/3 mb-3" />
+          <div className="h-4 bg-gray-50 rounded w-1/2 mb-8" />
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="h-20 bg-gray-50 rounded-xl" />
+            <div className="h-20 bg-gray-50 rounded-xl" />
+            <div className="h-20 bg-gray-50 rounded-xl" />
+            <div className="h-20 bg-gray-50 rounded-xl" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!service) {
+    return (
+      <div className="min-h-screen bg-surface-50 px-6 py-20">
+        <div className="max-w-2xl mx-auto card text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Service unavailable</h1>
+          <p className="text-sm text-gray-500 mt-2">This service is currently unavailable for checkout.</p>
+          <Link to="/" className="btn-primary mt-6 inline-flex">Back to Home</Link>
+        </div>
+      </div>
+    );
+  }
+
   const handlePay = async () => {
+    if (serviceAmount <= 0) {
+      toast.error('Starter checkout is unavailable for this service');
+      return;
+    }
+
     if (!window.Razorpay) {
       toast.error('Payment service not available');
       return;
     }
+
     setIsPaying(true);
     try {
       const { data } = await api.post('/payments/razorpay/order', {
@@ -58,7 +111,7 @@ const Checkout = () => {
         amount: order.amount,
         currency: order.currency,
         name: 'SkyWorld Ventures',
-        description: `${service.name} Starter Plan`,
+        description: `${serviceName} Starter Plan`,
         order_id: order.id,
         handler: async (response) => {
           try {
@@ -107,7 +160,7 @@ const Checkout = () => {
           <div className="mt-8 grid sm:grid-cols-2 gap-4">
             <div className="p-4 rounded-xl bg-gray-50">
               <p className="text-xs text-gray-400">Service</p>
-              <p className="text-sm font-medium text-gray-900 mt-1">{service.name}</p>
+              <p className="text-sm font-medium text-gray-900 mt-1">{serviceName}</p>
             </div>
             <div className="p-4 rounded-xl bg-gray-50">
               <p className="text-xs text-gray-400">Plan</p>
@@ -115,7 +168,7 @@ const Checkout = () => {
             </div>
             <div className="p-4 rounded-xl bg-gray-50">
               <p className="text-xs text-gray-400">Amount</p>
-              <p className="text-sm font-medium text-gray-900 mt-1">₹{service.price.toLocaleString()}</p>
+              <p className="text-sm font-medium text-gray-900 mt-1">{formatINR(serviceAmount)}</p>
             </div>
             <div className="p-4 rounded-xl bg-gray-50">
               <p className="text-xs text-gray-400">Payment</p>
@@ -125,7 +178,11 @@ const Checkout = () => {
 
           <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <p className="text-xs text-gray-400">You will be redirected to your dashboard after payment.</p>
-            <button onClick={handlePay} disabled={isPaying} className="btn-primary !py-2.5 !px-5 disabled:opacity-50">
+            <button
+              onClick={handlePay}
+              disabled={isPaying || serviceAmount <= 0}
+              className="btn-primary !py-2.5 !px-5 disabled:opacity-50"
+            >
               {isPaying ? 'Processing...' : 'Pay Now'}
             </button>
           </div>

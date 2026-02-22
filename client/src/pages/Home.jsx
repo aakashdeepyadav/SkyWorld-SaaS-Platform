@@ -1,6 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+﻿import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useQuery } from 'react-query';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
+import { formatINR } from '../utils/currency';
 
 /* ——— Scroll-triggered fade-in ——— */
 const Reveal = ({ children, className = '', delay = 0 }) => {
@@ -70,11 +73,67 @@ const Marquee = ({ items }) => (
     </div>
 );
 
+const SERVICE_CARD_CONTENT = {
+    'app-development': {
+        title: 'App Development',
+        desc: 'iOS, Android, and cross-platform apps. From MVP to enterprise scale - we ship experiences users keep coming back to.',
+        tags: ['Flutter', 'React Native', 'Swift'],
+        iconBg: 'bg-blue-500',
+        hoverBorder: 'hover:border-blue-200',
+        tagStyle: 'bg-blue-50 text-blue-600',
+        icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />,
+    },
+    'web-development': {
+        title: 'Web Development',
+        desc: 'SaaS platforms, marketing sites, web apps. React, Node.js, and the best of modern tooling - fast, accessible, scalable.',
+        tags: ['React', 'Node.js', 'Next.js'],
+        iconBg: 'bg-emerald-500',
+        hoverBorder: 'hover:border-emerald-200',
+        tagStyle: 'bg-emerald-50 text-emerald-600',
+        icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18zM3.6 9h16.8M3.6 15h16.8" />,
+    },
+    'branding-creative': {
+        title: 'Branding & Design',
+        desc: 'Logos, identity systems, UI/UX, and creative direction. We build brands that people recognize and trust.',
+        tags: ['Figma', 'UI/UX', 'Identity'],
+        iconBg: 'bg-violet-500',
+        hoverBorder: 'hover:border-violet-200',
+        tagStyle: 'bg-violet-50 text-violet-600',
+        icon: <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />,
+    }
+};
+
 const Home = () => {
     const [scrolled, setScrolled] = useState(false);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const isAuthenticated = Boolean(user);
+    const { data: liveServices = [] } = useQuery(
+        ['home-services'],
+        async () => {
+            const response = await api.get('/services');
+            return response.data?.services || [];
+        },
+        { staleTime: 30 * 1000 }
+    );
+
+    const services = useMemo(() => {
+        const order = ['app-development', 'web-development', 'branding-creative'];
+        const liveByCategory = new Map(liveServices.map((item) => [item.category, item]));
+
+        return order.map((slug) => {
+            const content = SERVICE_CARD_CONTENT[slug];
+            const live = liveByCategory.get(slug);
+
+            return {
+                ...content,
+                slug,
+                title: live?.name || content.title,
+                desc: live?.description || content.desc,
+                basePrice: Number(live?.basePrice ?? 0)
+            };
+        });
+    }, [liveServices]);
 
     const handleLogout = async () => {
         await logout();
@@ -90,7 +149,7 @@ const Home = () => {
     return (
         <div className="min-h-screen bg-surface-50 font-sans">
 
-            {/* ═══ NAV — clean, just logo + auth ═══ */}
+            {/* --- NAV — clean, just logo + auth --- */}
             <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm' : ''
                 }`}>
                 <div className="max-w-6xl mx-auto px-6 lg:px-8 flex justify-between items-center h-16">
@@ -127,7 +186,7 @@ const Home = () => {
                 </div>
             </nav>
 
-            {/* ═══ HERO ═══ */}
+            {/* --- HERO --- */}
             <section className="relative bg-surface-900 overflow-hidden">
                 {/* Dot grid */}
                 <div className="absolute inset-0" style={{
@@ -203,7 +262,7 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ═══ SERVICES ═══ */}
+            {/* --- SERVICES --- */}
             <section className="py-24 sm:py-32 px-6 lg:px-8 bg-white">
                 <div className="max-w-6xl mx-auto">
                     <Reveal>
@@ -214,38 +273,7 @@ const Home = () => {
                     </Reveal>
 
                     <div className="mt-14 grid md:grid-cols-3 gap-6">
-                        {[
-                            {
-                                title: 'App Development',
-                                desc: 'iOS, Android, and cross-platform apps. From MVP to enterprise scale — we ship experiences users keep coming back to.',
-                                tags: ['Flutter', 'React Native', 'Swift'],
-                                slug: 'app-development',
-                                iconBg: 'bg-blue-500',
-                                hoverBorder: 'hover:border-blue-200',
-                                tagStyle: 'bg-blue-50 text-blue-600',
-                                icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />,
-                            },
-                            {
-                                title: 'Web Development',
-                                desc: 'SaaS platforms, marketing sites, web apps. React, Node.js, and the best of modern tooling — fast, accessible, scalable.',
-                                tags: ['React', 'Node.js', 'Next.js'],
-                                slug: 'web-development',
-                                iconBg: 'bg-emerald-500',
-                                hoverBorder: 'hover:border-emerald-200',
-                                tagStyle: 'bg-emerald-50 text-emerald-600',
-                                icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18zM3.6 9h16.8M3.6 15h16.8" />,
-                            },
-                            {
-                                title: 'Branding & Design',
-                                desc: 'Logos, identity systems, UI/UX, and creative direction. We build brands that people recognize and trust.',
-                                tags: ['Figma', 'UI/UX', 'Identity'],
-                                slug: 'branding-creative',
-                                iconBg: 'bg-violet-500',
-                                hoverBorder: 'hover:border-violet-200',
-                                tagStyle: 'bg-violet-50 text-violet-600',
-                                icon: <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />,
-                            },
-                        ].map((s, i) => (
+                        {services.map((s, i) => (
                             <Reveal key={s.title} delay={i * 120}>
                                 <Link to={`/services/${s.slug}`} className={`h-full p-8 rounded-2xl bg-white border border-gray-100 ${s.hoverBorder} hover:shadow-xl hover:shadow-gray-900/[0.06] transition-all duration-300 hover:-translate-y-1.5 group relative overflow-hidden block`}>
                                     {/* Subtle gradient on hover */}
@@ -261,6 +289,11 @@ const Home = () => {
                                                 <span key={tag} className={`text-xs font-medium px-2.5 py-1 rounded-md ${s.tagStyle}`}>{tag}</span>
                                             ))}
                                         </div>
+                                        {s.basePrice > 0 && (
+                                            <p className="text-sm font-semibold text-gray-700 mb-4">
+                                                Starter from {formatINR(s.basePrice)}
+                                            </p>
+                                        )}
                                         <div className="flex items-center text-sm font-medium text-gray-400 group-hover:text-primary-500 transition-colors duration-300">
                                             Learn more
                                             <svg className="w-4 h-4 ml-1.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
@@ -273,7 +306,7 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ═══ PRODUCT PREVIEW ═══ */}
+            {/* --- PRODUCT PREVIEW --- */}
             <section className="py-24 sm:py-32 px-6 lg:px-8 bg-surface-50 border-y border-gray-100">
                 <div className="max-w-6xl mx-auto">
                     <Reveal>
@@ -319,7 +352,7 @@ const Home = () => {
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
-                                            <p className="text-2xl font-bold text-gray-900">₹10.2L</p>
+                                            <p className="text-2xl font-bold text-gray-900">?10.2L</p>
                                             <p className="text-xs text-gray-400 mt-1">Revenue this month</p>
                                         </div>
                                         <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
@@ -341,7 +374,7 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ═══ PROCESS ═══ */}
+            {/* --- PROCESS --- */}
             <section className="py-24 sm:py-32 px-6 lg:px-8 bg-white">
                 <div className="max-w-6xl mx-auto">
                     <Reveal>
@@ -372,7 +405,7 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ═══ CTA ═══ */}
+            {/* --- CTA --- */}
             <section className="relative py-28 sm:py-36 px-6 lg:px-8 bg-surface-900 overflow-hidden">
                 <div className="absolute inset-0" style={{
                     backgroundImage: 'radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)',
@@ -408,7 +441,7 @@ const Home = () => {
                 </Reveal>
             </section>
 
-            {/* ═══ FOOTER ═══ */}
+            {/* --- FOOTER --- */}
             <footer className="bg-surface-900 border-t border-white/5 py-8 px-6 lg:px-8">
                 <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-2">
@@ -435,3 +468,4 @@ const Home = () => {
 };
 
 export default Home;
+

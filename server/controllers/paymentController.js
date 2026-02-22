@@ -4,7 +4,8 @@ import Payment from '../models/Payment.js';
 import Project from '../models/Project.js';
 import ServiceRequest from '../models/ServiceRequest.js';
 import CustomRequest from '../models/CustomRequest.js';
-import { CUSTOM_REQUEST_STATUS, DELIVERY_STATUS, PAYMENT_STATUS, PROJECT_STATUS, ROLES, SERVICE_CATEGORIES } from '../utils/constants.js';
+import Service from '../models/Service.js';
+import { CUSTOM_REQUEST_STATUS, DELIVERY_STATUS, PAYMENT_STATUS, PROJECT_STATUS, ROLES } from '../utils/constants.js';
 import { createAuditLog } from '../middleware/auth.js';
 
 const razorpay = new Razorpay({
@@ -208,15 +209,28 @@ export const createRazorpayOrder = async (req, res, next) => {
       resolvedPlan = 'custom';
     }
 
-    const starterPrices = {
-      [SERVICE_CATEGORIES.WEB_DEVELOPMENT]: 1499,
-      [SERVICE_CATEGORIES.APP_DEVELOPMENT]: 2999,
-      [SERVICE_CATEGORIES.BRANDING_CREATIVE]: 799
-    };
-
     let derivedAmount = amount ?? project?.budget ?? serviceRequest?.estimatedPrice;
+    if (resolvedPlan === 'starter' && !resolvedServiceType) {
+      return res.status(400).json({
+        success: false,
+        message: 'Service type is required for starter checkout'
+      });
+    }
+
     if (resolvedPlan === 'starter' && resolvedServiceType) {
-      derivedAmount = starterPrices[resolvedServiceType];
+      const starterService = await Service.findOne({
+        category: resolvedServiceType,
+        isActive: true
+      }).select('basePrice');
+
+      if (!starterService) {
+        return res.status(404).json({
+          success: false,
+          message: 'Selected service is unavailable for starter checkout'
+        });
+      }
+
+      derivedAmount = starterService.basePrice;
     } else if (customRequest) {
       derivedAmount = customRequest.quotedPrice;
     }
