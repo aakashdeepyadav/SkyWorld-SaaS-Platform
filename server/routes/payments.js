@@ -22,8 +22,8 @@ router.post('/razorpay/webhook', razorpayWebhook);
 router.use(authenticate);
 router.use(apiRateLimiter);
 
-router.get('/', validators.pagination, handleValidationErrors, getPayments);
-router.get('/:id', validators.mongoId, handleValidationErrors, getPayment);
+router.get('/', authorize(ROLES.CLIENT, ROLES.ADMIN), validators.pagination, handleValidationErrors, getPayments);
+router.get('/:id', authorize(ROLES.CLIENT, ROLES.ADMIN), validators.mongoId, handleValidationErrors, getPayment);
 router.post('/', authorize(ROLES.CLIENT, ROLES.ADMIN), createPayment);
 router.post('/razorpay/order', authorize(ROLES.CLIENT, ROLES.ADMIN), createRazorpayOrder);
 router.post('/razorpay/verify', authorize(ROLES.CLIENT, ROLES.ADMIN), verifyRazorpayPayment);

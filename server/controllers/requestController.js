@@ -202,12 +202,34 @@ export const updateRequestStatus = async (req, res, next) => {
       });
     }
 
-    // Check permissions
-    if (req.user.role === ROLES.CLIENT && request.clientId.toString() !== req.user._id.toString()) {
+    if (!Object.values(REQUEST_STATUS).includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid request status'
+      });
+    }
+
+    const isAdmin = req.user.role === ROLES.ADMIN;
+    const isAssignedDeveloper = request.assignedDeveloperId?.toString() === req.user._id.toString();
+
+    if (!isAdmin && !isAssignedDeveloper) {
       return res.status(403).json({
         success: false,
         message: 'Access denied'
       });
+    }
+
+    if (!isAdmin) {
+      const isValidDeveloperTransition =
+        (request.status === REQUEST_STATUS.APPROVED && status === REQUEST_STATUS.IN_PROGRESS) ||
+        (request.status === REQUEST_STATUS.IN_PROGRESS && status === REQUEST_STATUS.COMPLETED);
+
+      if (!isValidDeveloperTransition) {
+        return res.status(403).json({
+          success: false,
+          message: 'Developers can only move requests from approved to in-progress or in-progress to completed'
+        });
+      }
     }
 
     const updateData = { status };

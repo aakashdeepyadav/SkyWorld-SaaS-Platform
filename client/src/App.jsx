@@ -98,15 +98,24 @@ function App() {
           element={<RoleRoute allowedRoles={['client', 'admin']}><NewRequest /></RoleRoute>}
         />
         <Route path="/requests/:id" element={<RequestDetail />} />
-        <Route path="/custom-requests" element={<CustomRequestList />} />
+        <Route
+          path="/custom-requests"
+          element={<RoleRoute allowedRoles={['client', 'admin']}><CustomRequestList /></RoleRoute>}
+        />
 
         {/* Projects */}
         <Route path="/projects" element={<ProjectList />} />
         <Route path="/projects/:id" element={<ProjectDetail />} />
 
         {/* Payments */}
-        <Route path="/payments" element={<PaymentList />} />
-        <Route path="/checkout" element={<Checkout />} />
+        <Route
+          path="/payments"
+          element={<RoleRoute allowedRoles={['client', 'admin']}><PaymentList /></RoleRoute>}
+        />
+        <Route
+          path="/checkout"
+          element={<RoleRoute allowedRoles={['client', 'admin']}><Checkout /></RoleRoute>}
+        />
 
         {/* Admin Only */}
         <Route
@@ -121,8 +130,14 @@ function App() {
         {/* Profile & Settings */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/custom-request" element={<CustomRequestForm />} />
-        <Route path="/custom-request/thanks" element={<CustomRequestThankYou />} />
+        <Route
+          path="/custom-request"
+          element={<RoleRoute allowedRoles={['client', 'admin']}><CustomRequestForm /></RoleRoute>}
+        />
+        <Route
+          path="/custom-request/thanks"
+          element={<RoleRoute allowedRoles={['client', 'admin']}><CustomRequestThankYou /></RoleRoute>}
+        />
       </Route>
 
       {/* 404 */}

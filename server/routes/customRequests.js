@@ -27,8 +27,8 @@ router.post(
   createCustomRequest
 );
 
-router.get('/', validators.pagination, handleValidationErrors, getCustomRequests);
-router.get('/:id', validators.mongoId, handleValidationErrors, getCustomRequest);
+router.get('/', authorize(ROLES.CLIENT, ROLES.ADMIN), validators.pagination, handleValidationErrors, getCustomRequests);
+router.get('/:id', authorize(ROLES.CLIENT, ROLES.ADMIN), validators.mongoId, handleValidationErrors, getCustomRequest);
 router.put('/:id', adminOnly, validators.mongoId, handleValidationErrors, updateCustomRequest);
 
 export default router;

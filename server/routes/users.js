@@ -24,7 +24,7 @@ router.put('/profile/me', validators.updateProfile, handleValidationErrors, upda
 
 // Admin routes
 router.get('/', adminOnly, validators.pagination, handleValidationErrors, getUsers);
-router.get('/:id', validators.mongoId, handleValidationErrors, getUser);
+router.get('/:id', adminOnly, validators.mongoId, handleValidationErrors, getUser);
 router.put('/:id/role', adminOnly, validators.mongoId, handleValidationErrors, updateUserRole);
 router.put('/:id/status', adminOnly, validators.mongoId, handleValidationErrors, updateUserStatus);
 

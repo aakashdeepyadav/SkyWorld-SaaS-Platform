@@ -183,6 +183,13 @@ export const updateProject = async (req, res, next) => {
       });
     }
 
+    if (isClient && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Clients cannot update projects directly'
+      });
+    }
+
     // Developers can only update status and progress
     if (isDeveloper && !isAdmin) {
       const allowedFields = ['status', 'progress', 'milestones'];

@@ -140,7 +140,7 @@ const Layout = () => {
     ...(user?.role !== 'developer' ? [{ name: 'Custom Requests', href: '/custom-requests', icon: DocumentTextIcon }] : []),
     { name: 'Requests', href: '/requests', icon: ClipboardDocumentListIcon },
     { name: 'Projects', href: '/projects', icon: FolderIcon },
-    { name: 'Payments', href: '/payments', icon: CreditCardIcon },
+    ...(user?.role !== 'developer' ? [{ name: 'Payments', href: '/payments', icon: CreditCardIcon }] : []),
   ];
 
   const adminNavigation = [
