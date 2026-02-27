@@ -91,6 +91,22 @@ export const login = async (req, res, next) => {
       });
     }
 
+    // ── 2FA Challenge ────────────────────────────────────────────────────
+    if (user.twoFactorEnabled) {
+      // Don't issue tokens yet — return a temp token for the 2FA verify step
+      const tempToken = Buffer.from(
+        JSON.stringify({ uid: user._id.toString(), ts: Date.now() })
+      ).toString('base64');
+
+      return res.json({
+        success: true,
+        twoFactorRequired: true,
+        tempToken,
+        message: 'Two-factor authentication required',
+      });
+    }
+
+    // ── Standard login (no 2FA) ──────────────────────────────────────────
     user.lastLogin = new Date();
     await user.save({ validateBeforeSave: false });
 

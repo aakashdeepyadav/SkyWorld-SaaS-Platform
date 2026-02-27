@@ -13,6 +13,11 @@
     @apply bg-surface-50 text-gray-900 font-sans antialiased;
   }
 
+  .dark body,
+  html.dark body {
+    @apply bg-surface-900 text-gray-100;
+  }
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
@@ -26,8 +31,16 @@
     @apply bg-gray-300 rounded-full;
   }
 
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-surface-700;
+  }
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-400;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    @apply bg-surface-200;
   }
 }
 
@@ -39,7 +52,7 @@
   }
 
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-5 rounded-xl border border-gray-200 transition-colors duration-200 active:scale-[0.98];
+    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-5 rounded-xl border border-gray-200 transition-colors duration-200 active:scale-[0.98] dark:bg-surface-800 dark:hover:bg-surface-700 dark:text-gray-300 dark:border-surface-700;
   }
 
   .btn-danger {
@@ -47,17 +60,17 @@
   }
 
   .btn-ghost {
-    @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-medium py-2.5 px-5 rounded-xl transition-colors duration-200;
+    @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-medium py-2.5 px-5 rounded-xl transition-colors duration-200 dark:text-gray-400 dark:hover:text-white dark:hover:bg-surface-700;
   }
 
   /* ─── Inputs ─────────────────────────────────────────── */
   .input-field {
-    @apply w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all duration-200;
+    @apply w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all duration-200 dark:bg-surface-800 dark:border-surface-700 dark:text-white dark:placeholder-gray-500;
   }
 
   /* ─── Cards ──────────────────────────────────────────── */
   .card {
-    @apply bg-white rounded-2xl shadow-card p-6 border border-gray-100 transition-all duration-300;
+    @apply bg-white rounded-2xl shadow-card p-6 border border-gray-100 transition-all duration-300 dark:bg-surface-800 dark:border-surface-700 dark:shadow-none;
   }
 
   .card-hover {
@@ -65,7 +78,7 @@
   }
 
   .glass-card {
-    @apply bg-white/70 backdrop-blur-xl rounded-2xl shadow-glass border border-white/20 p-6;
+    @apply bg-white/70 backdrop-blur-xl rounded-2xl shadow-glass border border-white/20 p-6 dark:bg-surface-800/70 dark:border-surface-700/30;
   }
 
   /* ─── Stat Cards ─────────────────────────────────────── */
@@ -84,19 +97,19 @@
   }
 
   .badge-primary {
-    @apply badge bg-primary-50 text-primary-700 ring-1 ring-primary-200;
+    @apply badge bg-primary-50 text-primary-700 ring-1 ring-primary-200 dark:bg-primary-500/10 dark:text-primary-400 dark:ring-primary-500/30;
   }
 
   .badge-success {
-    @apply badge bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200;
+    @apply badge bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/30;
   }
 
   .badge-warning {
-    @apply badge bg-amber-50 text-amber-700 ring-1 ring-amber-200;
+    @apply badge bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/30;
   }
 
   .badge-danger {
-    @apply badge bg-red-50 text-red-700 ring-1 ring-red-200;
+    @apply badge bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/30;
   }
 
   /* ─── Typography ─────────────────────────────────────── */
@@ -105,11 +118,11 @@
   }
 
   .section-title {
-    @apply text-3xl sm:text-4xl font-bold text-gray-900;
+    @apply text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white;
   }
 
   .section-subtitle {
-    @apply text-lg text-gray-500 max-w-2xl mx-auto;
+    @apply text-lg text-gray-500 max-w-2xl mx-auto dark:text-gray-400;
   }
 
   /* ─── Animations ─────────────────────────────────────── */
@@ -133,5 +146,21 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(14, 165, 233, 0);
   }
 }

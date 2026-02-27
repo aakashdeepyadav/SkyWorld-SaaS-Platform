@@ -5,6 +5,10 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Toaster } from 'react-hot-toast';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import { SocketProvider } from './context/SocketContext';
+import { ThemeProvider } from './context/ThemeContext';
+import CommandPalette from './components/common/CommandPalette';
 import './index.css';
 
 const queryClient = new QueryClient({
@@ -20,10 +24,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <App />
-          <Toaster position="top-right" />
-        </AuthProvider>
+        <ErrorBoundary>
+          <ThemeProvider>
+            <AuthProvider>
+              <SocketProvider>
+                <App />
+                <CommandPalette />
+                <Toaster position="top-right" />
+              </SocketProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>

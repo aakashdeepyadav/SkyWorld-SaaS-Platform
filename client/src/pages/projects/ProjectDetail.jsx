@@ -4,8 +4,9 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { ArrowLeftIcon, ChatBubbleLeftRightIcon, PaperAirplaneIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, ChatBubbleLeftRightIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { formatINR } from '../../utils/currency';
+import ProjectTracker from '../../components/common/ProjectTracker';
 
 const getStatusBadge = (status) => {
     const map = {
@@ -180,73 +181,46 @@ const ProjectDetail = () => {
                 <ArrowLeftIcon className="w-4 h-4 mr-1.5" /> Back to Projects
             </button>
 
-            {/* Header */}
-            <div className="card">
+            {/* Header Card */}
+            <div className="card dark:bg-surface-800 dark:border-surface-700">
                 <div className="flex items-start justify-between mb-4">
                     <div>
-                        <h1 className="text-xl font-bold text-gray-900">{project.title}</h1>
+                        <h1 className="text-xl font-bold text-gray-900 dark:text-white">{project.title}</h1>
                         <p className="text-sm text-gray-400 mt-0.5">Created {new Date(project.createdAt).toLocaleDateString()}</p>
                     </div>
                     <span className={`${getStatusBadge(project.status)} capitalize text-sm`}>{project.status}</span>
                 </div>
 
                 {project.description && (
-                    <p className="text-sm text-gray-600 leading-relaxed mb-6 whitespace-pre-wrap">{project.description}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-6 whitespace-pre-wrap">{project.description}</p>
                 )}
 
                 {/* Meta Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                    <div className="p-3 bg-gray-50 rounded-xl">
+                    <div className="p-3 bg-gray-50 dark:bg-surface-700 rounded-xl">
                         <p className="text-xs text-gray-400">Client</p>
-                        <p className="text-sm font-medium text-gray-900 truncate">{project.clientId?.name || 'N/A'}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{project.clientId?.name || 'N/A'}</p>
                     </div>
-                    <div className="p-3 bg-gray-50 rounded-xl">
+                    <div className="p-3 bg-gray-50 dark:bg-surface-700 rounded-xl">
                         <p className="text-xs text-gray-400">Budget</p>
-                        <p className="text-sm font-medium text-gray-900">{project.budget ? formatINR(project.budget) : 'TBD'}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{project.budget ? formatINR(project.budget) : 'TBD'}</p>
                     </div>
-                    <div className="p-3 bg-gray-50 rounded-xl">
+                    <div className="p-3 bg-gray-50 dark:bg-surface-700 rounded-xl">
                         <p className="text-xs text-gray-400">Start</p>
-                        <p className="text-sm font-medium text-gray-900">{project.startDate ? new Date(project.startDate).toLocaleDateString() : 'TBD'}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{project.startDate ? new Date(project.startDate).toLocaleDateString() : 'TBD'}</p>
                     </div>
-                    <div className="p-3 bg-gray-50 rounded-xl">
+                    <div className="p-3 bg-gray-50 dark:bg-surface-700 rounded-xl">
                         <p className="text-xs text-gray-400">End</p>
-                        <p className="text-sm font-medium text-gray-900">{project.endDate ? new Date(project.endDate).toLocaleDateString() : 'TBD'}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{project.endDate ? new Date(project.endDate).toLocaleDateString() : 'TBD'}</p>
                     </div>
                 </div>
 
-                {/* Progress */}
-                <div className="mb-6">
-                    <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="font-medium text-gray-700">Progress</span>
-                        <span className="text-gray-500">{project.progress || 0}%</span>
-                    </div>
-                    <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                            className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-500"
-                            style={{ width: `${project.progress || 0}%` }}
-                        />
-                    </div>
-                    {(isDev || isAdmin) && project.status !== 'completed' && (
-                        <div className="flex items-center gap-2 mt-3">
-                            <input
-                                type="range"
-                                min="0"
-                                max="100"
-                                step="5"
-                                defaultValue={project.progress || 0}
-                                className="flex-1 h-1 bg-gray-200 rounded-lg accent-primary-500 cursor-pointer"
-                                onMouseUp={(e) => updateProgressMutation.mutate(Number(e.target.value))}
-                                onTouchEnd={(e) => updateProgressMutation.mutate(Number(e.target.value))}
-                            />
-                        </div>
-                    )}
-                </div>
-
+                {/* Pay CTA */}
                 {canPay && (
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-primary-50 rounded-xl">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-primary-50 dark:bg-primary-500/10 rounded-xl mb-6">
                         <div>
-                            <p className="text-sm font-semibold text-primary-700">Pay for this project</p>
-                            <p className="text-xs text-primary-600 mt-0.5">Amount: {formatINR(project.budget)}</p>
+                            <p className="text-sm font-semibold text-primary-700 dark:text-primary-400">Pay for this project</p>
+                            <p className="text-xs text-primary-600 dark:text-primary-500 mt-0.5">Amount: {formatINR(project.budget)}</p>
                         </div>
                         <button
                             onClick={handlePay}
@@ -261,14 +235,14 @@ const ProjectDetail = () => {
                 {/* Developers */}
                 {project.developerIds?.length > 0 && (
                     <div>
-                        <h3 className="text-sm font-semibold text-gray-700 mb-2">Team</h3>
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Team</h3>
                         <div className="flex flex-wrap gap-2">
                             {project.developerIds.map(dev => (
-                                <div key={dev._id || dev} className="inline-flex items-center px-3 py-1.5 bg-gray-50 rounded-lg text-sm">
-                                    <div className="w-6 h-6 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-xs font-semibold mr-2">
+                                <div key={dev._id || dev} className="inline-flex items-center px-3 py-1.5 bg-gray-50 dark:bg-surface-700 rounded-lg text-sm">
+                                    <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 flex items-center justify-center text-xs font-semibold mr-2">
                                         {(dev.name || 'D').charAt(0).toUpperCase()}
                                     </div>
-                                    <span className="text-gray-700">{dev.name || dev.email || 'Developer'}</span>
+                                    <span className="text-gray-700 dark:text-gray-300">{dev.name || dev.email || 'Developer'}</span>
                                 </div>
                             ))}
                         </div>
@@ -276,29 +250,33 @@ const ProjectDetail = () => {
                 )}
             </div>
 
-            {/* Milestones */}
-            {project.milestones?.length > 0 && (
-                <div className="card">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Milestones</h2>
-                    <div className="space-y-3">
-                        {project.milestones.map((ms, i) => (
-                            <div key={i} className={`flex items-start p-3 rounded-xl ${ms.completed ? 'bg-emerald-50' : 'bg-gray-50'}`}>
-                                <CheckCircleIcon className={`w-5 h-5 mr-3 flex-shrink-0 mt-0.5 ${ms.completed ? 'text-emerald-500' : 'text-gray-300'}`} />
-                                <div className="flex-1 min-w-0">
-                                    <p className={`text-sm font-medium ${ms.completed ? 'text-emerald-700 line-through' : 'text-gray-900'}`}>{ms.title}</p>
-                                    {ms.description && <p className="text-xs text-gray-500 mt-0.5">{ms.description}</p>}
-                                    {ms.dueDate && <p className="text-xs text-gray-400 mt-1">Due: {new Date(ms.dueDate).toLocaleDateString()}</p>}
-                                </div>
-                            </div>
-                        ))}
+            {/* ── Visual Project Status Tracker ─────────────────────────── */}
+            <ProjectTracker project={project} />
+
+            {/* Admin/Dev: Progress Slider */}
+            {(isDev || isAdmin) && project.status !== 'completed' && project.status !== 'cancelled' && (
+                <div className="card dark:bg-surface-800 dark:border-surface-700">
+                    <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Update Progress</h2>
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            step="5"
+                            defaultValue={project.progress || 0}
+                            className="flex-1 h-1.5 bg-gray-200 dark:bg-surface-700 rounded-lg accent-primary-500 cursor-pointer"
+                            onMouseUp={(e) => updateProgressMutation.mutate(Number(e.target.value))}
+                            onTouchEnd={(e) => updateProgressMutation.mutate(Number(e.target.value))}
+                        />
+                        <span className="text-sm font-medium text-gray-500 w-10 text-right">{project.progress || 0}%</span>
                     </div>
                 </div>
             )}
 
             {/* Status Actions */}
             {(isAdmin || isDev) && project.status !== 'completed' && project.status !== 'cancelled' && (
-                <div className="card">
-                    <h2 className="font-semibold text-gray-900 mb-3">Update Status</h2>
+                <div className="card dark:bg-surface-800 dark:border-surface-700">
+                    <h2 className="font-semibold text-gray-900 dark:text-white mb-3">Update Status</h2>
                     <div className="flex flex-wrap gap-2">
                         {project.status === 'planning' && (
                             <button onClick={() => updateStatusMutation.mutate('in-progress')} className="btn-primary !text-sm !py-2">Start Development</button>
@@ -317,12 +295,12 @@ const ProjectDetail = () => {
             )}
 
             {/* Messages Panel */}
-            <div className="card">
+            <div className="card dark:bg-surface-800 dark:border-surface-700">
                 <button
                     onClick={() => setShowMessages(!showMessages)}
                     className="flex items-center justify-between w-full text-left"
                 >
-                    <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
                         <ChatBubbleLeftRightIcon className="w-5 h-5 mr-2 text-primary-500" /> Messages
                     </h2>
                     <svg className={`w-4 h-4 text-gray-400 transition-transform ${showMessages ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,8 +309,7 @@ const ProjectDetail = () => {
                 </button>
 
                 {showMessages && (
-                    <div className="mt-4 border-t border-gray-100 pt-4">
-                        {/* Message list */}
+                    <div className="mt-4 border-t border-gray-100 dark:border-surface-700 pt-4">
                         <div className="max-h-80 overflow-y-auto space-y-3 mb-4">
                             {messagesLoading ? (
                                 <div className="text-center py-8 text-sm text-gray-400">Loading messages...</div>
@@ -344,8 +321,8 @@ const ProjectDetail = () => {
                                     return (
                                         <div key={msg._id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                                             <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${isMe
-                                                    ? 'bg-primary-500 text-white rounded-br-md'
-                                                    : 'bg-gray-100 text-gray-800 rounded-bl-md'
+                                                ? 'bg-primary-500 text-white rounded-br-md'
+                                                : 'bg-gray-100 dark:bg-surface-700 text-gray-800 dark:text-gray-200 rounded-bl-md'
                                                 }`}>
                                                 {!isMe && <p className="text-xs font-semibold mb-1 opacity-70">{msg.senderId?.name}</p>}
                                                 <p className="whitespace-pre-wrap break-words">{msg.content}</p>
@@ -360,7 +337,6 @@ const ProjectDetail = () => {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* Send message */}
                         <div className="flex items-center gap-2">
                             <input
                                 type="text"

@@ -93,11 +93,13 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-[45%] bg-surface-900 relative">
-        <div className="flex flex-col justify-between p-12 xl:p-16 w-full">
-          <Link to="/" className="flex items-center space-x-2 w-fit" title="Go to Home">
-            <img src="/logo.png" alt="SkyWorld" className="w-8 h-8 object-contain" />
-            <span className="text-lg font-semibold text-white">SkyWorld</span>
+      <div className="hidden lg:flex lg:w-[45%] bg-surface-900 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 30% 80%, rgba(14,165,233,.08) 0%, transparent 60%)' }} />
+        <div className="absolute top-0 right-0 w-80 h-80" style={{ background: 'radial-gradient(circle, rgba(14,165,233,.05) 0%, transparent 70%)' }} />
+        <div className="flex flex-col justify-between p-12 xl:p-16 w-full relative z-10">
+          <Link to="/" className="flex items-center w-fit" title="Go to Home">
+            <img src="/wordmark_logo_white_fullname.png" alt="SkyWorld Ventures" className="h-9 w-auto object-contain" />
           </Link>
 
           <div>
@@ -117,9 +119,8 @@ const Register = () => {
 
       <div className="flex-1 flex items-center justify-center px-6 sm:px-12 bg-white">
         <div className="w-full max-w-sm">
-          <Link to="/" className="lg:hidden flex items-center space-x-2 mb-10 w-fit" title="Go to Home">
-            <img src="/logo.png" alt="SkyWorld" className="w-8 h-8 object-contain" />
-            <span className="text-lg font-semibold text-gray-900">SkyWorld</span>
+          <Link to="/" className="lg:hidden flex items-center mb-10 w-fit" title="Go to Home">
+            <img src="/wordmark_logo_coloured_.png" alt="SkyWorld" className="h-7 w-auto object-contain" />
           </Link>
 
           {!otpStep ? (

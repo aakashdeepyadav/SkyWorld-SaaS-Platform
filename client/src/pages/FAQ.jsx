@@ -53,28 +53,28 @@ const FAQ_ITEMS = [
 
 const FAQ = () => {
   return (
-    <div className="min-h-screen bg-surface-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto card sm:p-12 animate-fade-in">
+    <div className="min-h-screen bg-surface-50 dark:bg-surface-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto card dark:bg-surface-800 dark:border-surface-700 sm:p-12 animate-fade-in">
         <Link to="/" className="text-primary-500 hover:text-primary-600 text-sm font-medium mb-6 inline-flex items-center">
           &larr; Back to Home
         </Link>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Frequently Asked Questions</h1>
-        <p className="text-sm text-gray-500 mb-8">Last updated: February 22, 2026</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Frequently Asked Questions</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">Last updated: February 22, 2026</p>
 
         <div className="space-y-3">
           {FAQ_ITEMS.map((item) => (
-            <details key={item.q} className="group rounded-xl border border-gray-200 bg-white p-4 open:border-primary-200 open:bg-primary-50/20">
-              <summary className="cursor-pointer list-none text-sm sm:text-base font-semibold text-gray-900 flex items-center justify-between gap-3">
+            <details key={item.q} className="group rounded-xl border border-gray-200 dark:border-surface-600 bg-white dark:bg-surface-700/50 p-4 open:border-primary-200 dark:open:border-primary-500/30 open:bg-primary-50/20 dark:open:bg-primary-500/5">
+              <summary className="cursor-pointer list-none text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 flex items-center justify-between gap-3">
                 <span>{item.q}</span>
                 <span className="text-primary-500 transition-transform group-open:rotate-45">+</span>
               </summary>
-              <p className="mt-3 text-sm text-gray-600 leading-relaxed">{item.a}</p>
+              <p className="mt-3 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{item.a}</p>
             </details>
           ))}
         </div>
 
-        <div className="mt-10 text-sm text-gray-500">
+        <div className="mt-10 text-sm text-gray-500 dark:text-gray-400">
           Still need help?{' '}
           <a href="mailto:ventures.skyworld@gmail.com" className="text-primary-500 hover:underline">
             Contact support

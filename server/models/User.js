@@ -62,7 +62,7 @@ const userSchema = new mongoose.Schema({
   failedLoginAttempts: {
     type: Number,
     default: 0,
-    select: false // Don't expose in queries by default
+    select: false
   },
   lockUntil: {
     type: Date,
@@ -72,7 +72,7 @@ const userSchema = new mongoose.Schema({
   // ─── Password Reset Fields ───────────────────────────────────────────────
   passwordResetToken: {
     type: String,
-    select: false // Don't expose in queries by default
+    select: false
   },
   passwordResetExpires: {
     type: Date,
@@ -109,18 +109,30 @@ const userSchema = new mongoose.Schema({
     email: { type: Boolean, default: true },
     projectUpdates: { type: Boolean, default: true },
     marketing: { type: Boolean, default: false }
+  },
+  // ─── Two-Factor Authentication ──────────────────────────────────────────
+  twoFactorSecret: {
+    type: String,
+    select: false
+  },
+  twoFactorEnabled: {
+    type: Boolean,
+    default: false
+  },
+  twoFactorBackupCodes: {
+    type: [String],
+    select: false
   }
 }, {
   timestamps: true
 });
 
 // Indexes
-// email and googleId indexes are auto-created by unique/sparse in schema
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ createdAt: -1 });
 
-// Hash password before saving (bcrypt cost factor 12 for stronger hashing)
+// Hash password before saving (bcrypt cost factor 12)
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
@@ -146,7 +158,6 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 
 // Method to increment failed login attempts
 userSchema.methods.incrementFailedAttempts = async function (lockDurationMs) {
-  // If lock has expired, reset counter
   if (this.lockUntil && this.lockUntil < Date.now()) {
     return this.updateOne({
       $set: { failedLoginAttempts: 1, lockUntil: null }
@@ -156,7 +167,6 @@ userSchema.methods.incrementFailedAttempts = async function (lockDurationMs) {
   const updates = { $inc: { failedLoginAttempts: 1 } };
   const attempts = this.failedLoginAttempts + 1;
 
-  // Lock account if max attempts reached
   if (attempts >= 5) {
     updates.$set = { lockUntil: new Date(Date.now() + lockDurationMs) };
   }
@@ -185,7 +195,7 @@ userSchema.methods.createPasswordResetToken = function () {
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
   this.passwordResetAttempts = 0;
 
-  return resetToken; // Return unhashed token for email
+  return resetToken;
 };
 
 // Method to clear password reset fields
@@ -199,7 +209,6 @@ userSchema.methods.clearPasswordResetFields = function () {
 userSchema.methods.incrementPasswordResetAttempts = async function () {
   this.passwordResetAttempts += 1;
 
-  // Lock password reset after 2 attempts for 24 hours
   if (this.passwordResetAttempts >= 2) {
     this.passwordResetExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
   }
@@ -220,6 +229,7 @@ userSchema.methods.toPublicJSON = function () {
     isActive: this.isActive,
     authMethod: this.googleId ? 'google' : 'email',
     emailVerified: this.emailVerified,
+    twoFactorEnabled: this.twoFactorEnabled || false,
     notificationPreferences: this.notificationPreferences,
     createdAt: this.createdAt
   };

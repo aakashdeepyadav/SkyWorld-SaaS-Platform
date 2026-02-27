@@ -1,4 +1,5 @@
 import express from 'express';
+import { createServer } from 'http';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -17,6 +18,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { globalRateLimiter } from './middleware/rateLimiter.js';
 import { csrfProtection } from './middleware/csrfProtection.js';
 import { logger } from './utils/logger.js';
+import { initSocket } from './socket.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import projectRoutes from './routes/projects.js';
@@ -27,12 +29,16 @@ import paymentRoutes from './routes/payments.js';
 import messageRoutes from './routes/messages.js';
 import fileRoutes from './routes/files.js';
 import statsRoutes from './routes/stats.js';
+import notificationRoutes from './routes/notifications.js';
+import adminRoutes from './routes/admin.js';
+import { initSentry } from './config/sentry.js';
 
 dotenv.config();
 
 // Validate environment variables before anything else
 validateEnv();
 configureCloudinary();
+initSentry();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -154,17 +160,26 @@ app.get('/health', (req, res) => {
 // Avoid noisy 404 logs for browser favicon probes.
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/services', serviceRoutes);
-app.use('/api/requests', requestRoutes);
-app.use('/api/custom-requests', customRequestRoutes);
-app.use('/api/customRequests', customRequestRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/messages', messageRoutes);
-app.use('/api/files', fileRoutes);
-app.use('/api/admin', statsRoutes);
+// API v1 Router — all routes mounted under /api/v1
+const v1 = express.Router();
+v1.use('/auth', authRoutes);
+v1.use('/users', userRoutes);
+v1.use('/projects', projectRoutes);
+v1.use('/services', serviceRoutes);
+v1.use('/requests', requestRoutes);
+v1.use('/custom-requests', customRequestRoutes);
+v1.use('/customRequests', customRequestRoutes);
+v1.use('/payments', paymentRoutes);
+v1.use('/messages', messageRoutes);
+v1.use('/files', fileRoutes);
+v1.use('/admin', statsRoutes);
+v1.use('/admin', adminRoutes);
+v1.use('/notifications', notificationRoutes);
+
+// Versioned endpoint (canonical)
+app.use('/api/v1', v1);
+// Backward-compatible alias — existing clients using /api/* keep working
+app.use('/api', v1);
 
 // 404 Handler
 app.use((req, res) => {
@@ -179,10 +194,15 @@ app.use(errorHandler);
 
 // ─── Start Server ────────────────────────────────────────────────────────────
 
+// Create HTTP server and attach Socket.IO
+const httpServer = createServer(app);
+initSocket(httpServer, allowedOrigins);
+
 const startServer = async () => {
   try {
-    app.listen(PORT, HOST, () => {
+    httpServer.listen(PORT, HOST, () => {
       logger.info(`Server running on ${HOST}:${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+      logger.info('Socket.IO attached and ready');
     });
     await connectDB();
   } catch (error) {
