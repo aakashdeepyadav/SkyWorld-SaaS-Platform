@@ -33,7 +33,7 @@ const PageLoader = () => (
     </div>
     <div
       style={{
-        width: 120, height: 1.5, background: 'rgba(148,163,184,.08)',
+        width: 120, height: 1.5, background: 'transparent',
         borderRadius: 2, overflow: 'hidden',
       }}
     >
