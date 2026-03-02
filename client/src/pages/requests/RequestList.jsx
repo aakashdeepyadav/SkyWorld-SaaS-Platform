@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { PlusIcon, FunnelIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, ClockIcon } from '@heroicons/react/24/outline';
 
 const STATUS_TABS = [
     { key: '', label: 'All' },
@@ -50,10 +50,10 @@ const RequestList = () => {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Service Requests</h1>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {isClient ? 'Track your requests and their progress.' : 'Manage and review service requests.'}
+                        {isClient ? 'Requests created for your account.' : 'Manage and review service requests.'}
                     </p>
                 </div>
-                {(isClient || user?.role === 'admin') && (
+                {user?.role === 'admin' && (
                     <Link to="/requests/new" className="btn-primary inline-flex items-center self-start">
                         <PlusIcon className="w-4 h-4 mr-1.5" /> New Request
                     </Link>
@@ -91,9 +91,9 @@ const RequestList = () => {
                     <ClockIcon className="w-12 h-12 text-gray-200 dark:text-gray-600 mx-auto mb-3" />
                     <p className="text-gray-500 dark:text-gray-400 font-medium">No requests found</p>
                     <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                        {isClient ? 'Submit your first service request to get started.' : 'No matching requests.'}
+                        {isClient ? 'No service requests on your account yet.' : 'No matching requests.'}
                     </p>
-                    {isClient && (
+                    {user?.role === 'admin' && (
                         <Link to="/requests/new" className="btn-primary inline-block mt-4">
                             <PlusIcon className="w-4 h-4 mr-1 inline" /> Create Request
                         </Link>

@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
-import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { formatINR } from '../../utils/currency';
 
 const NewRequest = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const isClient = user?.role === 'client';
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [servicesLoading, setServicesLoading] = useState(true);
@@ -40,17 +37,14 @@ const NewRequest = () => {
   const validate = () => {
     const errs = {};
     if (!formData.serviceId) errs.serviceId = 'Please select a service';
+    if (!formData.title.trim()) errs.title = 'Title is required';
+    else if (formData.title.trim().length < 5) errs.title = 'Title must be at least 5 characters';
+    else if (formData.title.trim().length > 200) errs.title = 'Title must be under 200 characters';
 
-    if (!isClient) {
-      if (!formData.title.trim()) errs.title = 'Title is required';
-      else if (formData.title.trim().length < 5) errs.title = 'Title must be at least 5 characters';
-      else if (formData.title.trim().length > 200) errs.title = 'Title must be under 200 characters';
+    if (!formData.description.trim()) errs.description = 'Description is required';
+    else if (formData.description.trim().length < 10) errs.description = 'Description must be at least 10 characters';
 
-      if (!formData.description.trim()) errs.description = 'Description is required';
-      else if (formData.description.trim().length < 10) errs.description = 'Description must be at least 10 characters';
-
-      if (formData.requirements.length > 10000) errs.requirements = 'Requirements must be under 10000 characters';
-    }
+    if (formData.requirements.length > 10000) errs.requirements = 'Requirements must be under 10000 characters';
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -66,26 +60,11 @@ const NewRequest = () => {
     e.preventDefault();
 
     if (!hasServices) {
-      toast.error('No active services available right now. Please use custom request.');
+      toast.error('No active services available right now.');
       return;
     }
 
     if (!validate()) return;
-
-    if (isClient) {
-      const service = services.find((s) => s._id === formData.serviceId);
-      const serviceSlug = service?.category;
-
-      if (!serviceSlug) {
-        toast.error('Selected service is invalid. Please try again.');
-        return;
-      }
-
-      navigate(
-        `/checkout?service=${encodeURIComponent(serviceSlug)}&serviceId=${encodeURIComponent(formData.serviceId)}&plan=starter`
-      );
-      return;
-    }
 
     setLoading(true);
     try {
@@ -95,10 +74,10 @@ const NewRequest = () => {
         description: formData.description.trim(),
         requirements: formData.requirements.trim()
       });
-      toast.success('Service request submitted successfully');
+      toast.success('Service request created successfully');
       navigate('/requests');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to submit request');
+      toast.error(error.response?.data?.message || 'Failed to create request');
     } finally {
       setLoading(false);
     }
@@ -117,9 +96,7 @@ const NewRequest = () => {
         <div className="card">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">New Service Request</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-            {isClient
-              ? 'Select a service and continue to secure payment checkout.'
-              : 'Describe your project and we will match you with the right team.'}
+            Create a service request and assign it to a developer.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -130,10 +107,6 @@ const NewRequest = () => {
               ) : !hasServices ? (
                 <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                   No active services are available right now.
-                  <Link to="/custom-request" className="ml-1 font-semibold underline underline-offset-2">
-                    Submit a custom request instead
-                  </Link>
-                  .
                 </div>
               ) : (
                 <select
@@ -152,10 +125,8 @@ const NewRequest = () => {
               {errors.serviceId && <p className="mt-1 text-xs text-red-500">{errors.serviceId}</p>}
             </div>
 
-            {!isClient && (
-              <>
-                <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Project Title</label>
+            <div>
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Project Title</label>
                   <input
                     id="title"
                     name="title"
@@ -202,13 +173,11 @@ const NewRequest = () => {
                   {errors.requirements && <p className="mt-1 text-xs text-red-500">{errors.requirements}</p>}
                   <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">{formData.requirements.length}/10000</p>
                 </div>
-              </>
-            )}
 
             <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-surface-700">
               <button type="button" onClick={() => navigate(-1)} className="btn-secondary">Cancel</button>
               <button type="submit" disabled={loading || !hasServices} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
-                {loading ? 'Submitting...' : isClient ? 'Continue to Payment' : 'Submit Request'}
+                {loading ? 'Creating...' : 'Create Request'}
               </button>
             </div>
           </form>

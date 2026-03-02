@@ -3,13 +3,13 @@ import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
 import {
-  PlusIcon,
   BriefcaseIcon,
-  ClockIcon,
   CheckCircleIcon,
   DocumentTextIcon,
   CreditCardIcon,
   LockClosedIcon,
+  GlobeAltIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -18,11 +18,6 @@ import { useState } from 'react';
 const ClientDashboard = () => {
   const { user } = useAuth();
   const [payingProjectId, setPayingProjectId] = useState(null);
-
-  const { data: requests, isLoading: requestsLoading } = useQuery('clientRequests', async () => {
-    const response = await api.get('/requests');
-    return response.data;
-  });
 
   const { data: projects, isLoading: projectsLoading } = useQuery('clientProjects', async () => {
     const response = await api.get('/projects');
@@ -101,12 +96,12 @@ const ClientDashboard = () => {
       ring: 'ring-blue-500/20',
     },
     {
-      name: 'Pending Requests',
-      value: requests?.requests?.filter((r) => r.status === 'pending').length || 0,
-      icon: ClockIcon,
-      bg: 'bg-amber-500/10',
-      color: 'text-amber-500',
-      ring: 'ring-amber-500/20',
+      name: 'Custom Requests',
+      value: customRequests?.requests?.length || 0,
+      icon: DocumentTextIcon,
+      bg: 'bg-sky-500/10',
+      color: 'text-sky-500',
+      ring: 'ring-sky-500/20',
     },
     {
       name: 'Completed',
@@ -115,14 +110,6 @@ const ClientDashboard = () => {
       bg: 'bg-emerald-500/10',
       color: 'text-emerald-500',
       ring: 'ring-emerald-500/20',
-    },
-    {
-      name: 'Custom Requests',
-      value: customRequests?.requests?.length || 0,
-      icon: DocumentTextIcon,
-      bg: 'bg-sky-500/10',
-      color: 'text-sky-500',
-      ring: 'ring-sky-500/20',
     },
   ];
 
@@ -167,14 +154,20 @@ const ClientDashboard = () => {
             Your projects and requests at a glance.
           </p>
         </div>
-        <Link to="/requests/new" className="btn-primary inline-flex items-center self-start">
-          <PlusIcon className="w-4 h-4 mr-1.5" />
-          New Request
-        </Link>
+        <div className="flex gap-2 self-start">
+          <Link to="/" className="btn-primary inline-flex items-center">
+            <GlobeAltIcon className="w-4 h-4 mr-1.5" />
+            Browse Services
+          </Link>
+          <Link to="/custom-request" className="btn-secondary inline-flex items-center">
+            <SparklesIcon className="w-4 h-4 mr-1.5" />
+            Custom Request
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {statCards.map((stat) => (
           <div
             key={stat.name}
@@ -292,43 +285,45 @@ const ClientDashboard = () => {
         </div>
 
         <div className="card">
-          <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Service Requests</h2>
-          {requestsLoading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="animate-pulse p-3">
-                  <div className="h-3.5 bg-gray-100 dark:bg-surface-700 rounded w-2/3 mb-2" />
-                  <div className="h-3 bg-gray-50 dark:bg-surface-700/50 rounded w-full" />
-                </div>
-              ))}
-            </div>
-          ) : requests?.requests?.length === 0 ? (
-            <div className="text-center py-8">
-              <ClockIcon className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-              <p className="text-sm text-gray-400 dark:text-gray-500">No requests yet</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {requests?.requests?.slice(0, 5).map((request) => (
-                <div
-                  key={request._id}
-                  className="p-3 rounded-xl border border-gray-100 dark:border-surface-700 hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                      {request.title}
-                    </h3>
-                    <span className={`${getStatusBadge(request.status)} capitalize`}>
-                      {request.status}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                    Service: {request.serviceId?.name}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
+          <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
+          <div className="space-y-2">
+            <Link
+              to="/"
+              className="flex items-center p-3 rounded-xl border border-gray-100 dark:border-surface-700 hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors group"
+            >
+              <div className="w-9 h-9 rounded-lg bg-primary-500/10 flex items-center justify-center mr-3">
+                <GlobeAltIcon className="w-5 h-5 text-primary-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">Browse Fixed Plans</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Pick a plan with fixed pricing and checkout instantly</p>
+              </div>
+            </Link>
+            <Link
+              to="/custom-request"
+              className="flex items-center p-3 rounded-xl border border-gray-100 dark:border-surface-700 hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors group"
+            >
+              <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center mr-3">
+                <SparklesIcon className="w-5 h-5 text-amber-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">Custom Request</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Describe your project and get a tailored quote</p>
+              </div>
+            </Link>
+            <Link
+              to="/custom-requests"
+              className="flex items-center p-3 rounded-xl border border-gray-100 dark:border-surface-700 hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors group"
+            >
+              <div className="w-9 h-9 rounded-lg bg-sky-500/10 flex items-center justify-center mr-3">
+                <DocumentTextIcon className="w-5 h-5 text-sky-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">View Custom Requests</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Track quotes and pay for approved requests</p>
+              </div>
+            </Link>
+          </div>
         </div>
 
         <div className="card">

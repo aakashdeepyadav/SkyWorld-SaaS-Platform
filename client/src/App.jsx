@@ -261,7 +261,7 @@ function App() {
         <Route
           path="/requests/new"
           element={
-            <RoleRoute allowedRoles={['client', 'admin']}>
+            <RoleRoute allowedRoles={['admin']}>
               <NewRequest />
             </RoleRoute>
           }
