@@ -73,7 +73,7 @@ const Profile = () => {
         <div className="max-w-4xl mx-auto space-y-6">
             {/* Profile Header */}
             <div className="relative">
-                <div className="h-36 bg-primary-500 rounded-2xl" />
+                <div className="h-36 bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl" />
                 <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 px-6 -mt-12 relative z-10">
                     {/* Avatar with upload */}
                     <div className="relative group">
@@ -88,17 +88,17 @@ const Profile = () => {
                             <img
                                 src={user.avatar}
                                 alt={user.name}
-                                className="w-20 h-20 rounded-xl object-cover shadow-md border-4 border-white"
+                                className="w-24 h-24 rounded-2xl object-cover shadow-lg border-4 border-white dark:border-surface-800 ring-2 ring-primary-500/20"
                             />
                         ) : (
-                            <div className="w-20 h-20 rounded-xl bg-primary-600 flex items-center justify-center text-white text-2xl font-bold shadow-md border-4 border-white">
+                            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white text-3xl font-bold shadow-lg border-4 border-white dark:border-surface-800 ring-2 ring-primary-500/20">
                                 {user?.name?.charAt(0).toUpperCase()}
                             </div>
                         )}
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={avatarLoading}
-                            className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all duration-200 cursor-pointer"
+                            className="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all duration-200 cursor-pointer"
                             title="Change photo"
                         >
                             {avatarLoading ? (
@@ -109,8 +109,8 @@ const Profile = () => {
                         </button>
                     </div>
                     <div className="flex-1 pb-1">
-                        <h1 className="text-2xl font-bold text-gray-900">{user?.name}</h1>
-                        <p className="text-gray-500">{user?.email}</p>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user?.name}</h1>
+                        <p className="text-gray-500 dark:text-gray-400">{user?.email}</p>
                     </div>
                     <button
                         onClick={() => setEditing(!editing)}
@@ -124,55 +124,55 @@ const Profile = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
                 {/* Personal Info */}
                 <div className="lg:col-span-2 card">
-                    <h2 className="text-lg font-bold text-gray-900 mb-5">Personal Information</h2>
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">Personal Information</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1.5">Full Name</label>
+                                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">Full Name</label>
                                 <input
                                     name="name"
                                     value={formData.name}
                                     onChange={handleChange}
                                     disabled={!editing}
-                                    className={`input-field ${!editing && 'bg-gray-50 cursor-not-allowed'}`}
+                                    className={`input-field ${!editing && 'bg-gray-50 dark:bg-surface-900/50 cursor-not-allowed'}`}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1.5">Email</label>
+                                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">Email</label>
                                 <div className="relative">
-                                    <EnvelopeIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <EnvelopeIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                                     <input
                                         value={user?.email || ''}
                                         disabled
-                                        className="input-field pl-10 bg-gray-50 cursor-not-allowed"
+                                        className="input-field pl-10 bg-gray-50 dark:bg-surface-900/50 cursor-not-allowed"
                                     />
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1.5">Phone</label>
+                                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">Phone</label>
                                 <div className="relative">
-                                    <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                                     <input
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleChange}
                                         disabled={!editing}
                                         placeholder="Enter phone number"
-                                        className={`input-field pl-10 ${!editing && 'bg-gray-50 cursor-not-allowed'}`}
+                                        className={`input-field pl-10 ${!editing && 'bg-gray-50 dark:bg-surface-900/50 cursor-not-allowed'}`}
                                     />
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1.5">Company</label>
+                                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">Company</label>
                                 <div className="relative">
-                                    <BuildingOfficeIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <BuildingOfficeIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                                     <input
                                         name="company"
                                         value={formData.company}
                                         onChange={handleChange}
                                         disabled={!editing}
                                         placeholder="Enter company name"
-                                        className={`input-field pl-10 ${!editing && 'bg-gray-50 cursor-not-allowed'}`}
+                                        className={`input-field pl-10 ${!editing && 'bg-gray-50 dark:bg-surface-900/50 cursor-not-allowed'}`}
                                     />
                                 </div>
                             </div>
@@ -189,33 +189,33 @@ const Profile = () => {
 
                 {/* Account Details */}
                 <div className="card h-fit">
-                    <h2 className="text-lg font-bold text-gray-900 mb-5">Account</h2>
-                    <div className="space-y-4">
-                        <div className="flex items-center p-3 bg-gray-50 rounded-xl">
-                            <ShieldCheckIcon className="w-5 h-5 text-primary-500 mr-3" />
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">Account</h2>
+                    <div className="space-y-3">
+                        <div className="flex items-center p-3 bg-gray-50 dark:bg-surface-900/50 rounded-xl border border-gray-100 dark:border-surface-700/50">
+                            <ShieldCheckIcon className="w-5 h-5 text-primary-500 mr-3 flex-shrink-0" />
                             <div>
-                                <p className="text-xs text-gray-500">Role</p>
-                                <p className="font-semibold text-gray-900 capitalize">{user?.role}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Role</p>
+                                <p className="font-semibold text-gray-900 dark:text-white capitalize">{user?.role}</p>
                             </div>
                         </div>
-                        <div className="flex items-center p-3 bg-gray-50 rounded-xl">
-                            <div className={`w-2.5 h-2.5 rounded-full mr-3 ${user?.isActive !== false ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                        <div className="flex items-center p-3 bg-gray-50 dark:bg-surface-900/50 rounded-xl border border-gray-100 dark:border-surface-700/50">
+                            <div className={`w-2.5 h-2.5 rounded-full mr-3 flex-shrink-0 ${user?.isActive !== false ? 'bg-emerald-500' : 'bg-gray-400'}`} />
                             <div>
-                                <p className="text-xs text-gray-500">Status</p>
-                                <p className="font-semibold text-gray-900 capitalize">{user?.isActive !== false ? 'Active' : 'Inactive'}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Status</p>
+                                <p className="font-semibold text-gray-900 dark:text-white capitalize">{user?.isActive !== false ? 'Active' : 'Inactive'}</p>
                             </div>
                         </div>
-                        <div className="flex items-center p-3 bg-gray-50 rounded-xl">
-                            <CalendarIcon className="w-5 h-5 text-gray-400 mr-3" />
+                        <div className="flex items-center p-3 bg-gray-50 dark:bg-surface-900/50 rounded-xl border border-gray-100 dark:border-surface-700/50">
+                            <CalendarIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-3 flex-shrink-0" />
                             <div>
-                                <p className="text-xs text-gray-500">Member Since</p>
-                                <p className="font-semibold text-gray-900">
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Member Since</p>
+                                <p className="font-semibold text-gray-900 dark:text-white">
                                     {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A'}
                                 </p>
                             </div>
                         </div>
-                        <div className="flex items-center p-3 bg-gray-50 rounded-xl">
-                            <div className="w-5 h-5 mr-3 flex items-center justify-center">
+                        <div className="flex items-center p-3 bg-gray-50 dark:bg-surface-900/50 rounded-xl border border-gray-100 dark:border-surface-700/50">
+                            <div className="w-5 h-5 mr-3 flex items-center justify-center flex-shrink-0">
                                 {user?.authMethod === 'google' ? (
                                     <svg className="w-4 h-4" viewBox="0 0 24 24">
                                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -224,12 +224,12 @@ const Profile = () => {
                                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                                     </svg>
                                 ) : (
-                                    <EnvelopeIcon className="w-5 h-5 text-gray-400" />
+                                    <EnvelopeIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                                 )}
                             </div>
                             <div>
-                                <p className="text-xs text-gray-500">Auth Method</p>
-                                <p className="font-semibold text-gray-900 capitalize">{user?.authMethod || 'Email'}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Auth Method</p>
+                                <p className="font-semibold text-gray-900 dark:text-white capitalize">{user?.authMethod || 'Email'}</p>
                             </div>
                         </div>
                     </div>
@@ -240,4 +240,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
