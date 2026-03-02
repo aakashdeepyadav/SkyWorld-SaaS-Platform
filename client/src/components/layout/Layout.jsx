@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -205,8 +205,14 @@ const Layout = () => {
         </header>
 
         {/* Page content */}
-        <main className="p-4 sm:p-6 lg:p-8 animate-fade-in">
-          <Outlet />
+        <main className="p-4 sm:p-6 lg:p-8">
+          <Suspense fallback={
+            <div className="flex items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+            </div>
+          }>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

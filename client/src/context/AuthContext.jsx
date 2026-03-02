@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     // Skip auth check if user has never logged in (avoids console 401 errors)
     const hasSession = localStorage.getItem('hasSession');
     if (!hasSession) {
@@ -37,9 +37,9 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     try {
       const response = await api.post('/auth/login', { email, password });
       setUser(response.data.user);
@@ -50,9 +50,9 @@ export const AuthProvider = ({ children }) => {
       toast.error(error.response?.data?.message || 'Login failed');
       throw error;
     }
-  };
+  }, []);
 
-  const register = async (email, password, name) => {
+  const register = useCallback(async (email, password, name) => {
     try {
       const response = await api.post('/auth/register', { email, password, name });
       if (response.data?.requiresOtp) {
@@ -67,9 +67,9 @@ export const AuthProvider = ({ children }) => {
       toast.error(error.response?.data?.message || 'Registration failed');
       throw error;
     }
-  };
+  }, []);
 
-  const verifyOtp = async (email, otp, purpose) => {
+  const verifyOtp = useCallback(async (email, otp, purpose) => {
     try {
       const response = await api.post('/auth/verify-otp', { email, otp, purpose });
       setUser(response.data.user);
@@ -80,9 +80,9 @@ export const AuthProvider = ({ children }) => {
       toast.error(error.response?.data?.message || 'OTP verification failed');
       throw error;
     }
-  };
+  }, []);
 
-  const resendOtp = async (email, purpose) => {
+  const resendOtp = useCallback(async (email, purpose) => {
     try {
       const response = await api.post('/auth/resend-otp', { email, purpose });
       toast.success(response.data.message || 'OTP resent');
@@ -91,9 +91,9 @@ export const AuthProvider = ({ children }) => {
       toast.error(error.response?.data?.message || 'Failed to resend OTP');
       throw error;
     }
-  };
+  }, []);
 
-  const googleLogin = async (code) => {
+  const googleLogin = useCallback(async (code) => {
     try {
       const response = await api.post('/auth/google', { code });
       setUser(response.data.user);
@@ -104,9 +104,9 @@ export const AuthProvider = ({ children }) => {
       toast.error(error.response?.data?.message || 'Google login failed');
       throw error;
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await api.post('/auth/logout');
       setUser(null);
@@ -115,13 +115,13 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       setUser(null);
     }
-  };
+  }, []);
 
-  const updateUser = (userData) => {
+  const updateUser = useCallback((userData) => {
     setUser(userData);
-  };
+  }, []);
 
-  const value = {
+  const value = useMemo(() => ({
     user,
     loading,
     login,
@@ -131,8 +131,8 @@ export const AuthProvider = ({ children }) => {
     googleLogin,
     logout,
     updateUser,
-    checkAuth
-  };
+    checkAuth,
+  }), [user, loading, login, register, verifyOtp, resendOtp, googleLogin, logout, updateUser, checkAuth]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
