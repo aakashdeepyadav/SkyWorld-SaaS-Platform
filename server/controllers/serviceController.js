@@ -6,23 +6,23 @@ import { logger } from '../utils/logger.js';
 const DEFAULT_SERVICES = [
   {
     name: 'Web Development',
-    description: 'High-converting websites built for speed and clarity.',
+    description: 'Professional websites that bring customers to your door.',
     category: SERVICE_CATEGORIES.WEB_DEVELOPMENT,
-    basePrice: 1499,
+    basePrice: 3999,
     isActive: true
   },
   {
     name: 'App Development',
-    description: 'Clean, intuitive apps with robust architecture.',
+    description: 'Take your business mobile with apps customers love to use.',
     category: SERVICE_CATEGORIES.APP_DEVELOPMENT,
-    basePrice: 2999,
+    basePrice: 18999,
     isActive: true
   },
   {
-    name: 'Branding & Creative',
-    description: 'Brand identity, design systems, and creative assets.',
+    name: 'Branding & Design',
+    description: 'Stand out with a professional identity your customers remember.',
     category: SERVICE_CATEGORIES.BRANDING_CREATIVE,
-    basePrice: 799,
+    basePrice: 2499,
     isActive: true
   }
 ];

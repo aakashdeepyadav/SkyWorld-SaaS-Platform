@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { PAYMENT_STATUS } from '../utils/constants.js';
+import { PAYMENT_PHASE, PAYMENT_STATUS } from '../utils/constants.js';
 
 const paymentSchema = new mongoose.Schema({
   clientId: {
@@ -25,7 +25,16 @@ const paymentSchema = new mongoose.Schema({
   },
   plan: {
     type: String,
-    enum: ['starter', 'custom']
+    trim: true
+  },
+  paymentPhase: {
+    type: String,
+    enum: Object.values(PAYMENT_PHASE),
+    default: PAYMENT_PHASE.ADVANCE
+  },
+  totalPlanPrice: {
+    type: Number,
+    min: 0
   },
   amount: {
     type: Number,

@@ -12,6 +12,30 @@ export const SERVICE_CATEGORIES = {
   BRANDING_CREATIVE: 'branding-creative'
 };
 
+// Plan prices (server-side price validation — must match frontend planCatalog.js)
+export const PLAN_PRICES = {
+  'web-development': {
+    launch: 3999,
+    starter: 7499,
+    growth: 11999,
+  },
+  'app-development': {
+    mini: 18999,
+    lite: 34999,
+  },
+  'branding-creative': {
+    starter: 2499,
+    plus: 4999,
+  },
+};
+
+// Combo prices (for reference — combos flow through custom requests)
+export const COMBO_PRICES = {
+  'restaurant-starter': 10099,
+  'medical-growth': 17508,
+  'premium-business': 33205,
+};
+
 // Service Request Status
 export const REQUEST_STATUS = {
   PENDING: 'pending',
@@ -42,6 +66,13 @@ export const CUSTOM_REQUEST_STATUS = {
   QUOTED: 'quoted',
   APPROVED: 'approved',
   CANCELLED: 'cancelled'
+};
+
+// Payment Phase (split-payment model — every plan is 50 / 50)
+export const PAYMENT_PHASE = {
+  ADVANCE: 'advance',   // First 50 %
+  FINAL: 'final',       // Remaining 50 %
+  FULL: 'full',         // Legacy one-shot (custom / admin override)
 };
 
 // Payment Status

@@ -56,7 +56,20 @@ const projectSchema = new mongoose.Schema({
   },
   plan: {
     type: String,
-    enum: ['starter', 'custom']
+    trim: true
+  },
+  advancePaid: {
+    type: Boolean,
+    default: false
+  },
+  finalPaid: {
+    type: Boolean,
+    default: false
+  },
+  totalPlanPrice: {
+    type: Number,
+    min: 0,
+    default: 0
   },
   paymentStatus: {
     type: String,

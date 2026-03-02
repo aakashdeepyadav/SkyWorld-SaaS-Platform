@@ -5,6 +5,7 @@ import {
   createPayment,
   updatePaymentStatus,
   createRazorpayOrder,
+  createFinalPaymentOrder,
   verifyRazorpayPayment,
   razorpayWebhook
 } from '../controllers/paymentController.js';
@@ -28,6 +29,7 @@ router.get('/:id', authorize(ROLES.CLIENT, ROLES.ADMIN), validators.mongoId, han
 router.get('/:id/invoice', authorize(ROLES.CLIENT, ROLES.ADMIN), validators.mongoId, handleValidationErrors, downloadInvoice);
 router.post('/', authorize(ROLES.CLIENT, ROLES.ADMIN), createPayment);
 router.post('/razorpay/order', authorize(ROLES.CLIENT, ROLES.ADMIN), createRazorpayOrder);
+router.post('/razorpay/final-order', authorize(ROLES.CLIENT, ROLES.ADMIN), createFinalPaymentOrder);
 router.post('/razorpay/verify', authorize(ROLES.CLIENT, ROLES.ADMIN), verifyRazorpayPayment);
 router.put('/:id/status', adminOnly, validators.mongoId, handleValidationErrors, updatePaymentStatus);
 

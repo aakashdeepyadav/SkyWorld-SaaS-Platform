@@ -1,142 +1,290 @@
-# SkyWorld Project Structure Overview
+# SkyWorld — Full Project Structure Reference
 
-## 1) High-Level Architecture
-- **Frontend**: React + Vite (client/)
-- **Backend**: Express + MongoDB (server/)
-- **Auth**: JWT with refresh token cookies, Google OAuth
-- **Payments**: Razorpay (order creation, verification, webhook)
-- **Storage**: Cloudinary for uploads
-- **Roles**: Admin, Client, Developer
+_Last updated: 2026-03-02_
 
-## 2) Root Level
-- **package.json**: Workspace scripts to run client/server and build frontend
-- **render.yaml**: Render deployment configuration
-- **.github/workflows/deploy.yml**: CI/CD pipeline
-- **docs/**: Product, API, and architecture documentation
-- **client/**: Frontend application
-- **server/**: Backend API
+This document describes the complete current project layout for the SkyWorld workspace.
+It is intended to be a maintainable reference for onboarding, debugging, deployment, and ownership.
 
-## 3) Frontend (client/)
-### Entry and Core
-- **src/main.jsx**: React bootstrapping and providers
-- **src/App.jsx**: Routes, auth guard, role guard
-- **src/index.css**: Tailwind base styles and component classes
-- **src/services/api.js**: Axios instance and auth refresh flow
+## 1) Repository Summary
 
-### Pages
-- **Home.jsx**: Landing page with service cards and product sections
-- **auth/**: Login, Register, Forgot/Reset Password, Google Callback
-- **client/Dashboard.jsx**: Client dashboard (projects, requests, custom requests)
-- **developer/Dashboard.jsx**: Developer dashboard (assigned projects)
-- **admin/Dashboard.jsx**: Admin metrics and recent activity
-- **admin/UserManagement.jsx**: Admin user management
-- **admin/ServiceManagement.jsx**: Admin service catalog management
-- **projects/**: Project list and detail views
-- **requests/**:
-  - Service request flow: RequestList, RequestDetail, NewRequest
-  - Custom request flow: CustomRequestForm, CustomRequestList, CustomRequestThankYou
-- **services/ServiceDetail.jsx**: Service details with plans and CTA
-- **checkout/Checkout.jsx**: Starter plan checkout using Razorpay
-- **payments/PaymentList.jsx**: Payment history
-- **Profile.jsx / Settings.jsx**: Account screens
+- **Architecture**: Monorepo with React frontend (`client/`) + Express backend (`server/`)
+- **Deployment**: Vercel (frontend), Render (backend), Docker support
+- **Documentation**: Deep technical docs in `docs/` plus top-level reports
+- **Testing**: Backend unit tests under `server/__tests__/`
 
-### Components
-- **components/common/**: ProtectedRoute, RoleRoute
-- **components/layout/**: Sidebar + layout shell
+## 2) Complete Structure Tree (source-oriented)
 
-### Config & Assets
-- **public/logo.png**
-- **tailwind.config.js / postcss.config.js**
-- **vite.config.js**
-- **nginx.conf / vercel.json** for deployment
+> Notes:
+>
+> - Dependency internals (`node_modules/**`) are intentionally not expanded.
+> - Build output folders are included as folders only where present.
+> - Local runtime artifacts (e.g., `.env`, concrete `*.log` files) are intentionally omitted.
 
-## 4) Backend (server/)
-### Entry and Configuration
-- **index.js**: App bootstrap, middleware, routes
-- **config/**:
-  - database.js: MongoDB connection
-  - validateEnv.js: Required environment checks
-  - cloudinary.js: Cloudinary setup
+```text
+SkyWorld/
+├── .dockerignore
+├── .gitignore
+├── .prettierignore
+├── .prettierrc
+├── docker-compose.yml
+├── Dockerfile
+├── ENHANCEMENT_REPORT.md
+├── package-lock.json
+├── package.json
+├── PROJECT_DOCS.md
+├── PROJECT_SUMMARY.md
+├── README.md
+├── render.yaml
+├── structure.md
+│
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       └── deploy.yml
+│
+├── client/
+│   ├── .env.example
+│   ├── Dockerfile
+│   ├── index.html
+│   ├── nginx.conf
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── tailwind.config.js
+│   ├── vercel.json
+│   ├── vite.config.js
+│   ├── dist/                          (build output)
+│   ├── node_modules/                  (dependencies)
+│   ├── public/
+│   │   ├── favicon_183px.png
+│   │   ├── favicon_48px.png
+│   │   ├── favicon_96px.png
+│   │   ├── iconAsset 57@2x.png
+│   │   ├── icon_logo_black_normal.png
+│   │   ├── icon_logo_coloured.png
+│   │   ├── icon_logo_coloured_normal.png
+│   │   ├── icon_logo_mini.png
+│   │   ├── logo.png
+│   │   ├── v1Asset 40SkyWorld.png
+│   │   ├── wordmark_logo_all_black.png
+│   │   ├── wordmark_logo_all_white_fullname.png
+│   │   ├── wordmark_logo_black_fullname.png
+│   │   ├── wordmark_logo_coloured_.png
+│   │   ├── wordmark_logo_coloured_fullname.png
+│   │   ├── wordmark_logo_white_.png
+│   │   └── wordmark_logo_white_fullname.png
+│   └── src/
+│       ├── App.jsx
+│       ├── index.css
+│       ├── main.jsx
+│       ├── components/
+│       │   ├── common/
+│       │   │   ├── CommandPalette.jsx
+│       │   │   ├── ErrorBoundary.jsx
+│       │   │   ├── NotificationBell.jsx
+│       │   │   ├── ProjectTracker.jsx
+│       │   │   ├── ProtectedRoute.jsx
+│       │   │   └── RoleRoute.jsx
+│       │   └── layout/
+│       │       └── Layout.jsx
+│       ├── context/
+│       │   ├── AuthContext.jsx
+│       │   ├── SocketContext.jsx
+│       │   └── ThemeContext.jsx
+│       ├── pages/
+│       │   ├── FAQ.jsx
+│       │   ├── Home.jsx
+│       │   ├── NotFound.jsx
+│       │   ├── PrivacyPolicy.jsx
+│       │   ├── Profile.jsx
+│       │   ├── Settings.jsx
+│       │   ├── TermsOfService.jsx
+│       │   ├── admin/
+│       │   │   ├── Dashboard.jsx
+│       │   │   ├── ServiceManagement.jsx
+│       │   │   └── UserManagement.jsx
+│       │   ├── auth/
+│       │   │   ├── ForgotPassword.jsx
+│       │   │   ├── GoogleCallback.jsx
+│       │   │   ├── Login.jsx
+│       │   │   ├── Register.jsx
+│       │   │   └── ResetPassword.jsx
+│       │   ├── checkout/
+│       │   │   └── Checkout.jsx
+│       │   ├── client/
+│       │   │   └── Dashboard.jsx
+│       │   ├── developer/
+│       │   │   └── Dashboard.jsx
+│       │   ├── payments/
+│       │   │   └── PaymentList.jsx
+│       │   ├── projects/
+│       │   │   ├── ProjectDetail.jsx
+│       │   │   └── ProjectList.jsx
+│       │   ├── requests/
+│       │   │   ├── CustomRequestForm.jsx
+│       │   │   ├── CustomRequestList.jsx
+│       │   │   ├── CustomRequestThankYou.jsx
+│       │   │   ├── NewRequest.jsx
+│       │   │   ├── RequestDetail.jsx
+│       │   │   └── RequestList.jsx
+│       │   └── services/
+│       │       └── ServiceDetail.jsx
+│       ├── services/
+│       │   └── api.js
+│       └── utils/
+│           └── currency.js
+│
+├── docs/
+│   ├── API.md
+│   ├── ARCHITECTURE.md
+│   ├── DATABASE.md
+│   ├── DEPLOYMENT.md
+│   ├── RBAC_FLOW.md
+│   ├── SECURITY.md
+│   ├── SRS.md
+│   ├── UI_UX_DESIGN.md
+│   └── USER_MANUAL.md
+│
+├── logs/
+│   └── (runtime logs, ignored)
+│
+└── server/
+    ├── .env.example
+    ├── eslint.config.js
+    ├── index.js
+    ├── package-lock.json
+    ├── package.json
+    ├── socket.js
+    ├── vitest.config.js
+    ├── node_modules/                  (dependencies)
+    ├── logs/
+    │   └── (runtime logs, ignored)
+    ├── __tests__/
+    │   ├── helpers.js
+    │   └── unit/
+    │       ├── AppError.test.js
+    │       ├── constants.test.js
+    │       ├── errorHandler.test.js
+    │       └── rbac.test.js
+    ├── config/
+    │   ├── cloudinary.js
+    │   ├── database.js
+    │   ├── sentry.js
+    │   └── validateEnv.js
+    ├── controllers/
+    │   ├── analyticsController.js
+    │   ├── authController.js
+    │   ├── customRequestController.js
+    │   ├── fileController.js
+    │   ├── messageController.js
+    │   ├── notificationController.js
+    │   ├── paymentController.js
+    │   ├── projectController.js
+    │   ├── requestController.js
+    │   ├── serviceController.js
+    │   ├── statsController.js
+    │   ├── twoFactorController.js
+    │   └── userController.js
+    ├── middleware/
+    │   ├── auth.js
+    │   ├── csrfProtection.js
+    │   ├── errorHandler.js
+    │   ├── rateLimiter.js
+    │   ├── rbac.js
+    │   ├── socketAuth.js
+    │   ├── upload.js
+    │   └── validation.js
+    ├── models/
+    │   ├── AuditLog.js
+    │   ├── CustomRequest.js
+    │   ├── File.js
+    │   ├── Message.js
+    │   ├── Notification.js
+    │   ├── Payment.js
+    │   ├── Project.js
+    │   ├── Service.js
+    │   ├── ServiceRequest.js
+    │   └── User.js
+    ├── routes/
+    │   ├── admin.js
+    │   ├── auth.js
+    │   ├── customRequests.js
+    │   ├── files.js
+    │   ├── messages.js
+    │   ├── notifications.js
+    │   ├── payments.js
+    │   ├── projects.js
+    │   ├── requests.js
+    │   ├── services.js
+    │   ├── stats.js
+    │   └── users.js
+    ├── services/
+    │   ├── authService.js
+    │   ├── cloudinaryService.js
+    │   ├── emailService.js
+    │   ├── invoiceService.js
+    │   └── notificationService.js
+    └── utils/
+        ├── AppError.js
+        ├── constants.js
+        ├── logger.js
+        └── testEmail.js
+```
 
-### Middleware
-- **auth.js**: JWT auth, refresh, audit logging
-- **rbac.js**: Role checks (admin-only, allowed roles)
-- **validation.js**: Express-validator rules
-- **rateLimiter.js**: API + auth rate limiting
-- **upload.js**: Multer memory storage, file validations
-- **errorHandler.js**: Centralized error handling
+## 3) Folder Responsibilities
 
-### Models
-- **User.js**: User profiles and roles
-- **Service.js**: Service catalog
-- **ServiceRequest.js**: Standard service requests
-- **CustomRequest.js**: Custom plan requests with file uploads
-- **Project.js**: Projects created from payments or requests
-- **Payment.js**: Razorpay payment records
-- **Message.js**: Project messaging
-- **File.js**: Project files
-- **AuditLog.js**: System audit logs
+### Root files and directories
 
-### Controllers
-- **authController.js**: Register/login/refresh/password reset
-- **serviceController.js**: Service catalog CRUD
-- **requestController.js**: Standard request CRUD and assignment
-- **customRequestController.js**: Custom request creation + quoting
-- **projectController.js**: Project CRUD
-- **paymentController.js**: Razorpay order, verify, webhook
-- **statsController.js**: Admin dashboard stats
-- **userController.js**: User management
-- **messageController.js**: Project messaging
-- **fileController.js**: File uploads and retrieval
+- **`package.json` / `package-lock.json`**: Root workspace scripts and dependency lock.
+- **`docker-compose.yml` + `Dockerfile`**: Containerized local/deployment workflows.
+- **`render.yaml`**: Render service definition.
+- **`README.md`**: Product and setup guide.
+- **`PROJECT_DOCS.md`, `PROJECT_SUMMARY.md`, `ENHANCEMENT_REPORT.md`**: Project-level design and progress artifacts.
+- **`.github/workflows/`**: CI/CD automation pipelines.
+- **`logs/`**: Root-level runtime logs (local/ignored).
 
-### Routes
-- **auth.js**: /api/auth
-- **services.js**: /api/services
-- **requests.js**: /api/requests
-- **customRequests.js**: /api/custom-requests
-- **projects.js**: /api/projects
-- **payments.js**: /api/payments
-- **stats.js**: /api/admin/stats
-- **users.js**: /api/users
-- **messages.js**: /api/messages
-- **files.js**: /api/files
+### `client/` (Frontend SPA)
 
-### Services/Utils
-- **services/authService.js**: Cookie/session helpers
-- **services/cloudinaryService.js**: Upload handler
-- **services/emailService.js**: Email utilities
-- **utils/constants.js**: Enums for statuses, roles
-- **utils/logger.js**: Logging setup
+- **Entry + app shell**: `src/main.jsx`, `src/App.jsx`, `src/index.css`
+- **Core UI blocks**: `src/components/common/`, `src/components/layout/`
+- **Global state/providers**: `src/context/` (auth, socket, theme)
+- **Route pages**: `src/pages/` grouped by feature/role
+- **API client layer**: `src/services/api.js`
+- **Utility layer**: `src/utils/currency.js`
+- **Brand assets**: `public/` logos/icons/wordmarks
+- **Build + deploy config**: `vite.config.js`, `tailwind.config.js`, `postcss.config.js`, `nginx.conf`, `vercel.json`, `Dockerfile`
 
-## 5) Key Functional Flows
-### Authentication
-- JWT access + refresh cookie strategy
-- Role-based guards on protected routes
+### `server/` (Backend API)
 
-### Service Requests (Starter/Standard)
-- Client submits request → Admin assigns developer → Project created
+- **Bootstrap/runtime**: `index.js`, `socket.js`
+- **Configuration**: `config/` (DB, env validation, cloudinary, sentry)
+- **HTTP layer**: `routes/` + `controllers/`
+- **Business/application services**: `services/`
+- **Cross-cutting middleware**: auth, RBAC, validation, rate limiting, upload, CSRF, error handler
+- **Data models**: `models/` (Mongoose schema layer)
+- **Utility modules**: `utils/` (errors, constants, logger, test email)
+- **Test suite**: `__tests__/unit/` and helpers
+- **Server env template**: `.env.example` (runtime `.env*` files are local/ignored)
+- **Server logs**: `server/logs/`
 
-### Custom Requests
-- Client submits custom form + optional file
-- Admin adds quote and updates status
-- Client pays via Razorpay → Project created
+### `docs/` (Project documentation)
 
-### Payments
-- Razorpay order created on backend
-- Signature verification on backend
-- Payment record saved and project updated/created
+- **`API.md`**: Endpoint contracts and usage.
+- **`ARCHITECTURE.md`**: Technical architecture and system boundaries.
+- **`DATABASE.md`**: Data modeling and storage reference.
+- **`DEPLOYMENT.md`**: Deployment pipelines and environments.
+- **`RBAC_FLOW.md`**: Role-based access behavior.
+- **`SECURITY.md`**: Security controls and practices.
+- **`SRS.md`**: Requirement specification.
+- **`UI_UX_DESIGN.md`**: UI/UX system and decisions.
+- **`USER_MANUAL.md`**: End-user workflow documentation.
 
-## 6) Environment & Deployment
-- **server/.env.example**: API secrets (Razorpay, DB, JWT, email)
-- **client/.env.example**: API base URL and OAuth settings
-- **render.yaml / nginx.conf / vercel.json**: Deployment configuration
+## 4) Maintenance Guidance for This File
 
-## 7) Documentation (docs/)
-- **API.md**: API endpoints and examples
-- **ARCHITECTURE.md**: System design
-- **DATABASE.md**: Schemas and indexes
-- **DEPLOYMENT.md**: Deployment steps
-- **SECURITY.md**: Security controls
-- **SRS.md**: Requirements specification
-- **UI_UX_DESIGN.md**: UI/UX guidelines
-- **USER_MANUAL.md**: User guides
+Use this checklist when updating structure docs:
+
+1. Add/remove paths whenever files or folders are added/removed.
+2. Keep each folder’s “responsibility” summary aligned with current implementation.
+3. Keep generated/dependency folders collapsed (do not expand package internals).
+4. Update the “Last updated” date each time this file is revised.
+5. If architecture changes materially, also update `README.md` and `docs/ARCHITECTURE.md`.

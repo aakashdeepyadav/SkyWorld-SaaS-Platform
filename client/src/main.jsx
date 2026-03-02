@@ -40,3 +40,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>
 );
 
+/* Remove the pre-React HTML loader once the app mounts */
+requestAnimationFrame(() => {
+  const el = document.getElementById('app-loader');
+  if (el) {
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 400);
+  }
+});
+

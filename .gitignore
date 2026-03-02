@@ -5,12 +5,18 @@ client/node_modules/
 
 # Environment variables
 .env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 server/.env
+server/.env.*
 client/.env
+client/.env.*
+!.env.example
+!server/.env.example
+!client/.env.example
 
 # Build outputs
 dist/

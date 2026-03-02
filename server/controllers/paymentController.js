@@ -5,7 +5,7 @@ import Project from '../models/Project.js';
 import ServiceRequest from '../models/ServiceRequest.js';
 import CustomRequest from '../models/CustomRequest.js';
 import Service from '../models/Service.js';
-import { CUSTOM_REQUEST_STATUS, DELIVERY_STATUS, PAYMENT_STATUS, PROJECT_STATUS, ROLES } from '../utils/constants.js';
+import { CUSTOM_REQUEST_STATUS, DELIVERY_STATUS, PAYMENT_PHASE, PAYMENT_STATUS, PLAN_PRICES, PROJECT_STATUS, ROLES } from '../utils/constants.js';
 import { createAuditLog } from '../middleware/auth.js';
 
 const razorpay = new Razorpay({
@@ -213,14 +213,24 @@ export const createRazorpayOrder = async (req, res, next) => {
     }
 
     let derivedAmount = amount ?? project?.budget ?? serviceRequest?.estimatedPrice;
-    if (resolvedPlan === 'starter' && !serviceId && !resolvedServiceType) {
+    if (resolvedPlan && resolvedPlan !== 'custom' && !resolvedServiceType) {
       return res.status(400).json({
         success: false,
-        message: 'Service selection is required for starter checkout'
+        message: 'Service selection is required for plan checkout'
       });
     }
 
-    if (resolvedPlan === 'starter') {
+    // ── Plan price validation (covers all tiers, not just 'starter') ──
+    if (resolvedPlan && resolvedPlan !== 'custom' && resolvedServiceType) {
+      const categoryPrices = PLAN_PRICES[resolvedServiceType];
+      if (!categoryPrices || categoryPrices[resolvedPlan] === undefined) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid plan for selected service category'
+        });
+      }
+
+      // Verify the service category is active in DB
       if (serviceId) {
         if (!isMongoObjectId(serviceId)) {
           return res.status(400).json({
@@ -228,7 +238,6 @@ export const createRazorpayOrder = async (req, res, next) => {
             message: 'Invalid service ID'
           });
         }
-
         starterService = await Service.findOne({
           _id: serviceId,
           isActive: true
@@ -237,14 +246,14 @@ export const createRazorpayOrder = async (req, res, next) => {
         if (!starterService) {
           return res.status(404).json({
             success: false,
-            message: 'Selected service is unavailable for starter checkout'
+            message: 'Selected service is unavailable'
           });
         }
 
         if (resolvedServiceType && starterService.category !== resolvedServiceType) {
           return res.status(400).json({
             success: false,
-            message: 'Starter checkout service does not match selected category'
+            message: 'Service does not match selected category'
           });
         }
 
@@ -260,12 +269,13 @@ export const createRazorpayOrder = async (req, res, next) => {
         if (!starterService) {
           return res.status(404).json({
             success: false,
-            message: 'Selected service is unavailable for starter checkout'
+            message: 'Selected service is unavailable'
           });
         }
       }
 
-      derivedAmount = starterService.basePrice;
+      // Use the server-side validated plan price (never trust client-sent amount)
+      derivedAmount = categoryPrices[resolvedPlan];
     } else if (customRequest) {
       derivedAmount = customRequest.quotedPrice;
     }
@@ -279,6 +289,11 @@ export const createRazorpayOrder = async (req, res, next) => {
       });
     }
 
+    // ── Split payment: always charge 50 % advance, 50 % on delivery ──
+    const isCustom = resolvedPlan === 'custom';
+    const paymentPhase = isCustom ? PAYMENT_PHASE.FULL : PAYMENT_PHASE.ADVANCE;
+    const chargeAmount = isCustom ? normalizedAmount : Math.ceil(normalizedAmount / 2);
+
     const normalizedCurrency = (currency || 'INR').toUpperCase();
 
     const payment = await Payment.create({
@@ -288,14 +303,16 @@ export const createRazorpayOrder = async (req, res, next) => {
       customRequestId,
       serviceType: resolvedServiceType,
       plan: resolvedPlan,
-      amount: normalizedAmount,
+      paymentPhase,
+      totalPlanPrice: normalizedAmount,
+      amount: chargeAmount,
       currency: normalizedCurrency,
       paymentMethod: 'razorpay',
       status: PAYMENT_STATUS.PROCESSING
     });
 
     const order = await razorpay.orders.create({
-      amount: Math.round(normalizedAmount * 100),
+      amount: Math.round(chargeAmount * 100),
       currency: normalizedCurrency,
       receipt: payment._id.toString(),
       notes: {
@@ -305,7 +322,8 @@ export const createRazorpayOrder = async (req, res, next) => {
         customRequestId: customRequestId || '',
         serviceId: serviceId || starterService?._id?.toString() || '',
         serviceType: resolvedServiceType || '',
-        plan: resolvedPlan || ''
+        plan: resolvedPlan || '',
+        paymentPhase
       }
     });
 
@@ -376,7 +394,23 @@ export const verifyRazorpayPayment = async (req, res, next) => {
 
     if (verified) {
       let projectIdToAttach = payment.projectId;
+      const isAdvance = payment.paymentPhase === PAYMENT_PHASE.ADVANCE;
+      const isFinal = payment.paymentPhase === PAYMENT_PHASE.FINAL;
 
+      // ── Handle FINAL payment — project already exists ──
+      if (isFinal && projectIdToAttach) {
+        await Project.findByIdAndUpdate(projectIdToAttach, {
+          finalPaid: true,
+          paymentStatus: PAYMENT_STATUS.COMPLETED,
+        });
+        payment.projectId = projectIdToAttach;
+        await payment.save();
+
+        res.json({ success: true, message: 'Final payment verified', payment });
+        return;
+      }
+
+      // ── Handle ADVANCE or FULL — create project if needed ──
       if (!projectIdToAttach && payment.serviceRequestId) {
         const serviceRequest = await ServiceRequest.findById(payment.serviceRequestId);
         if (serviceRequest) {
@@ -391,10 +425,13 @@ export const verifyRazorpayPayment = async (req, res, next) => {
               clientId: serviceRequest.clientId,
               status: PROJECT_STATUS.PLANNING,
               deliveryStatus: DELIVERY_STATUS.PENDING,
-              paymentStatus: PAYMENT_STATUS.COMPLETED,
+              paymentStatus: isAdvance ? PAYMENT_STATUS.PROCESSING : PAYMENT_STATUS.COMPLETED,
               serviceType: payment.serviceType,
               plan: payment.plan,
-              budget: payment.amount
+              totalPlanPrice: payment.totalPlanPrice || payment.amount,
+              advancePaid: true,
+              finalPaid: !isAdvance,
+              budget: payment.totalPlanPrice || payment.amount
             });
             projectIdToAttach = project._id;
           }
@@ -418,7 +455,10 @@ export const verifyRazorpayPayment = async (req, res, next) => {
               paymentStatus: PAYMENT_STATUS.COMPLETED,
               serviceType: customRequest.serviceType,
               plan: 'custom',
-              budget: payment.amount
+              totalPlanPrice: payment.totalPlanPrice || payment.amount,
+              advancePaid: true,
+              finalPaid: true,
+              budget: payment.totalPlanPrice || payment.amount
             });
             projectIdToAttach = project._id;
             await CustomRequest.findByIdAndUpdate(customRequest._id, {
@@ -429,18 +469,23 @@ export const verifyRazorpayPayment = async (req, res, next) => {
         }
       }
 
-      if (!projectIdToAttach && payment.serviceType && payment.plan === 'starter') {
-        const title = `${payment.serviceType.replace('-', ' ')} starter plan`;
+      if (!projectIdToAttach && payment.serviceType && payment.plan) {
+        const planLabel = payment.plan.replace(/-/g, ' ');
+        const svcLabel = payment.serviceType.replace(/-/g, ' ');
+        const title = `${svcLabel} — ${planLabel} plan`;
         const project = await Project.create({
           title,
-          description: 'Starter plan purchase',
+          description: `${planLabel} plan purchase`,
           clientId: payment.clientId,
           status: PROJECT_STATUS.PLANNING,
           deliveryStatus: DELIVERY_STATUS.PENDING,
-          paymentStatus: PAYMENT_STATUS.COMPLETED,
+          paymentStatus: isAdvance ? PAYMENT_STATUS.PROCESSING : PAYMENT_STATUS.COMPLETED,
           serviceType: payment.serviceType,
           plan: payment.plan,
-          budget: payment.amount
+          totalPlanPrice: payment.totalPlanPrice || payment.amount,
+          advancePaid: true,
+          finalPaid: !isAdvance,
+          budget: payment.totalPlanPrice || payment.amount
         });
         projectIdToAttach = project._id;
       }
@@ -448,7 +493,20 @@ export const verifyRazorpayPayment = async (req, res, next) => {
       if (projectIdToAttach) {
         payment.projectId = projectIdToAttach;
         await payment.save();
-        await Project.findByIdAndUpdate(projectIdToAttach, { paymentStatus: PAYMENT_STATUS.COMPLETED });
+
+        // If advance payment on existing project, mark advancePaid
+        if (isAdvance) {
+          await Project.findByIdAndUpdate(projectIdToAttach, {
+            advancePaid: true,
+            paymentStatus: PAYMENT_STATUS.PROCESSING, // awaiting final
+          });
+        } else {
+          await Project.findByIdAndUpdate(projectIdToAttach, {
+            advancePaid: true,
+            finalPaid: true,
+            paymentStatus: PAYMENT_STATUS.COMPLETED,
+          });
+        }
       }
     }
 
@@ -518,6 +576,98 @@ export const razorpayWebhook = async (req, res, next) => {
     }
 
     res.json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @route   POST /api/payments/razorpay/final-order
+ * @desc    Create Razorpay order for the remaining 50 % (final payment)
+ * @access  Private/Client
+ */
+export const createFinalPaymentOrder = async (req, res, next) => {
+  try {
+    const { projectId } = req.body;
+
+    if (!projectId || !isMongoObjectId(projectId)) {
+      return res.status(400).json({ success: false, message: 'Valid project ID is required' });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ success: false, message: 'Project not found' });
+    }
+
+    if (req.user.role === ROLES.CLIENT && project.clientId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Access denied' });
+    }
+
+    if (!project.advancePaid) {
+      return res.status(400).json({ success: false, message: 'Advance payment has not been completed yet' });
+    }
+
+    if (project.finalPaid) {
+      return res.status(400).json({ success: false, message: 'Final payment has already been completed' });
+    }
+
+    // Calculate remaining amount (total - advance already paid)
+    const advancePayment = await Payment.findOne({
+      projectId: project._id,
+      paymentPhase: PAYMENT_PHASE.ADVANCE,
+      status: PAYMENT_STATUS.COMPLETED,
+    });
+
+    if (!advancePayment) {
+      return res.status(400).json({ success: false, message: 'No completed advance payment found for this project' });
+    }
+
+    const totalPrice = project.totalPlanPrice || advancePayment.totalPlanPrice || (advancePayment.amount * 2);
+    const finalAmount = totalPrice - advancePayment.amount;
+
+    if (finalAmount <= 0) {
+      return res.status(400).json({ success: false, message: 'Nothing remaining to pay' });
+    }
+
+    const currency = advancePayment.currency || 'INR';
+
+    const payment = await Payment.create({
+      clientId: project.clientId,
+      projectId: project._id,
+      serviceType: project.serviceType,
+      plan: project.plan,
+      paymentPhase: PAYMENT_PHASE.FINAL,
+      totalPlanPrice: totalPrice,
+      amount: finalAmount,
+      currency,
+      paymentMethod: 'razorpay',
+      status: PAYMENT_STATUS.PROCESSING,
+    });
+
+    const order = await razorpay.orders.create({
+      amount: Math.round(finalAmount * 100),
+      currency,
+      receipt: payment._id.toString(),
+      notes: {
+        paymentId: payment._id.toString(),
+        projectId: project._id.toString(),
+        serviceType: project.serviceType || '',
+        plan: project.plan || '',
+        paymentPhase: PAYMENT_PHASE.FINAL,
+      },
+    });
+
+    payment.razorpayOrderId = order.id;
+    await payment.save();
+
+    await createAuditLog(req, 'final_payment_created', 'payment', payment._id, { amount: finalAmount, projectId: project._id });
+
+    res.status(201).json({
+      success: true,
+      order,
+      keyId: process.env.RAZORPAY_KEY_ID,
+      payment,
+    });
   } catch (error) {
     next(error);
   }
