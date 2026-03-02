@@ -54,8 +54,8 @@ const UserManagement = () => {
     return (
         <div className="space-y-6 animate-fade-in">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-                <p className="text-sm text-gray-500 mt-1">Manage platform users, roles, and access.</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage platform users, roles, and access.</p>
             </div>
 
             {/* Filters */}
@@ -88,43 +88,43 @@ const UserManagement = () => {
                 <div className="card animate-pulse space-y-3">
                     {[1, 2, 3, 4, 5].map(i => (
                         <div key={i} className="flex items-center gap-4 py-3">
-                            <div className="w-9 h-9 bg-gray-100 rounded-full" />
+                            <div className="w-9 h-9 bg-gray-100 dark:bg-surface-700 rounded-full" />
                             <div className="flex-1 space-y-2">
-                                <div className="h-3.5 bg-gray-100 rounded w-1/4" />
-                                <div className="h-3 bg-gray-50 rounded w-1/3" />
+                                <div className="h-3.5 bg-gray-100 dark:bg-surface-700 rounded w-1/4" />
+                                <div className="h-3 bg-gray-50 dark:bg-surface-600 rounded w-1/3" />
                             </div>
                         </div>
                     ))}
                 </div>
             ) : data?.users?.length === 0 ? (
                 <div className="card text-center py-16">
-                    <UsersIcon className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                    <p className="text-gray-500 font-medium">No users found</p>
+                    <UsersIcon className="w-12 h-12 text-gray-200 dark:text-gray-600 mx-auto mb-3" />
+                    <p className="text-gray-500 dark:text-gray-400 font-medium">No users found</p>
                 </div>
             ) : (
                 <div className="card !p-0 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="border-b border-gray-100">
-                                    <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">User</th>
-                                    <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Role</th>
-                                    <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Status</th>
-                                    <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Joined</th>
-                                    <th className="text-right text-xs font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Actions</th>
+                                <tr className="border-b border-gray-100 dark:border-surface-700">
+                                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-5 py-3">User</th>
+                                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-5 py-3">Role</th>
+                                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-5 py-3">Status</th>
+                                    <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-5 py-3">Joined</th>
+                                    <th className="text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-5 py-3">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-gray-50 dark:divide-surface-700">
                                 {data.users.map(u => (
-                                    <tr key={u._id} className="hover:bg-gray-50/50 transition-colors">
+                                    <tr key={u._id} className="hover:bg-gray-50/50 dark:hover:bg-surface-700/50 transition-colors">
                                         <td className="px-5 py-3.5">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-sm font-semibold flex-shrink-0">
+                                                <div className="w-9 h-9 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 flex items-center justify-center text-sm font-semibold flex-shrink-0">
                                                     {u.name?.charAt(0).toUpperCase() || '?'}
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <p className="text-sm font-medium text-gray-900 truncate">{u.name}</p>
-                                                    <p className="text-xs text-gray-400 truncate">{u.email}</p>
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{u.name}</p>
+                                                    <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{u.email}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -136,7 +136,7 @@ const UserManagement = () => {
                                                         updateRoleMutation.mutate({ userId: u._id, role: e.target.value });
                                                     }
                                                 }}
-                                                className="text-xs font-medium border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none cursor-pointer"
+                                                className="text-xs font-medium border border-gray-200 dark:border-surface-600 rounded-lg px-2 py-1.5 bg-white dark:bg-surface-700 dark:text-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none cursor-pointer"
                                             >
                                                 {ROLE_OPTIONS.map(r => (
                                                     <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
@@ -151,15 +151,15 @@ const UserManagement = () => {
                                                     }
                                                 }}
                                                 className={`inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full transition-colors ${u.isActive !== false
-                                                        ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                                                        : 'bg-red-50 text-red-700 hover:bg-red-100'
+                                                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20'
+                                                        : 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20'
                                                     }`}
                                             >
                                                 <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${u.isActive !== false ? 'bg-emerald-500' : 'bg-red-500'}`} />
                                                 {u.isActive !== false ? 'Active' : 'Inactive'}
                                             </button>
                                         </td>
-                                        <td className="px-5 py-3.5 text-xs text-gray-400">
+                                        <td className="px-5 py-3.5 text-xs text-gray-400 dark:text-gray-500">
                                             {new Date(u.createdAt).toLocaleDateString()}
                                         </td>
                                         <td className="px-5 py-3.5 text-right">

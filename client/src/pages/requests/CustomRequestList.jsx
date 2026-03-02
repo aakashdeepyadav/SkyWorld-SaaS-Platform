@@ -160,8 +160,8 @@ const CustomRequestList = () => {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Custom Requests</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Custom Requests</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {isAdmin ? 'Review custom requests and send quotes.' : 'Track your custom plan requests.'}
           </p>
         </div>
@@ -177,7 +177,7 @@ const CustomRequestList = () => {
           <button
             key={tab.key}
             onClick={() => { setStatusFilter(tab.key); setPage(1); }}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium ${statusFilter === tab.key ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium ${statusFilter === tab.key ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-surface-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-surface-600'}`}
           >
             {tab.label}
           </button>
@@ -188,14 +188,14 @@ const CustomRequestList = () => {
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
             <div key={i} className="card animate-pulse">
-              <div className="h-4 bg-gray-100 rounded w-1/3 mb-2" />
-              <div className="h-3 bg-gray-50 rounded w-2/3" />
+              <div className="h-4 bg-gray-100 dark:bg-surface-700 rounded w-1/3 mb-2" />
+              <div className="h-3 bg-gray-50 dark:bg-surface-600 rounded w-2/3" />
             </div>
           ))}
         </div>
       ) : data?.requests?.length === 0 ? (
         <div className="card text-center py-16">
-          <p className="text-gray-500 font-medium">No custom requests yet</p>
+          <p className="text-gray-500 dark:text-gray-400 font-medium">No custom requests yet</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -209,10 +209,10 @@ const CustomRequestList = () => {
                     </span>
                     <span className={`${getStatusBadge(request.status)} capitalize`}>{request.status}</span>
                   </div>
-                  <h3 className="text-sm font-semibold text-gray-900">{request.fullName}</h3>
-                  <p className="text-xs text-gray-400 mt-1">{request.email}</p>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{request.fullName}</h3>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{request.email}</p>
                   {request.projectDescription && (
-                    <p className="text-sm text-gray-600 mt-3 line-clamp-3">{request.projectDescription}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-3 line-clamp-3">{request.projectDescription}</p>
                   )}
                   <div className="mt-3 flex flex-wrap gap-2">
                     {Number(request.expectedPrice) > 0 && (
@@ -221,7 +221,7 @@ const CustomRequestList = () => {
                       </span>
                     )}
                     {request.budgetRange && (
-                      <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-surface-700 px-2 py-1 rounded-full">
                         Budget range: {request.budgetRange}
                       </span>
                     )}
@@ -233,9 +233,9 @@ const CustomRequestList = () => {
                   )}
                 </div>
                 <div className="flex flex-col gap-2 min-w-[180px]">
-                  <div className="p-3 rounded-xl bg-gray-50 text-xs text-gray-500">
+                  <div className="p-3 rounded-xl bg-gray-50 dark:bg-surface-700 text-xs text-gray-500 dark:text-gray-400">
                     <p>Quote</p>
-                    <p className="text-sm font-semibold text-gray-900 mt-1">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white mt-1">
                       {request.quotedPrice ? formatINR(Number(request.quotedPrice)) : 'Pending'}
                     </p>
                   </div>
@@ -268,7 +268,7 @@ const CustomRequestList = () => {
           >
             Previous
           </button>
-          <span className="text-sm text-gray-500">Page {page} of {totalPages}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">Page {page} of {totalPages}</span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
@@ -282,8 +282,8 @@ const CustomRequestList = () => {
       {isModalOpen && selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-scale-in">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Update Quote</h2>
+          <div className="relative bg-white dark:bg-surface-800 rounded-2xl shadow-xl w-full max-w-md p-6 animate-scale-in">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Update Quote</h2>
             <div className="space-y-4">
               {Number(selected.expectedPrice) > 0 && (
                 <div className="rounded-xl bg-amber-50 border border-amber-200 p-3">
@@ -304,7 +304,7 @@ const CustomRequestList = () => {
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Quoted price (INR)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quoted price (INR)</label>
                 <input
                   type="number"
                   min="0"
@@ -312,10 +312,10 @@ const CustomRequestList = () => {
                   onChange={(e) => setQuotedPrice(e.target.value)}
                   className="input-field"
                 />
-                <p className="text-xs text-gray-400 mt-1">This amount will be used for client payment once status is quoted.</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">This amount will be used for client payment once status is quoted.</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                 <select value={status} onChange={(e) => setStatus(e.target.value)} className="input-field">
                   <option value="pending">Pending</option>
                   <option value="quoted">Quoted</option>

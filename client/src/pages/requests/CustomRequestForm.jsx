@@ -73,14 +73,14 @@ const CustomRequestForm = () => {
         <Link to={`/services/${formData.serviceType}`} className="text-sm text-primary-600 hover:text-primary-500">
           Back to {selectedServiceLabel}
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900 mt-3">Custom Plan Request</h1>
-        <p className="text-sm text-gray-500 mt-1">Tell us about your project and we will send a tailored proposal.</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-3">Custom Plan Request</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Tell us about your project and we will send a tailored proposal.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="card space-y-5">
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Service</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service</label>
             <select name="serviceType" value={formData.serviceType} onChange={handleChange} className="input-field">
               {SERVICE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -88,50 +88,50 @@ const CustomRequestForm = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full name</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full name</label>
             <input name="fullName" value={formData.fullName} onChange={handleChange} className="input-field" required />
           </div>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
             <input name="email" type="email" value={formData.email} onChange={handleChange} className="input-field" required />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
             <input name="phone" value={formData.phone} onChange={handleChange} className="input-field" required />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Business name</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Business name</label>
           <input name="businessName" value={formData.businessName} onChange={handleChange} className="input-field" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Project description</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project description</label>
           <textarea name="projectDescription" value={formData.projectDescription} onChange={handleChange} className="input-field min-h-[120px]" required />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Required features</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Required features</label>
           <textarea name="requiredFeatures" value={formData.requiredFeatures} onChange={handleChange} className="input-field min-h-[100px]" />
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Deadline</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deadline</label>
             <input name="deadline" type="date" value={formData.deadline} onChange={handleChange} className="input-field" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Budget range</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Budget range</label>
             <input name="budgetRange" value={formData.budgetRange} onChange={handleChange} className="input-field" placeholder="e.g. ₹50,000 – ₹1,00,000" />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Your expected price (INR)</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your expected price (INR)</label>
           <input
             name="expectedPrice"
             type="number"
@@ -142,15 +142,15 @@ const CustomRequestForm = () => {
             className="input-field"
             placeholder="e.g. 75000"
           />
-          <p className="text-xs text-gray-400 mt-1">This is your offer. Admin will review and approve a final payable amount.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">This is your offer. Admin will review and approve a final payable amount.</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Optional file upload</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Optional file upload</label>
           <input
             type="file"
             onChange={(e) => setFile(e.target.files?.[0] || null)}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-600 hover:file:bg-primary-100"
+            className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 dark:file:bg-primary-500/10 file:text-primary-600 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-primary-500/20"
           />
         </div>
 

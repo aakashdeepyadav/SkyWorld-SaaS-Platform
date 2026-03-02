@@ -18,9 +18,9 @@ const DeveloperDashboard = () => {
   };
 
   const statCards = [
-    { name: 'Total Projects', value: stats.total, icon: BriefcaseIcon, bg: 'bg-blue-50', color: 'text-blue-600' },
-    { name: 'In Progress', value: stats.inProgress, icon: ClockIcon, bg: 'bg-amber-50', color: 'text-amber-600' },
-    { name: 'Completed', value: stats.completed, icon: CheckCircleIcon, bg: 'bg-emerald-50', color: 'text-emerald-600' },
+    { name: 'Total Projects', value: stats.total, icon: BriefcaseIcon, bg: 'bg-blue-50 dark:bg-blue-500/10', color: 'text-blue-600 dark:text-blue-400' },
+    { name: 'In Progress', value: stats.inProgress, icon: ClockIcon, bg: 'bg-amber-50 dark:bg-amber-500/10', color: 'text-amber-600 dark:text-amber-400' },
+    { name: 'Completed', value: stats.completed, icon: CheckCircleIcon, bg: 'bg-emerald-50 dark:bg-emerald-500/10', color: 'text-emerald-600 dark:text-emerald-400' },
   ];
 
   const getStatusBadge = (status) => {
@@ -32,8 +32,8 @@ const DeveloperDashboard = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user?.name?.split(' ')[0]}</h1>
-        <p className="text-sm text-gray-500 mt-1">Your project overview.</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {user?.name?.split(' ')[0]}</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your project overview.</p>
       </div>
 
       {/* Stats */}
@@ -45,8 +45,8 @@ const DeveloperDashboard = () => {
                 <stat.icon className={`w-5 h-5 ${stat.color}`} />
               </div>
               <div className="ml-3">
-                <p className="text-sm text-gray-500">{stat.name}</p>
-                <p className="text-xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{stat.name}</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
               </div>
             </div>
           </div>
@@ -56,43 +56,43 @@ const DeveloperDashboard = () => {
       {/* Projects */}
       <div className="card">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-900">My Projects</h2>
+          <h2 className="font-semibold text-gray-900 dark:text-white">My Projects</h2>
           <span className="badge-primary">{stats.total} total</span>
         </div>
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map(i => (
-              <div key={i} className="animate-pulse p-3 border border-gray-100 rounded-xl">
-                <div className="h-4 bg-gray-100 rounded w-1/3 mb-2" />
-                <div className="h-3 bg-gray-50 rounded w-2/3" />
+              <div key={i} className="animate-pulse p-3 border border-gray-100 dark:border-surface-700 rounded-xl">
+                <div className="h-4 bg-gray-100 dark:bg-surface-700 rounded w-1/3 mb-2" />
+                <div className="h-3 bg-gray-50 dark:bg-surface-600 rounded w-2/3" />
               </div>
             ))}
           </div>
         ) : projects?.projects?.length === 0 ? (
           <div className="text-center py-10">
-            <BriefcaseIcon className="w-10 h-10 text-gray-200 mx-auto mb-2" />
-            <p className="text-sm text-gray-400">No projects assigned yet</p>
+            <BriefcaseIcon className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-2" />
+            <p className="text-sm text-gray-400 dark:text-gray-500">No projects assigned yet</p>
           </div>
         ) : (
           <div className="space-y-2">
             {projects?.projects?.map((project) => (
-              <div key={project._id} className="p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
+              <div key={project._id} className="p-4 border border-gray-100 dark:border-surface-700 rounded-xl hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900">{project.title}</h3>
-                    <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">{project.description}</p>
-                    <p className="text-xs text-gray-400 mt-1">Client: {project.clientId?.name}</p>
+                    <h3 className="font-medium text-gray-900 dark:text-white">{project.title}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">{project.description}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Client: {project.clientId?.name}</p>
                   </div>
                   <span className={`${getStatusBadge(project.status)} capitalize ml-3 whitespace-nowrap`}>
                     {project.status}
                   </span>
                 </div>
                 <div className="mt-3">
-                  <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                  <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-1">
                     <span>Progress</span>
                     <span>{project.progress || 0}%</span>
                   </div>
-                  <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-1 bg-gray-100 dark:bg-surface-700 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${project.status === 'completed' ? 'bg-emerald-500' : 'bg-primary-500'
                         }`}

@@ -108,15 +108,15 @@ const NewRequest = () => {
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in space-y-6">
-      <button onClick={() => navigate(-1)} className="flex items-center text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors">
+      <button onClick={() => navigate(-1)} className="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white mb-6 transition-colors">
         <ArrowLeftIcon className="w-4 h-4 mr-1.5" />
         Back
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6">
         <div className="card">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">New Service Request</h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">New Service Request</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             {isClient
               ? 'Select a service and continue to secure payment checkout.'
               : 'Describe your project and we will match you with the right team.'}
@@ -124,9 +124,9 @@ const NewRequest = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="serviceId" className="block text-sm font-medium text-gray-700 mb-1.5">Service Type</label>
+              <label htmlFor="serviceId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Service Type</label>
               {servicesLoading ? (
-                <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
+                <div className="h-12 bg-gray-100 dark:bg-surface-700 rounded-xl animate-pulse" />
               ) : !hasServices ? (
                 <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                   No active services are available right now.
@@ -155,7 +155,7 @@ const NewRequest = () => {
             {!isClient && (
               <>
                 <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1.5">Project Title</label>
+                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Project Title</label>
                   <input
                     id="title"
                     name="title"
@@ -170,7 +170,7 @@ const NewRequest = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
                   <textarea
                     id="description"
                     name="description"
@@ -182,12 +182,12 @@ const NewRequest = () => {
                     maxLength={5000}
                   />
                   {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
-                  <p className="mt-1 text-xs text-gray-400">{formData.description.length}/5000</p>
+                  <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">{formData.description.length}/5000</p>
                 </div>
 
                 <div>
-                  <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Technical Requirements <span className="text-gray-400 font-normal">(optional)</span>
+                  <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Technical Requirements <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
                   </label>
                   <textarea
                     id="requirements"
@@ -200,12 +200,12 @@ const NewRequest = () => {
                     maxLength={10000}
                   />
                   {errors.requirements && <p className="mt-1 text-xs text-red-500">{errors.requirements}</p>}
-                  <p className="mt-1 text-xs text-gray-400">{formData.requirements.length}/10000</p>
+                  <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">{formData.requirements.length}/10000</p>
                 </div>
               </>
             )}
 
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-surface-700">
               <button type="button" onClick={() => navigate(-1)} className="btn-secondary">Cancel</button>
               <button type="submit" disabled={loading || !hasServices} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
                 {loading ? 'Submitting...' : isClient ? 'Continue to Payment' : 'Submit Request'}
@@ -216,31 +216,31 @@ const NewRequest = () => {
 
         <div className="space-y-6">
           <div className="card">
-            <h2 className="text-sm font-semibold text-gray-900 mb-3">Selected Service</h2>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Selected Service</h2>
             {selectedService ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-gray-900">{selectedService.name}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{selectedService.name}</p>
                   <span className="badge-primary capitalize">{selectedService.category?.replace('-', ' ')}</span>
                 </div>
                 {selectedService.description && (
-                  <p className="text-xs text-gray-500">{selectedService.description}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{selectedService.description}</p>
                 )}
-                <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-surface-700">
                   <span>Starting at</span>
-                  <span className="text-sm font-semibold text-gray-900">
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
                     {selectedService.basePrice > 0 ? formatINR(selectedService.basePrice) : 'Custom Quote'}
                   </span>
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-gray-500">Choose a service to see details.</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Choose a service to see details.</p>
             )}
           </div>
 
           <div className="card">
-            <h2 className="text-sm font-semibold text-gray-900 mb-3">Request Checklist</h2>
-            <ul className="space-y-2 text-xs text-gray-500">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Request Checklist</h2>
+            <ul className="space-y-2 text-xs text-gray-500 dark:text-gray-400">
               <li>Describe the business goal and target users</li>
               <li>List must-have features and integrations</li>
               <li>Share any brand assets or references</li>
