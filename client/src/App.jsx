@@ -45,6 +45,7 @@ const PageLoader = () => (
         background: 'transparent',
         borderRadius: 2,
         overflow: 'hidden',
+        marginTop: 6,
       }}
     >
       <div

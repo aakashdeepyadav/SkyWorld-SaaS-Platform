@@ -1,11 +1,24 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
 
 const Contact = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
   const [status, setStatus] = useState('idle'); // idle | sending | success | error
+  const [countdown, setCountdown] = useState(5);
+
+  // Auto-redirect to home after success
+  useEffect(() => {
+    if (status !== 'success') return;
+    if (countdown <= 0) {
+      navigate('/');
+      return;
+    }
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [status, countdown, navigate]);
 
   const handleChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -44,8 +57,29 @@ const Contact = () => {
         </p>
 
         {status === 'success' && (
-          <div className="mb-6 rounded-xl border border-green-200 dark:border-green-500/30 bg-green-50 dark:bg-green-500/10 p-4 text-sm text-green-700 dark:text-green-300">
-            Thank you! Your message has been sent successfully. We'll be in touch soon.
+          <div className="mb-6 rounded-xl border border-green-200 dark:border-green-500/30 bg-green-50 dark:bg-green-500/10 p-5 text-center">
+            <svg
+              className="mx-auto mb-3 w-10 h-10 text-green-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <p className="text-base font-semibold text-green-700 dark:text-green-300 mb-1">
+              Message sent successfully!
+            </p>
+            <p className="text-sm text-green-600 dark:text-green-400">
+              Thank you for reaching out. We'll get back to you soon.
+            </p>
+            <p className="text-xs text-green-500/70 dark:text-green-400/50 mt-3">
+              Redirecting to homepage in {countdown}s…
+            </p>
           </div>
         )}
 
@@ -58,121 +92,128 @@ const Contact = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Name */}
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+        {status !== 'success' && (
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Name */}
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+              >
+                Full Name <span className="text-red-400">*</span>
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                required
+                value={form.name}
+                onChange={handleChange}
+                placeholder="John Doe"
+                className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+              >
+                Email Address <span className="text-red-400">*</span>
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={form.email}
+                onChange={handleChange}
+                placeholder="you@example.com"
+                className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
+              />
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label
+                htmlFor="phone"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+              >
+                Phone Number
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                value={form.phone}
+                onChange={handleChange}
+                placeholder="+91 98765 43210"
+                className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
+              />
+            </div>
+
+            {/* Subject */}
+            <div>
+              <label
+                htmlFor="subject"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+              >
+                Subject <span className="text-red-400">*</span>
+              </label>
+              <input
+                id="subject"
+                name="subject"
+                type="text"
+                required
+                value={form.subject}
+                onChange={handleChange}
+                placeholder="Project inquiry, feedback, etc."
+                className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
+              />
+            </div>
+
+            {/* Message */}
+            <div>
+              <label
+                htmlFor="message"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+              >
+                Message <span className="text-red-400">*</span>
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                rows={5}
+                required
+                value={form.message}
+                onChange={handleChange}
+                placeholder="Tell us about your project or question…"
+                className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition resize-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={status === 'sending'}
+              className="w-full sm:w-auto px-8 py-2.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Full Name <span className="text-red-400">*</span>
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              value={form.name}
-              onChange={handleChange}
-              placeholder="John Doe"
-              className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
-            />
-          </div>
+              {status === 'sending' ? 'Sending…' : 'Send Message'}
+            </button>
+          </form>
+        )}
 
-          {/* Email */}
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+        {status !== 'success' && (
+          <div className="mt-10 text-sm text-gray-500 dark:text-gray-400">
+            Or email us directly at{' '}
+            <a
+              href="mailto:ventures.skyworld@gmail.com"
+              className="text-primary-500 hover:underline"
             >
-              Email Address <span className="text-red-400">*</span>
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={form.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-              className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
-            />
+              ventures.skyworld@gmail.com
+            </a>
           </div>
-
-          {/* Phone */}
-          <div>
-            <label
-              htmlFor="phone"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-            >
-              Phone Number
-            </label>
-            <input
-              id="phone"
-              name="phone"
-              type="tel"
-              value={form.phone}
-              onChange={handleChange}
-              placeholder="+91 98765 43210"
-              className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
-            />
-          </div>
-
-          {/* Subject */}
-          <div>
-            <label
-              htmlFor="subject"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-            >
-              Subject <span className="text-red-400">*</span>
-            </label>
-            <input
-              id="subject"
-              name="subject"
-              type="text"
-              required
-              value={form.subject}
-              onChange={handleChange}
-              placeholder="Project inquiry, feedback, etc."
-              className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
-            />
-          </div>
-
-          {/* Message */}
-          <div>
-            <label
-              htmlFor="message"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-            >
-              Message <span className="text-red-400">*</span>
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              rows={5}
-              required
-              value={form.message}
-              onChange={handleChange}
-              placeholder="Tell us about your project or question…"
-              className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition resize-none"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={status === 'sending'}
-            className="w-full sm:w-auto px-8 py-2.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {status === 'sending' ? 'Sending…' : 'Send Message'}
-          </button>
-        </form>
-
-        <div className="mt-10 text-sm text-gray-500 dark:text-gray-400">
-          Or email us directly at{' '}
-          <a href="mailto:ventures.skyworld@gmail.com" className="text-primary-500 hover:underline">
-            ventures.skyworld@gmail.com
-          </a>
-        </div>
+        )}
       </div>
     </div>
   );
