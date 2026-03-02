@@ -20,7 +20,7 @@ const PageLoader = () => (
       fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
     }}
   >
-    <div style={{ position: 'relative', width: 32, height: 32, marginBottom: 16 }}>
+    <div style={{ position: 'relative', width: 32, height: 32 }}>
       <img
         src="/icon_logo_coloured.png"
         alt=""
@@ -38,30 +38,9 @@ const PageLoader = () => (
         }}
       />
     </div>
-    <div
-      style={{
-        width: 120,
-        height: 1.5,
-        background: 'transparent',
-        borderRadius: 2,
-        overflow: 'hidden',
-        marginTop: 6,
-      }}
-    >
-      <div
-        style={{
-          width: '40%',
-          height: '100%',
-          borderRadius: 2,
-          background: 'linear-gradient(90deg,#0ea5e9,#6366f1)',
-          animation: '_plBar 1.4s ease-in-out infinite',
-        }}
-      />
-    </div>
     <style>{`
       @keyframes _plPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.85}}
       @keyframes _plGlow{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.3);opacity:1}}
-      @keyframes _plBar{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(300%)}}
     `}</style>
   </div>
 );
