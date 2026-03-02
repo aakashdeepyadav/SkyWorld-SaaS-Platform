@@ -9,8 +9,13 @@ import Layout from './components/layout/Layout';
 const PageLoader = () => (
   <div
     style={{
-      position: 'fixed', inset: 0, zIndex: 9999,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      position: 'fixed',
+      inset: 0,
+      zIndex: 9999,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
       background: '#0f172a',
       fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
     }}
@@ -25,7 +30,9 @@ const PageLoader = () => (
       />
       <div
         style={{
-          position: 'absolute', inset: -6, borderRadius: '50%',
+          position: 'absolute',
+          inset: -6,
+          borderRadius: '50%',
           background: 'radial-gradient(circle,rgba(14,165,233,.12) 0%,transparent 70%)',
           animation: '_plGlow 2s ease-in-out infinite',
         }}
@@ -33,13 +40,18 @@ const PageLoader = () => (
     </div>
     <div
       style={{
-        width: 120, height: 1.5, background: 'transparent',
-        borderRadius: 2, overflow: 'hidden',
+        width: 120,
+        height: 1.5,
+        background: 'transparent',
+        borderRadius: 2,
+        overflow: 'hidden',
       }}
     >
       <div
         style={{
-          width: '40%', height: '100%', borderRadius: 2,
+          width: '40%',
+          height: '100%',
+          borderRadius: 2,
           background: 'linear-gradient(90deg,#0ea5e9,#6366f1)',
           animation: '_plBar 1.4s ease-in-out infinite',
         }}
@@ -68,6 +80,7 @@ const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const FAQ = lazy(() => import('./pages/FAQ'));
+const Contact = lazy(() => import('./pages/Contact'));
 const ServiceDetail = lazy(() => import('./pages/services/ServiceDetail'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
@@ -110,55 +123,249 @@ function App() {
   return (
     <Routes>
       {/* Root */}
-      <Route path="/" element={<Suspense fallback={<PageLoader />}><Home /></Suspense>} />
-      <Route path="/website" element={<Suspense fallback={<PageLoader />}><Home /></Suspense>} />
+      <Route
+        path="/"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Home />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/website"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Home />
+          </Suspense>
+        }
+      />
 
       {/* Public routes */}
-      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Suspense fallback={<PageLoader />}><Login /></Suspense>} />
-      <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Suspense fallback={<PageLoader />}><Register /></Suspense>} />
-      <Route path="/auth/google/callback" element={<Suspense fallback={<PageLoader />}><GoogleCallback /></Suspense>} />
-      <Route path="/forgot-password" element={user ? <Navigate to="/dashboard" /> : <Suspense fallback={<PageLoader />}><ForgotPassword /></Suspense>} />
-      <Route path="/reset-password" element={user ? <Navigate to="/dashboard" /> : <Suspense fallback={<PageLoader />}><ResetPassword /></Suspense>} />
-      <Route path="/privacy" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
-      <Route path="/terms" element={<Suspense fallback={<PageLoader />}><TermsOfService /></Suspense>} />
-      <Route path="/faq" element={<Suspense fallback={<PageLoader />}><FAQ /></Suspense>} />
-      <Route path="/services/:slug" element={<Suspense fallback={<PageLoader />}><ServiceDetail /></Suspense>} />
+      <Route
+        path="/login"
+        element={
+          user ? (
+            <Navigate to="/dashboard" />
+          ) : (
+            <Suspense fallback={<PageLoader />}>
+              <Login />
+            </Suspense>
+          )
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          user ? (
+            <Navigate to="/dashboard" />
+          ) : (
+            <Suspense fallback={<PageLoader />}>
+              <Register />
+            </Suspense>
+          )
+        }
+      />
+      <Route
+        path="/auth/google/callback"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <GoogleCallback />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/forgot-password"
+        element={
+          user ? (
+            <Navigate to="/dashboard" />
+          ) : (
+            <Suspense fallback={<PageLoader />}>
+              <ForgotPassword />
+            </Suspense>
+          )
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          user ? (
+            <Navigate to="/dashboard" />
+          ) : (
+            <Suspense fallback={<PageLoader />}>
+              <ResetPassword />
+            </Suspense>
+          )
+        }
+      />
+      <Route
+        path="/privacy"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <PrivacyPolicy />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/terms"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <TermsOfService />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/faq"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <FAQ />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/contact"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Contact />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/services/:slug"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <ServiceDetail />
+          </Suspense>
+        }
+      />
 
       {/* Protected routes — Suspense is handled INSIDE Layout around <Outlet> */}
-      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route path="/dashboard" element={<Navigate to={`/dashboard/${user?.role || 'client'}`} />} />
+      <Route
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      >
+        <Route
+          path="/dashboard"
+          element={<Navigate to={`/dashboard/${user?.role || 'client'}`} />}
+        />
 
-        <Route path="/dashboard/admin" element={<RoleRoute allowedRoles={['admin']}><AdminDashboard /></RoleRoute>} />
-        <Route path="/dashboard/developer" element={<RoleRoute allowedRoles={['developer']}><DeveloperDashboard /></RoleRoute>} />
-        <Route path="/dashboard/client" element={<RoleRoute allowedRoles={['client']}><ClientDashboard /></RoleRoute>} />
+        <Route
+          path="/dashboard/admin"
+          element={
+            <RoleRoute allowedRoles={['admin']}>
+              <AdminDashboard />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/dashboard/developer"
+          element={
+            <RoleRoute allowedRoles={['developer']}>
+              <DeveloperDashboard />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/dashboard/client"
+          element={
+            <RoleRoute allowedRoles={['client']}>
+              <ClientDashboard />
+            </RoleRoute>
+          }
+        />
 
         {/* Service Requests */}
         <Route path="/requests" element={<RequestList />} />
-        <Route path="/requests/new" element={<RoleRoute allowedRoles={['client', 'admin']}><NewRequest /></RoleRoute>} />
+        <Route
+          path="/requests/new"
+          element={
+            <RoleRoute allowedRoles={['client', 'admin']}>
+              <NewRequest />
+            </RoleRoute>
+          }
+        />
         <Route path="/requests/:id" element={<RequestDetail />} />
-        <Route path="/custom-requests" element={<RoleRoute allowedRoles={['client', 'admin']}><CustomRequestList /></RoleRoute>} />
+        <Route
+          path="/custom-requests"
+          element={
+            <RoleRoute allowedRoles={['client', 'admin']}>
+              <CustomRequestList />
+            </RoleRoute>
+          }
+        />
 
         {/* Projects */}
         <Route path="/projects" element={<ProjectList />} />
         <Route path="/projects/:id" element={<ProjectDetail />} />
 
         {/* Payments */}
-        <Route path="/payments" element={<RoleRoute allowedRoles={['client', 'admin']}><PaymentList /></RoleRoute>} />
-        <Route path="/checkout" element={<RoleRoute allowedRoles={['client', 'admin']}><Checkout /></RoleRoute>} />
+        <Route
+          path="/payments"
+          element={
+            <RoleRoute allowedRoles={['client', 'admin']}>
+              <PaymentList />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <RoleRoute allowedRoles={['client', 'admin']}>
+              <Checkout />
+            </RoleRoute>
+          }
+        />
 
         {/* Admin Only */}
-        <Route path="/admin/users" element={<RoleRoute allowedRoles={['admin']}><UserManagement /></RoleRoute>} />
-        <Route path="/admin/services" element={<RoleRoute allowedRoles={['admin']}><ServiceManagement /></RoleRoute>} />
+        <Route
+          path="/admin/users"
+          element={
+            <RoleRoute allowedRoles={['admin']}>
+              <UserManagement />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/services"
+          element={
+            <RoleRoute allowedRoles={['admin']}>
+              <ServiceManagement />
+            </RoleRoute>
+          }
+        />
 
         {/* Profile & Settings */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/custom-request" element={<RoleRoute allowedRoles={['client', 'admin']}><CustomRequestForm /></RoleRoute>} />
-        <Route path="/custom-request/thanks" element={<RoleRoute allowedRoles={['client', 'admin']}><CustomRequestThankYou /></RoleRoute>} />
+        <Route
+          path="/custom-request"
+          element={
+            <RoleRoute allowedRoles={['client', 'admin']}>
+              <CustomRequestForm />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/custom-request/thanks"
+          element={
+            <RoleRoute allowedRoles={['client', 'admin']}>
+              <CustomRequestThankYou />
+            </RoleRoute>
+          }
+        />
       </Route>
 
       {/* 404 */}
-      <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
+      <Route
+        path="*"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <NotFound />
+          </Suspense>
+        }
+      />
     </Routes>
   );
 }

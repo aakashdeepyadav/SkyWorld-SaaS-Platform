@@ -48,4 +48,3 @@ requestAnimationFrame(() => {
     setTimeout(() => el.remove(), 400);
   }
 });
-

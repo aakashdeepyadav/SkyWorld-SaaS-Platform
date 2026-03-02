@@ -234,35 +234,50 @@ const Home = () => {
         <div className="hp-hero__glow" />
 
         <div className="hp-hero__content">
-          <p className="hp-hero__pill" style={{ animationDelay: '.12s' }}>Digital Studio</p>
+          <p className="hp-hero__pill" style={{ animationDelay: '.12s' }}>
+            Digital Studio
+          </p>
 
           <h1 className="hp-hero__h1">
-            <span className="hp-hero__ln" style={{ animationDelay: '.2s' }}>We design &amp; build</span>
+            <span className="hp-hero__ln" style={{ animationDelay: '.2s' }}>
+              We design &amp; build
+            </span>
             <br />
-            <span className="hp-hero__ln" style={{ animationDelay: '.34s' }}>digital products that</span>
+            <span className="hp-hero__ln" style={{ animationDelay: '.34s' }}>
+              digital products that
+            </span>
             <br />
-            <span className="hp-hero__ln hp-hero__ln--em" style={{ animationDelay: '.48s' }}>people love.</span>
+            <span className="hp-hero__ln hp-hero__ln--em" style={{ animationDelay: '.48s' }}>
+              people love.
+            </span>
           </h1>
 
           <p className="hp-hero__sub" style={{ animationDelay: '.62s' }}>
-            A transparent, milestone-based process &mdash; so you always know
-            what&rsquo;s happening, what&rsquo;s next, and what it costs.
+            A transparent, milestone-based process &mdash; so you always know what&rsquo;s
+            happening, what&rsquo;s next, and what it costs.
           </p>
 
           <div className="hp-hero__btns" style={{ animationDelay: '.76s' }}>
             {authed ? (
               <>
-                <Link to={`/dashboard/${user?.role || 'client'}`} className="hp-btn hp-btn--primary">
+                <Link
+                  to={`/dashboard/${user?.role || 'client'}`}
+                  className="hp-btn hp-btn--primary"
+                >
                   Open Dashboard <span className="hp-btn__arr">&rarr;</span>
                 </Link>
-                <Link to="/services/web-development" className="hp-btn hp-btn--ghost">Browse Services</Link>
+                <Link to="/services/web-development" className="hp-btn hp-btn--ghost">
+                  Browse Services
+                </Link>
               </>
             ) : (
               <>
                 <Link to="/register" className="hp-btn hp-btn--primary">
                   Start a project <span className="hp-btn__arr">&rarr;</span>
                 </Link>
-                <Link to="/login" className="hp-btn hp-btn--ghost">Log in</Link>
+                <Link to="/login" className="hp-btn hp-btn--ghost">
+                  Log in
+                </Link>
               </>
             )}
           </div>
@@ -277,7 +292,9 @@ const Home = () => {
             { v: 24, s: 'hr', l: 'Response' },
           ].map((d) => (
             <div key={d.l} className="hp-st">
-              <span className="hp-st__v"><Num end={d.v} suffix={d.s} /></span>
+              <span className="hp-st__v">
+                <Num end={d.v} suffix={d.s} />
+              </span>
               <span className="hp-st__l">{d.l}</span>
             </div>
           ))}
@@ -651,7 +668,7 @@ const Home = () => {
             <Link to="/faq">FAQ</Link>
             <Link to="/privacy">Privacy</Link>
             <Link to="/terms">Terms</Link>
-            <a href="mailto:ventures.skyworld@gmail.com">Contact</a>
+            <Link to="/contact">Contact</Link>
           </div>
         </div>
       </footer>
