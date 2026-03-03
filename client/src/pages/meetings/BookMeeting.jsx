@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
@@ -38,6 +38,9 @@ const BookMeeting = () => {
   const [clientEmail, setClientEmail] = useState(user?.email || '');
   const [booking, setBooking] = useState(false);
   const [confirmed, setConfirmed] = useState(null);
+  const [checkingMeet, setCheckingMeet] = useState(true);
+  const [meetReady, setMeetReady] = useState(false);
+  const [meetStatusMessage, setMeetStatusMessage] = useState('Checking meeting service...');
 
   /* ── min date = today IST ── */
   const minDate = useMemo(() => toIST_YYYY_MM_DD(new Date()), []);
@@ -49,25 +52,56 @@ const BookMeeting = () => {
     return toIST_YYYY_MM_DD(d);
   }, []);
 
-  /* ── Fetch available slots ── */
-  const fetchSlots = useCallback(async (date) => {
-    setSelectedDate(date);
-    setSelectedSlot(null);
-    if (!date) return;
-    setLoadingSlots(true);
-    try {
-      const { data } = await api.get(`/meetings/slots?date=${date}`);
-      setSlots(data.slots || []);
-    } catch {
-      toast.error('Failed to load available slots');
-      setSlots([]);
-    } finally {
-      setLoadingSlots(false);
-    }
+  useEffect(() => {
+    const checkMeetStatus = async () => {
+      setCheckingMeet(true);
+      try {
+        const { data } = await api.get('/meetings/status');
+        setMeetReady(Boolean(data?.meetReady));
+        setMeetStatusMessage(data?.message || 'Meeting status checked.');
+      } catch {
+        setMeetReady(false);
+        setMeetStatusMessage(
+          'Unable to verify Google Meet setup right now. Please try again shortly.'
+        );
+      } finally {
+        setCheckingMeet(false);
+      }
+    };
+
+    checkMeetStatus();
   }, []);
+
+  /* ── Fetch available slots ── */
+  const fetchSlots = useCallback(
+    async (date) => {
+      if (!meetReady) {
+        toast.error('Meeting booking is temporarily unavailable.');
+        return;
+      }
+      setSelectedDate(date);
+      setSelectedSlot(null);
+      if (!date) return;
+      setLoadingSlots(true);
+      try {
+        const { data } = await api.get(`/meetings/slots?date=${date}`);
+        setSlots(data.slots || []);
+      } catch {
+        toast.error('Failed to load available slots');
+        setSlots([]);
+      } finally {
+        setLoadingSlots(false);
+      }
+    },
+    [meetReady]
+  );
 
   /* ── Book meeting ── */
   const handleBook = async () => {
+    if (!meetReady) {
+      toast.error(meetStatusMessage || 'Meeting booking is currently unavailable');
+      return;
+    }
     if (!selectedDate || !selectedSlot) {
       toast.error('Please select a date and time slot');
       return;
@@ -244,6 +278,20 @@ const BookMeeting = () => {
             </div>
           </div>
 
+          <div className="mb-6">
+            <div
+              className={`rounded-xl border p-3 text-sm ${
+                checkingMeet
+                  ? 'bg-gray-50 dark:bg-surface-700 border-gray-200 dark:border-surface-600 text-gray-500 dark:text-gray-400'
+                  : meetReady
+                    ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                    : 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-300'
+              }`}
+            >
+              {checkingMeet ? 'Checking Google Meet setup...' : meetStatusMessage}
+            </div>
+          </div>
+
           {/* Step 1: Your details */}
           <div className="mb-8">
             <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
@@ -291,6 +339,7 @@ const BookMeeting = () => {
               min={minDate}
               max={maxDate}
               onChange={(e) => fetchSlots(e.target.value)}
+              disabled={!meetReady || checkingMeet}
               className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 dark:border-surface-600 bg-white dark:bg-surface-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 outline-none transition-all"
             />
           </div>
@@ -402,7 +451,7 @@ const BookMeeting = () => {
 
               <button
                 onClick={handleBook}
-                disabled={booking}
+                disabled={booking || !meetReady || checkingMeet}
                 className="w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <VideoCameraIcon className="w-5 h-5" />

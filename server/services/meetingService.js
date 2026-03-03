@@ -7,6 +7,7 @@ import Booking from '../models/Booking.js';
 
 const TIMEZONE = 'Asia/Kolkata';
 const MEETING_DURATION_MINUTES = 30;
+const MEET_CAPABILITY_CACHE_TTL_MS = 5 * 60 * 1000;
 
 // Slot windows (24 h format): 09:00–12:00 and 13:00–17:00
 const SLOT_WINDOWS = [
@@ -17,6 +18,7 @@ const SLOT_WINDOWS = [
 // ─── Google Auth (Service Account) ───────────────────────────────────────────
 
 let _authClient = null;
+let _meetCapabilityCache = { checkedAt: 0, result: null };
 
 const getGoogleAuth = async () => {
   // Reuse authorized client across calls
@@ -64,6 +66,97 @@ const getCalendar = async () => {
 const getSheets = async () => {
   const auth = await getGoogleAuth();
   return google.sheets({ version: 'v4', auth });
+};
+
+export const checkMeetGenerationCapability = async () => {
+  const now = Date.now();
+  if (
+    _meetCapabilityCache.result &&
+    now - _meetCapabilityCache.checkedAt < MEET_CAPABILITY_CACHE_TTL_MS
+  ) {
+    return _meetCapabilityCache.result;
+  }
+
+  const calendarId = process.env.GOOGLE_CALENDAR_ID;
+  if (!calendarId) {
+    const result = {
+      ok: false,
+      message: 'GOOGLE_CALENDAR_ID is not configured.',
+    };
+    _meetCapabilityCache = { checkedAt: now, result };
+    return result;
+  }
+
+  let probeEventId = null;
+
+  try {
+    const calendar = await getCalendar();
+    const probeStart = new Date(Date.now() + 10 * 60 * 1000);
+    const probeEnd = new Date(Date.now() + 20 * 60 * 1000);
+
+    const probeEvent = await calendar.events.insert({
+      calendarId,
+      conferenceDataVersion: 1,
+      requestBody: {
+        summary: 'SkyWorld Meet Capability Check',
+        description: 'Temporary event to verify Google Meet link generation capability.',
+        start: { dateTime: probeStart.toISOString(), timeZone: TIMEZONE },
+        end: { dateTime: probeEnd.toISOString(), timeZone: TIMEZONE },
+        conferenceData: {
+          createRequest: {
+            requestId: `skyworld-preflight-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            conferenceSolutionKey: { type: 'hangoutsMeet' },
+          },
+        },
+      },
+    });
+
+    probeEventId = probeEvent.data?.id || null;
+    const meetLink =
+      probeEvent.data?.conferenceData?.entryPoints?.find((ep) => ep.entryPointType === 'video')?.uri ||
+      probeEvent.data?.hangoutLink ||
+      null;
+
+    if (!meetLink) {
+      const result = {
+        ok: false,
+        message: 'Calendar event was created but Google Meet link was not returned.',
+      };
+      _meetCapabilityCache = { checkedAt: now, result };
+      return result;
+    }
+
+    const result = {
+      ok: true,
+      message: 'Google Meet link generation is available.',
+    };
+    _meetCapabilityCache = { checkedAt: now, result };
+    return result;
+  } catch (error) {
+    const detail =
+      error?.response?.data?.error?.message ||
+      error?.errors?.[0]?.message ||
+      error.message ||
+      JSON.stringify(error);
+    const result = {
+      ok: false,
+      message: detail,
+    };
+    _meetCapabilityCache = { checkedAt: now, result };
+    return result;
+  } finally {
+    if (probeEventId) {
+      try {
+        const calendar = await getCalendar();
+        await calendar.events.delete({
+          calendarId: process.env.GOOGLE_CALENDAR_ID,
+          eventId: probeEventId,
+        });
+      } catch (cleanupError) {
+        logger.warn(`Meet capability probe cleanup failed: ${cleanupError?.message || 'Unknown error'}`);
+      }
+    }
+  }
 };
 
 // ─── Resend ──────────────────────────────────────────────────────────────────
@@ -140,12 +233,27 @@ export const getAvailableSlots = async (dateStr) => {
 const createCalendarEvent = async ({ clientName, clientEmail, date, startTime, endTime }) => {
   const calendarId = process.env.GOOGLE_CALENDAR_ID;
   if (!calendarId) {
-    logger.warn('GOOGLE_CALENDAR_ID not set — skipping calendar event creation');
-    return { meetLink: null, eventId: null };
+    const error = new Error('GOOGLE_CALENDAR_ID is not configured.');
+    error.statusCode = 500;
+    throw error;
   }
 
   const startDateTime = `${date}T${startTime}:00`;
   const endDateTime = `${date}T${endTime}:00`;
+
+  const baseEvent = {
+    summary: `SkyWorld Meeting — ${clientName}`,
+    description: `Meeting with ${clientName} (${clientEmail}).\nBooked via SkyWorld Platform.`,
+    start: { dateTime: startDateTime, timeZone: TIMEZONE },
+    end: { dateTime: endDateTime, timeZone: TIMEZONE },
+    reminders: {
+      useDefault: false,
+      overrides: [
+        { method: 'email', minutes: 30 },
+        { method: 'popup', minutes: 10 },
+      ],
+    },
+  };
 
   try {
     const calendar = await getCalendar();
@@ -153,24 +261,12 @@ const createCalendarEvent = async ({ clientName, clientEmail, date, startTime, e
       calendarId,
       conferenceDataVersion: 1,
       requestBody: {
-        summary: `SkyWorld Meeting — ${clientName}`,
-        description: `Meeting with ${clientName} (${clientEmail}).\nBooked via SkyWorld Platform.`,
-        start: { dateTime: startDateTime, timeZone: TIMEZONE },
-        end: { dateTime: endDateTime, timeZone: TIMEZONE },
-        // NOTE: attendees removed — service accounts cannot invite without Domain-Wide Delegation.
-        // The client receives the Meet link via the Resend confirmation email instead.
+        ...baseEvent,
         conferenceData: {
           createRequest: {
             requestId: `skyworld-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             conferenceSolutionKey: { type: 'hangoutsMeet' },
           },
-        },
-        reminders: {
-          useDefault: false,
-          overrides: [
-            { method: 'email', minutes: 30 },
-            { method: 'popup', minutes: 10 },
-          ],
         },
       },
     });
@@ -180,11 +276,20 @@ const createCalendarEvent = async ({ clientName, clientEmail, date, startTime, e
       event.data?.hangoutLink ||
       null;
 
+    if (!meetLink) {
+      const error = new Error('Google Meet link was not returned by Calendar API.');
+      error.statusCode = 502;
+      throw error;
+    }
+
+    logger.info('Calendar event created with Google Meet link');
     return { meetLink, eventId: event.data.id };
   } catch (error) {
     const detail = error?.response?.data?.error?.message || error?.errors?.[0]?.message || error.message || JSON.stringify(error);
     logger.error(`Google Calendar event creation failed: ${detail}`);
-    return { meetLink: null, eventId: null };
+    const wrappedError = new Error(`Unable to generate Google Meet link: ${detail}`);
+    wrappedError.statusCode = error.statusCode || 502;
+    throw wrappedError;
   }
 };
 

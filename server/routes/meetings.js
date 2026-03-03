@@ -1,10 +1,29 @@
 import { Router } from 'express';
-import { getAvailableSlots, bookMeeting } from '../services/meetingService.js';
+import {
+  getAvailableSlots,
+  bookMeeting,
+  checkMeetGenerationCapability,
+} from '../services/meetingService.js';
 import { authenticate } from '../middleware/auth.js';
 import Booking from '../models/Booking.js';
 import { logger } from '../utils/logger.js';
 
 const router = Router();
+
+// ─── GET /api/v1/meetings/status ────────────────────────────────────────────
+// Public preflight check: verifies if Google Meet links can be generated right now.
+router.get('/status', async (req, res, next) => {
+  try {
+    const capability = await checkMeetGenerationCapability();
+    return res.json({
+      success: true,
+      meetReady: capability.ok,
+      message: capability.message,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 // ─── GET /api/v1/meetings/slots?date=YYYY-MM-DD ─────────────────────────────
 // Public — no auth required so users can check availability before login.
@@ -91,6 +110,12 @@ router.post('/book', authenticate, async (req, res, next) => {
   } catch (error) {
     if (error.statusCode === 409) {
       return res.status(409).json({ success: false, message: error.message });
+    }
+    if (error.statusCode === 500 || error.statusCode === 502) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+      });
     }
     next(error);
   }
