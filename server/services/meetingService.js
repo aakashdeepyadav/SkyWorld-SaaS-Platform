@@ -16,7 +16,12 @@ const SLOT_WINDOWS = [
 
 // ─── Google Auth (Service Account) ───────────────────────────────────────────
 
-const getGoogleAuth = () => {
+let _authClient = null;
+
+const getGoogleAuth = async () => {
+  // Reuse authorized client across calls
+  if (_authClient) return _authClient;
+
   const email = process.env.GOOGLE_SERVICE_EMAIL;
   let privateKey = process.env.GOOGLE_PRIVATE_KEY;
 
@@ -27,7 +32,7 @@ const getGoogleAuth = () => {
   // Handle escaped newlines (common in .env / render env vars)
   privateKey = privateKey.replace(/\\n/g, '\n');
 
-  return new google.auth.JWT(
+  const jwt = new google.auth.JWT(
     email,
     null,
     privateKey,
@@ -36,16 +41,20 @@ const getGoogleAuth = () => {
       'https://www.googleapis.com/auth/spreadsheets',
     ]
   );
+
+  // Explicitly authorize — obtains the access token
+  await jwt.authorize();
+  _authClient = jwt;
+  return _authClient;
 };
 
-const getCalendar = () => {
-  // Don't cache — recreate if auth env vars change at runtime
-  const auth = getGoogleAuth();
+const getCalendar = async () => {
+  const auth = await getGoogleAuth();
   return google.calendar({ version: 'v3', auth });
 };
 
-const getSheets = () => {
-  const auth = getGoogleAuth();
+const getSheets = async () => {
+  const auth = await getGoogleAuth();
   return google.sheets({ version: 'v4', auth });
 };
 
@@ -131,7 +140,7 @@ const createCalendarEvent = async ({ clientName, clientEmail, date, startTime, e
   const endDateTime = `${date}T${endTime}:00`;
 
   try {
-    const calendar = getCalendar();
+    const calendar = await getCalendar();
     const event = await calendar.events.insert({
       calendarId,
       conferenceDataVersion: 1,
@@ -180,7 +189,7 @@ const logToSheet = async (booking) => {
   }
 
   try {
-    const sheets = getSheets();
+    const sheets = await getSheets();
     await sheets.spreadsheets.values.append({
       spreadsheetId,
       range: 'Sheet1!A:H',
