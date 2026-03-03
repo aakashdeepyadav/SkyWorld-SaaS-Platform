@@ -52,7 +52,7 @@ const ComboDetail = () => {
   const gradientCSS = GRADIENT_MAP[combo.gradient] || 'linear-gradient(135deg, #0ea5e9, #6366f1)';
 
   const handleGetCombo = () => {
-    const target = `/custom-request?service=combo&combo=${combo.slug}`;
+    const target = `/checkout/combo/${combo.slug}`;
     if (!user) {
       navigate('/login', { state: { from: target } });
       return;

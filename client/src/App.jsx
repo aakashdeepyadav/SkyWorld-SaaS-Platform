@@ -92,6 +92,9 @@ const ServiceManagement = lazy(() => import('./pages/admin/ServiceManagement'));
 // Payments
 const PaymentList = lazy(() => import('./pages/payments/PaymentList'));
 const Checkout = lazy(() => import('./pages/checkout/Checkout'));
+const ComboCheckout = lazy(() => import('./pages/checkout/ComboCheckout'));
+const MonthlyCheckout = lazy(() => import('./pages/checkout/MonthlyCheckout'));
+const AddOnCheckout = lazy(() => import('./pages/checkout/AddOnCheckout'));
 
 // Profile
 const Profile = lazy(() => import('./pages/Profile'));
@@ -250,6 +253,30 @@ function App() {
         element={
           <Suspense fallback={<PageLoader />}>
             <MonthlyPlanDetail />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/checkout/combo/:slug"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <ComboCheckout />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/checkout/monthly/:slug"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <MonthlyCheckout />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/checkout/addons"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <AddOnCheckout />
           </Suspense>
         }
       />

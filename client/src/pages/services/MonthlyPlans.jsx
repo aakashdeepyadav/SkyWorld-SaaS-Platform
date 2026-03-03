@@ -15,7 +15,7 @@ const MonthlyPlans = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = (plan) => {
-    const target = `/custom-request?service=maintenance&plan=${plan.slug}`;
+    const target = `/checkout/monthly/${plan.slug}`;
     if (!user) {
       navigate('/login', { state: { from: target } });
       return;

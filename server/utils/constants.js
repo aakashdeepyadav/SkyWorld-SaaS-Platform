@@ -27,6 +27,18 @@ export const PLAN_PRICES = {
     starter: 2499,
     plus: 4999,
   },
+  // Combo package prices
+  'combo': {
+    'restaurant-starter': 10099,
+    'medical-growth': 17508,
+    'premium-business': 33205,
+  },
+  // Monthly maintenance plan prices
+  'monthly': {
+    'care-lite': 1499,
+    'growth': 3499,
+    'growth-plus': 6999,
+  },
 };
 
 // Combo prices (for reference — combos flow through custom requests)
@@ -35,6 +47,12 @@ export const COMBO_PRICES = {
   'medical-growth': 17508,
   'premium-business': 33205,
 };
+
+// Service types that are virtual (no Service document in DB)
+export const VIRTUAL_SERVICE_TYPES = ['combo', 'monthly', 'addon'];
+
+// Service types that charge full amount (not 50/50 split)
+export const FULL_PAYMENT_TYPES = ['monthly', 'addon'];
 
 // Service Request Status
 export const REQUEST_STATUS = {

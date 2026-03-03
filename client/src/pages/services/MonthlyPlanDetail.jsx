@@ -39,7 +39,7 @@ const MonthlyPlanDetail = () => {
   }
 
   const handleGetStarted = () => {
-    const target = `/custom-request?service=maintenance&plan=${plan.slug}`;
+    const target = `/checkout/monthly/${plan.slug}`;
     if (!user) {
       navigate('/login', { state: { from: target } });
       return;

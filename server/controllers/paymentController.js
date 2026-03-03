@@ -5,7 +5,7 @@ import Project from '../models/Project.js';
 import ServiceRequest from '../models/ServiceRequest.js';
 import CustomRequest from '../models/CustomRequest.js';
 import Service from '../models/Service.js';
-import { CUSTOM_REQUEST_STATUS, DELIVERY_STATUS, PAYMENT_PHASE, PAYMENT_STATUS, PLAN_PRICES, PROJECT_STATUS, ROLES } from '../utils/constants.js';
+import { CUSTOM_REQUEST_STATUS, DELIVERY_STATUS, FULL_PAYMENT_TYPES, PAYMENT_PHASE, PAYMENT_STATUS, PLAN_PRICES, PROJECT_STATUS, ROLES, VIRTUAL_SERVICE_TYPES } from '../utils/constants.js';
 import { createAuditLog } from '../middleware/auth.js';
 
 const razorpay = new Razorpay({
@@ -230,47 +230,52 @@ export const createRazorpayOrder = async (req, res, next) => {
         });
       }
 
-      // Verify the service category is active in DB
-      if (serviceId) {
-        if (!isMongoObjectId(serviceId)) {
-          return res.status(400).json({
-            success: false,
-            message: 'Invalid service ID'
-          });
-        }
-        starterService = await Service.findOne({
-          _id: serviceId,
-          isActive: true
-        }).select('category basePrice');
+      // Virtual service types (combo, monthly, addon) have no Service document in DB
+      const isVirtual = VIRTUAL_SERVICE_TYPES.includes(resolvedServiceType);
 
-        if (!starterService) {
-          return res.status(404).json({
-            success: false,
-            message: 'Selected service is unavailable'
-          });
-        }
+      if (!isVirtual) {
+        // Verify the service category is active in DB
+        if (serviceId) {
+          if (!isMongoObjectId(serviceId)) {
+            return res.status(400).json({
+              success: false,
+              message: 'Invalid service ID'
+            });
+          }
+          starterService = await Service.findOne({
+            _id: serviceId,
+            isActive: true
+          }).select('category basePrice');
 
-        if (resolvedServiceType && starterService.category !== resolvedServiceType) {
-          return res.status(400).json({
-            success: false,
-            message: 'Service does not match selected category'
-          });
-        }
+          if (!starterService) {
+            return res.status(404).json({
+              success: false,
+              message: 'Selected service is unavailable'
+            });
+          }
 
-        resolvedServiceType = starterService.category;
-      } else {
-        starterService = await Service.findOne({
-          category: resolvedServiceType,
-          isActive: true
-        })
-          .sort({ updatedAt: -1, _id: -1 })
-          .select('category basePrice');
+          if (resolvedServiceType && starterService.category !== resolvedServiceType) {
+            return res.status(400).json({
+              success: false,
+              message: 'Service does not match selected category'
+            });
+          }
 
-        if (!starterService) {
-          return res.status(404).json({
-            success: false,
-            message: 'Selected service is unavailable'
-          });
+          resolvedServiceType = starterService.category;
+        } else {
+          starterService = await Service.findOne({
+            category: resolvedServiceType,
+            isActive: true
+          })
+            .sort({ updatedAt: -1, _id: -1 })
+            .select('category basePrice');
+
+          if (!starterService) {
+            return res.status(404).json({
+              success: false,
+              message: 'Selected service is unavailable'
+            });
+          }
         }
       }
 
@@ -289,10 +294,11 @@ export const createRazorpayOrder = async (req, res, next) => {
       });
     }
 
-    // ── Split payment: always charge 50 % advance, 50 % on delivery ──
+    // ── Split payment: 50% advance for projects, full for monthly/addon ──
     const isCustom = resolvedPlan === 'custom';
-    const paymentPhase = isCustom ? PAYMENT_PHASE.FULL : PAYMENT_PHASE.ADVANCE;
-    const chargeAmount = isCustom ? normalizedAmount : Math.ceil(normalizedAmount / 2);
+    const isFullPaymentType = FULL_PAYMENT_TYPES.includes(resolvedServiceType);
+    const paymentPhase = (isCustom || isFullPaymentType) ? PAYMENT_PHASE.FULL : PAYMENT_PHASE.ADVANCE;
+    const chargeAmount = (isCustom || isFullPaymentType) ? normalizedAmount : Math.ceil(normalizedAmount / 2);
 
     const normalizedCurrency = (currency || 'INR').toUpperCase();
 

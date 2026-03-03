@@ -16,7 +16,7 @@ const AddOns = () => {
   const navigate = useNavigate();
 
   const handleAddOn = (label) => {
-    const target = `/custom-request?addon=${encodeURIComponent(label)}`;
+    const target = `/checkout/addons?selected=${encodeURIComponent(label)}`;
     if (!user) {
       navigate('/login', { state: { from: target } });
       return;
@@ -142,11 +142,11 @@ const AddOns = () => {
             extras.
           </p>
           <Link
-            to={user ? '/custom-request' : '/register'}
+            to={user ? '/checkout/addons' : '/register'}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl text-white font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300 active:scale-[0.98]"
           >
             <ChatBubbleLeftRightIcon className="w-5 h-5" />
-            Request a Custom Quote
+            Browse &amp; Checkout Add-Ons
           </Link>
         </section>
       </div>
