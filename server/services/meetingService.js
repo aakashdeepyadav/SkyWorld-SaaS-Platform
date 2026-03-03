@@ -157,7 +157,8 @@ const createCalendarEvent = async ({ clientName, clientEmail, date, startTime, e
         description: `Meeting with ${clientName} (${clientEmail}).\nBooked via SkyWorld Platform.`,
         start: { dateTime: startDateTime, timeZone: TIMEZONE },
         end: { dateTime: endDateTime, timeZone: TIMEZONE },
-        attendees: [{ email: clientEmail }],
+        // NOTE: attendees removed — service accounts cannot invite without Domain-Wide Delegation.
+        // The client receives the Meet link via the Resend confirmation email instead.
         conferenceData: {
           createRequest: {
             requestId: `skyworld-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
