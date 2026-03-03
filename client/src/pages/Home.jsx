@@ -412,6 +412,18 @@ const Home = () => {
                   {plan.popular && <span className="hp-plan__badge">Popular</span>}
                   <h3 className="hp-plan__name">{plan.name}</h3>
                   <p className="hp-plan__for">{plan.bestFor}</p>
+
+                  {/* Highlight badges */}
+                  {plan.highlights?.length > 0 && (
+                    <div className="hp-plan__highlights">
+                      {plan.highlights.map((h) => (
+                        <span key={h} className="hp-plan__hl">
+                          {h}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="hp-plan__pricing">
                     <span className="hp-plan__amount">{formatINR(plan.price)}</span>
                     <span className="hp-plan__delivery">
@@ -426,6 +438,15 @@ const Home = () => {
                       </li>
                     ))}
                   </ul>
+
+                  {/* Support line */}
+                  {plan.support && (
+                    <div className="hp-plan__support">
+                      <Icon name="sparkle" size={13} strokeWidth={2} />
+                      {plan.support}
+                    </div>
+                  )}
+
                   <Link
                     to={`/services/${activeTab}`}
                     className={`hp-plan__cta ${plan.popular ? 'hp-plan__cta--pop' : ''}`}
@@ -525,16 +546,66 @@ const Home = () => {
                     <span className="hp-combo__dot">&middot;</span>
                     <span>{combo.bestFor}</span>
                   </div>
-                  <Link
-                    to={authed ? `/custom-request?service=combo&combo=${combo.slug}` : '/register'}
-                    className="hp-combo__cta"
-                  >
-                    Get This Combo <span className="hp-btn__arr">&rarr;</span>
+                  <Link to={`/combos/${combo.slug}`} className="hp-combo__cta">
+                    View Combo Details <span className="hp-btn__arr">&rarr;</span>
                   </Link>
                 </div>
               </FadeIn>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══ ADD-ONS TEASER ═══ */}
+      <section className="hp-combos" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+        <div className="hp-wrap">
+          <FadeIn>
+            <div
+              className="card dark:bg-surface-800 dark:border-surface-700"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                padding: '40px 24px',
+              }}
+            >
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  background: 'rgba(245,158,11,0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 16,
+                }}
+              >
+                <Icon name="sparkle" size={22} className="text-amber-500" />
+              </div>
+              <h3
+                style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}
+                className="text-gray-900 dark:text-white"
+              >
+                Need extras?
+              </h3>
+              <p
+                style={{ fontSize: 14, maxWidth: 480, marginBottom: 20 }}
+                className="text-gray-500 dark:text-gray-400"
+              >
+                From Google Business Profile setup to extra pages and priority updates — browse all
+                add-on services.
+              </p>
+              <Link
+                to="/addons"
+                className="hp-combo__cta"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+              >
+                View Add-On Services <span className="hp-btn__arr">&rarr;</span>
+              </Link>
+            </div>
+          </FadeIn>
         </div>
       </section>
 
@@ -547,6 +618,13 @@ const Home = () => {
               Optional monthly plans for updates, monitoring, and creatives — so you can focus on
               your business.
             </p>
+            <Link
+              to="/plans/monthly"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, marginTop: 8 }}
+              className="text-sky-600 dark:text-sky-400 hover:underline"
+            >
+              Compare all plans <span>&rarr;</span>
+            </Link>
           </FadeIn>
 
           <div className="hp-monthly__grid">
@@ -555,6 +633,31 @@ const Home = () => {
                 <div className={`hp-mplan ${plan.popular ? 'hp-mplan--pop' : ''}`}>
                   {plan.popular && <span className="hp-mplan__badge">Best Value</span>}
                   <h3 className="hp-mplan__name">{plan.name}</h3>
+
+                  {/* Highlight badges */}
+                  {plan.highlights?.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, margin: '8px 0 4px' }}>
+                      {plan.highlights.map((h) => (
+                        <span
+                          key={h}
+                          style={{
+                            fontSize: 9,
+                            fontWeight: 700,
+                            letterSpacing: '.04em',
+                            textTransform: 'uppercase',
+                            color: '#0ea5e9',
+                            background: 'rgba(14,165,233,.08)',
+                            padding: '2px 7px',
+                            borderRadius: 4,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {h}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="hp-mplan__price">
                     <span className="hp-mplan__amt">{formatINR(plan.price)}</span>
                     <span className="hp-mplan__per">/month</span>
@@ -568,7 +671,7 @@ const Home = () => {
                     ))}
                   </ul>
                   <Link
-                    to={authed ? '/custom-request?service=maintenance' : '/register'}
+                    to={`/plans/monthly/${plan.slug}`}
                     className={`hp-mplan__cta ${plan.popular ? 'hp-mplan__cta--pop' : ''}`}
                   >
                     Get Started
@@ -1088,6 +1191,20 @@ const Home = () => {
   font-size: 13px; color: var(--slate); padding: 4px 0; line-height: 1.5;
 }
 .hp-plan__ck { color: #10b981; flex-shrink: 0; margin-top: 2px; }
+.hp-plan__highlights {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+}
+.hp-plan__hl {
+  font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: rgb(var(--c)); background: rgba(var(--c),.07);
+  padding: 3px 8px; border-radius: 5px; white-space: nowrap;
+}
+.hp-plan__support {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: #10b981;
+  background: rgba(16,185,129,.06); border-radius: 8px;
+  padding: 8px 12px; margin-bottom: 14px;
+}
 .hp-plan__cta {
   display: flex; align-items: center; justify-content: center; gap: 6px;
   width: 100%; padding: 11px; border-radius: 10px;

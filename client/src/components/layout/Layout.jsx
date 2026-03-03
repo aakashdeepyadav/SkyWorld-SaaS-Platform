@@ -35,14 +35,18 @@ const Layout = () => {
   const isAdmin = user?.role === 'admin';
   const isDeveloper = user?.role === 'developer';
 
-
-
   const mainNavigation = [
     { name: 'Dashboard', href: `/dashboard/${user?.role}`, icon: HomeIcon },
-    ...(user?.role !== 'developer' ? [{ name: 'Custom Requests', href: '/custom-requests', icon: DocumentTextIcon }] : []),
-    ...(user?.role !== 'client' ? [{ name: 'Requests', href: '/requests', icon: ClipboardDocumentListIcon }] : []),
+    ...(user?.role !== 'developer'
+      ? [{ name: 'Custom Requests', href: '/custom-requests', icon: DocumentTextIcon }]
+      : []),
+    ...(user?.role !== 'client'
+      ? [{ name: 'Requests', href: '/requests', icon: ClipboardDocumentListIcon }]
+      : []),
     { name: 'Projects', href: '/projects', icon: FolderIcon },
-    ...(user?.role !== 'developer' ? [{ name: 'Payments', href: '/payments', icon: CreditCardIcon }] : []),
+    ...(user?.role !== 'developer'
+      ? [{ name: 'Payments', href: '/payments', icon: CreditCardIcon }]
+      : []),
   ];
 
   const adminNavigation = [
@@ -55,12 +59,16 @@ const Layout = () => {
     { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
   ];
 
-  const isActive = (href) => location.pathname === href || (href !== `/dashboard/${user?.role}` && location.pathname.startsWith(href));
+  const isActive = (href) =>
+    location.pathname === href ||
+    (href !== `/dashboard/${user?.role}` && location.pathname.startsWith(href));
 
   const NavSection = ({ label, items }) => (
     <div className="mb-2">
       {label && (
-        <p className="px-4 mb-2 text-[10px] font-bold uppercase tracking-widest text-gray-600">{label}</p>
+        <p className="px-4 mb-2 text-[10px] font-bold uppercase tracking-widest text-gray-600">
+          {label}
+        </p>
       )}
       <div className="space-y-0.5">
         {items.map((item) => (
@@ -68,13 +76,17 @@ const Layout = () => {
             key={item.name}
             to={item.href}
             onClick={() => setSidebarOpen(false)}
-            className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${isActive(item.href)
-              ? 'bg-primary-500/20 text-primary-400 shadow-glow/20'
-              : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
+            className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
+              isActive(item.href)
+                ? 'bg-primary-500/20 text-primary-400 shadow-glow/20'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
           >
-            <item.icon className={`w-5 h-5 mr-3 transition-colors ${isActive(item.href) ? 'text-primary-400' : 'text-gray-500 group-hover:text-gray-300'
-              }`} />
+            <item.icon
+              className={`w-5 h-5 mr-3 transition-colors ${
+                isActive(item.href) ? 'text-primary-400' : 'text-gray-500 group-hover:text-gray-300'
+              }`}
+            />
             {item.name}
             {isActive(item.href) && (
               <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-400" />
@@ -88,7 +100,7 @@ const Layout = () => {
   // Get the current page title
   const getPageTitle = () => {
     const allItems = [...mainNavigation, ...adminNavigation, ...accountNavigation];
-    const active = allItems.find(n => isActive(n.href));
+    const active = allItems.find((n) => isActive(n.href));
     if (active) return active.name;
 
     if (location.pathname.startsWith('/requests/new')) return 'New Request';
@@ -102,7 +114,11 @@ const Layout = () => {
     <div className="flex flex-col h-full">
       <div className="flex items-center px-6 h-16 border-b border-white/10">
         <a href={websiteUrl} className="flex items-center" title="Go to SkyWorld website">
-          <img src="/wordmark_logo_white_.png" alt="SkyWorld" className="h-7 w-auto object-contain" />
+          <img
+            src="/wordmark_logo_white_.png"
+            alt="SkyWorld"
+            className="h-7 w-auto object-contain"
+          />
         </a>
       </div>
 
@@ -157,8 +173,11 @@ const Layout = () => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 w-64 bg-sidebar-gradient z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}>
+      <aside
+        className={`fixed inset-y-0 left-0 w-64 bg-sidebar-gradient z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         <SidebarContent />
       </aside>
 
@@ -206,11 +225,13 @@ const Layout = () => {
 
         {/* Page content */}
         <main className="p-4 sm:p-6 lg:p-8">
-          <Suspense fallback={
-            <div className="flex items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
-            </div>
-          }>
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center py-20">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+              </div>
+            }
+          >
             <Outlet />
           </Suspense>
         </main>

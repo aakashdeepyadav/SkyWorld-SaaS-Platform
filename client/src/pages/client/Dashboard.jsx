@@ -295,8 +295,12 @@ const ClientDashboard = () => {
                 <GlobeAltIcon className="w-5 h-5 text-primary-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">Browse Fixed Plans</h3>
-                <p className="text-xs text-gray-400 dark:text-gray-500">Pick a plan with fixed pricing and checkout instantly</p>
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">
+                  Browse Fixed Plans
+                </h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  Pick a plan with fixed pricing and checkout instantly
+                </p>
               </div>
             </Link>
             <Link
@@ -307,8 +311,12 @@ const ClientDashboard = () => {
                 <SparklesIcon className="w-5 h-5 text-amber-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">Custom Request</h3>
-                <p className="text-xs text-gray-400 dark:text-gray-500">Describe your project and get a tailored quote</p>
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">
+                  Custom Request
+                </h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  Describe your project and get a tailored quote
+                </p>
               </div>
             </Link>
             <Link
@@ -319,8 +327,12 @@ const ClientDashboard = () => {
                 <DocumentTextIcon className="w-5 h-5 text-sky-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">View Custom Requests</h3>
-                <p className="text-xs text-gray-400 dark:text-gray-500">Track quotes and pay for approved requests</p>
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">
+                  View Custom Requests
+                </h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  Track quotes and pay for approved requests
+                </p>
               </div>
             </Link>
           </div>

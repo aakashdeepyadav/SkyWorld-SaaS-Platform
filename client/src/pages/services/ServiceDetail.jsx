@@ -179,6 +179,20 @@ const ServiceDetail = () => {
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{plan.bestFor}</p>
                 </div>
 
+                {/* Highlight badges */}
+                {plan.highlights?.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {plan.highlights.map((h) => (
+                      <span
+                        key={h}
+                        className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${catalog.lightBg} ${catalog.accentText}`}
+                      >
+                        {h}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
                     {formatINR(plan.price)}
@@ -200,6 +214,16 @@ const ServiceDetail = () => {
                     </div>
                   ))}
                 </div>
+
+                {/* Support info */}
+                {plan.support && (
+                  <div className="flex items-center gap-2 px-3 py-2.5 mb-4 rounded-lg bg-emerald-50 dark:bg-emerald-500/10">
+                    <SparklesIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                      {plan.support}
+                    </span>
+                  </div>
+                )}
 
                 {/* Excludes */}
                 {plan.excludes?.length > 0 && (

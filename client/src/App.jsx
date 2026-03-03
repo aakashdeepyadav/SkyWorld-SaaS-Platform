@@ -62,6 +62,10 @@ const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const Contact = lazy(() => import('./pages/Contact'));
 const ServiceDetail = lazy(() => import('./pages/services/ServiceDetail'));
+const ComboDetail = lazy(() => import('./pages/services/ComboDetail'));
+const AddOns = lazy(() => import('./pages/services/AddOns'));
+const MonthlyPlans = lazy(() => import('./pages/services/MonthlyPlans'));
+const MonthlyPlanDetail = lazy(() => import('./pages/services/MonthlyPlanDetail'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Dashboards
@@ -214,6 +218,38 @@ function App() {
         element={
           <Suspense fallback={<PageLoader />}>
             <ServiceDetail />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/combos/:slug"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <ComboDetail />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/addons"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <AddOns />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/plans/monthly"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <MonthlyPlans />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/plans/monthly/:slug"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <MonthlyPlanDetail />
           </Suspense>
         }
       />
