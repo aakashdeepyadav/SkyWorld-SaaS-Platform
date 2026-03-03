@@ -5,6 +5,7 @@ import { formatINR } from '../../utils/currency';
 import { findMonthlyPlan } from '../../utils/planCatalog';
 import { api } from '../../services/api';
 import toast from 'react-hot-toast';
+import MeetingPopup from '../../components/common/MeetingPopup';
 import {
   ArrowLeftIcon,
   CheckIcon,
@@ -21,6 +22,8 @@ const MonthlyCheckout = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isPaying, setIsPaying] = useState(false);
+  const [showMeetingPopup, setShowMeetingPopup] = useState(false);
+  const [meetingAsked, setMeetingAsked] = useState(false);
 
   const plan = useMemo(() => findMonthlyPlan(slug), [slug]);
 
@@ -64,6 +67,10 @@ const MonthlyCheckout = () => {
   }
 
   const handlePay = async () => {
+    if (!meetingAsked) {
+      setShowMeetingPopup(true);
+      return;
+    }
     if (!window.Razorpay) {
       toast.error('Payment service not available. Please refresh.');
       return;
@@ -292,6 +299,20 @@ const MonthlyCheckout = () => {
           </div>
         </div>
       </div>
+
+      {/* Meeting popup */}
+      <MeetingPopup
+        show={showMeetingPopup}
+        onClose={() => {
+          setShowMeetingPopup(false);
+          setMeetingAsked(true);
+        }}
+        onProceedToPayment={() => {
+          setShowMeetingPopup(false);
+          setMeetingAsked(true);
+        }}
+        redirectAfterMeeting={`/checkout/monthly/${slug}`}
+      />
     </div>
   );
 };

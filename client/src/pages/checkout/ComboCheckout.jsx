@@ -5,6 +5,7 @@ import { formatINR } from '../../utils/currency';
 import { findCombo, PLAN_CATALOG } from '../../utils/planCatalog';
 import { api } from '../../services/api';
 import toast from 'react-hot-toast';
+import MeetingPopup from '../../components/common/MeetingPopup';
 import {
   ArrowLeftIcon,
   CheckIcon,
@@ -26,6 +27,8 @@ const ComboCheckout = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isPaying, setIsPaying] = useState(false);
+  const [showMeetingPopup, setShowMeetingPopup] = useState(false);
+  const [meetingAsked, setMeetingAsked] = useState(false);
 
   const combo = useMemo(() => findCombo(slug), [slug]);
 
@@ -88,6 +91,10 @@ const ComboCheckout = () => {
   });
 
   const handlePay = async () => {
+    if (!meetingAsked) {
+      setShowMeetingPopup(true);
+      return;
+    }
     if (!window.Razorpay) {
       toast.error('Payment service not available. Please refresh.');
       return;
@@ -346,6 +353,20 @@ const ComboCheckout = () => {
           </div>
         </div>
       </div>
+
+      {/* Meeting popup */}
+      <MeetingPopup
+        show={showMeetingPopup}
+        onClose={() => {
+          setShowMeetingPopup(false);
+          setMeetingAsked(true);
+        }}
+        onProceedToPayment={() => {
+          setShowMeetingPopup(false);
+          setMeetingAsked(true);
+        }}
+        redirectAfterMeeting={`/checkout/combo/${slug}`}
+      />
     </div>
   );
 };

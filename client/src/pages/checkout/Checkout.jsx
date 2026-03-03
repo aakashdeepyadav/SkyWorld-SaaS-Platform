@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { findPlan, PLAN_CATALOG } from '../../utils/planCatalog';
 import toast from 'react-hot-toast';
 import { formatINR } from '../../utils/currency';
+import MeetingPopup from '../../components/common/MeetingPopup';
 import {
   ArrowLeftIcon,
   ShieldCheckIcon,
@@ -48,6 +49,8 @@ const Checkout = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isPaying, setIsPaying] = useState(false);
+  const [showMeetingPopup, setShowMeetingPopup] = useState(false);
+  const [meetingAsked, setMeetingAsked] = useState(false);
 
   const serviceSlug = searchParams.get('service');
   const serviceId = searchParams.get('serviceId');
@@ -148,6 +151,11 @@ const Checkout = () => {
   }
 
   const handlePay = async () => {
+    // Show meeting popup once before first payment attempt
+    if (!meetingAsked) {
+      setShowMeetingPopup(true);
+      return;
+    }
     if (planPrice <= 0) {
       toast.error('This plan is not available for checkout');
       return;
@@ -412,6 +420,20 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+
+      {/* Meeting popup */}
+      <MeetingPopup
+        show={showMeetingPopup}
+        onClose={() => {
+          setShowMeetingPopup(false);
+          setMeetingAsked(true);
+        }}
+        onProceedToPayment={() => {
+          setShowMeetingPopup(false);
+          setMeetingAsked(true);
+        }}
+        redirectAfterMeeting={window.location.pathname + window.location.search}
+      />
     </div>
   );
 };

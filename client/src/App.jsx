@@ -68,6 +68,9 @@ const MonthlyPlans = lazy(() => import('./pages/services/MonthlyPlans'));
 const MonthlyPlanDetail = lazy(() => import('./pages/services/MonthlyPlanDetail'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
+// Meetings
+const BookMeeting = lazy(() => import('./pages/meetings/BookMeeting'));
+
 // Dashboards
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const DeveloperDashboard = lazy(() => import('./pages/developer/Dashboard'));
@@ -277,6 +280,14 @@ function App() {
         element={
           <Suspense fallback={<PageLoader />}>
             <AddOnCheckout />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/book-meeting"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <BookMeeting />
           </Suspense>
         }
       />
