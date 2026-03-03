@@ -25,12 +25,26 @@ const getGoogleAuth = async () => {
   const email = process.env.GOOGLE_SERVICE_EMAIL;
   let privateKey = process.env.GOOGLE_PRIVATE_KEY;
 
+  // Debug: log what we received (without exposing the actual key)
+  logger.info(`Google Auth — email: ${email ? email : '(not set)'}, key length: ${privateKey ? privateKey.length : 0}`);
+
   if (!email || !privateKey) {
     throw new Error('Missing GOOGLE_SERVICE_EMAIL or GOOGLE_PRIVATE_KEY environment variables');
   }
 
+  // Strip surrounding quotes if present (common when pasted into Render dashboard)
+  privateKey = privateKey.trim().replace(/^["']|["']$/g, '');
+
   // Handle escaped newlines (common in .env / render env vars)
   privateKey = privateKey.replace(/\\n/g, '\n');
+
+  // Validate the key looks like a PEM
+  if (!privateKey.includes('-----BEGIN')) {
+    logger.error('GOOGLE_PRIVATE_KEY does not contain a valid PEM header. First 40 chars: ' + privateKey.substring(0, 40));
+    throw new Error('GOOGLE_PRIVATE_KEY is not a valid PEM private key');
+  }
+
+  logger.info(`Google Auth — PEM header found, key starts with: ${privateKey.substring(0, 30)}...`);
 
   const jwt = new google.auth.JWT(
     email,
@@ -45,6 +59,7 @@ const getGoogleAuth = async () => {
   // Explicitly authorize — obtains the access token
   await jwt.authorize();
   _authClient = jwt;
+  logger.info('Google Auth — JWT authorized successfully');
   return _authClient;
 };
 
