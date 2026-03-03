@@ -25,41 +25,34 @@ const getGoogleAuth = async () => {
   const email = process.env.GOOGLE_SERVICE_EMAIL;
   let privateKey = process.env.GOOGLE_PRIVATE_KEY;
 
-  // Debug: log what we received (without exposing the actual key)
-  logger.info(`Google Auth — email: ${email ? email : '(not set)'}, key length: ${privateKey ? privateKey.length : 0}`);
+  logger.info(`Google Auth init — email: ${email || '(not set)'}, raw key length: ${privateKey ? privateKey.length : 0}`);
 
   if (!email || !privateKey) {
     throw new Error('Missing GOOGLE_SERVICE_EMAIL or GOOGLE_PRIVATE_KEY environment variables');
   }
 
-  // Strip surrounding quotes if present (common when pasted into Render dashboard)
+  // Strip surrounding quotes (common when copy-pasted with quotes)
   privateKey = privateKey.trim().replace(/^["']|["']$/g, '');
 
-  // Handle escaped newlines (common in .env / render env vars)
+  // Replace literal \n sequences with real newlines
   privateKey = privateKey.replace(/\\n/g, '\n');
 
-  // Validate the key looks like a PEM
-  if (!privateKey.includes('-----BEGIN')) {
-    logger.error('GOOGLE_PRIVATE_KEY does not contain a valid PEM header. First 40 chars: ' + privateKey.substring(0, 40));
-    throw new Error('GOOGLE_PRIVATE_KEY is not a valid PEM private key');
-  }
+  logger.info(`Google Auth — processed key length: ${privateKey.length}, has BEGIN: ${privateKey.includes('-----BEGIN')}`);
 
-  logger.info(`Google Auth — PEM header found, key starts with: ${privateKey.substring(0, 30)}...`);
-
-  const jwt = new google.auth.JWT(
-    email,
-    null,
-    privateKey,
-    [
+  // Use GoogleAuth with credentials object (more robust than JWT for env vars)
+  const auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: email,
+      private_key: privateKey,
+    },
+    scopes: [
       'https://www.googleapis.com/auth/calendar',
       'https://www.googleapis.com/auth/spreadsheets',
-    ]
-  );
+    ],
+  });
 
-  // Explicitly authorize — obtains the access token
-  await jwt.authorize();
-  _authClient = jwt;
-  logger.info('Google Auth — JWT authorized successfully');
+  _authClient = await auth.getClient();
+  logger.info('Google Auth — authorized successfully');
   return _authClient;
 };
 
