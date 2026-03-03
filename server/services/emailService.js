@@ -207,103 +207,218 @@ class EmailService {
     return `${base}/icon_logo_coloured.png`;
   }
 
-  /* ── shared helpers ────────────────────────────────────────────────── */
-  _shell(title, body) {
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>${title} — SkyWorld</title>
-</head>
-<body style="margin:0;padding:0;background:#f4f4f5;-webkit-text-size-adjust:100%;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 0;">
-    <tr><td align="center">
-      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border:1px solid #e4e4e7;border-radius:8px;">
-
-        <!-- Logo bar -->
-        <tr>
-          <td style="padding:28px 32px 20px;border-bottom:1px solid #f0f0f3;">
-            <img src="${this.logoUrl}" alt="SkyWorld Ventures" height="30" style="display:block;height:30px;width:auto;"/>
-          </td>
-        </tr>
-
-        <!-- Body -->
-        <tr>
-          <td style="padding:28px 32px 32px;">
-            ${body}
-          </td>
-        </tr>
-
-        <!-- Footer -->
-        <tr>
-          <td style="padding:20px 32px;border-top:1px solid #f0f0f3;">
-            <p style="margin:0 0 4px;font-size:12px;color:#a1a1aa;line-height:1.5;">&copy; 2026 SkyWorld Ventures &middot; All rights reserved.</p>
-            <p style="margin:0;font-size:12px;color:#a1a1aa;line-height:1.5;">This is an automated message. Please do not reply.</p>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
-  }
-
-  /* ── OTP for signup / email verification ──────────────────────────── */
   getAuthOtpTemplate(userName, otp, actionLabel) {
-    const body = `
-            <p style="margin:0 0 20px;font-size:15px;color:#18181b;line-height:1.6;">Hi ${userName},</p>
-            <p style="margin:0 0 24px;font-size:15px;color:#3f3f46;line-height:1.6;">Use the code below to ${actionLabel}. It expires in ${OTP_EXPIRY_MINUTES} minutes.</p>
-
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-              <tr><td align="center" style="padding:20px 0;">
-                <table role="presentation" cellpadding="0" cellspacing="0" style="border:1px solid #e4e4e7;border-radius:6px;padding:16px 32px;">
-                  <tr><td style="font-size:32px;font-family:'Courier New',monospace;letter-spacing:8px;font-weight:700;color:#18181b;">${otp}</td></tr>
-                </table>
-              </td></tr>
-            </table>
-
-            <p style="margin:24px 0 0;font-size:13px;color:#71717a;line-height:1.6;">
-              If you didn't request this code, you can safely ignore this email. Never share this code with anyone — SkyWorld staff will never ask for it.
-            </p>`;
-    return this._shell('Verification Code', body);
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Verification Code - SkyWorld</title>
+        <style>
+          body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f1f5f9; }
+          .wrapper { width: 100%; background-color: #f1f5f9; padding: 40px 0; }
+          .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08); }
+          .header { background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 50%, #0369A1 100%); color: white; padding: 40px 30px; text-align: center; }
+          .header img { max-height: 44px; width: auto; margin-bottom: 16px; }
+          .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+          .header p { margin: 6px 0 0; font-size: 14px; opacity: 0.85; }
+          .content { padding: 36px 32px; }
+          .content h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; color: #0f172a; }
+          .content p { margin: 0 0 16px; font-size: 15px; color: #475569; }
+          .otp-box { background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border: 2px dashed #0EA5E9; border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0; }
+          .otp-box .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+          .otp-code { font-size: 36px; letter-spacing: 10px; font-weight: 800; color: #0369A1; font-family: 'Courier New', monospace; }
+          .security-note { background: #fffbeb; border-left: 4px solid #f59e0b; border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 24px 0; }
+          .security-note strong { display: flex; align-items: center; font-size: 14px; color: #92400e; margin-bottom: 8px; }
+          .security-note ul { margin: 0; padding-left: 18px; }
+          .security-note li { font-size: 13px; color: #78716c; margin-bottom: 4px; }
+          .divider { height: 1px; background: #e2e8f0; margin: 28px 0; }
+          .help-text { font-size: 13px; color: #94a3b8; text-align: center; }
+          .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px 32px; text-align: center; }
+          .footer-logo { max-height: 28px; width: auto; margin-bottom: 12px; opacity: 0.7; }
+          .footer p { margin: 0 0 4px; font-size: 12px; color: #94a3b8; }
+          .footer a { color: #0EA5E9; text-decoration: none; }
+        </style>
+      </head>
+      <body>
+        <div class="wrapper">
+          <div class="container">
+            <div class="header">
+              <img src="${this.logoUrl}" alt="SkyWorld" />
+              <h1>Email Verification Code</h1>
+              <p>Secure access to your SkyWorld account</p>
+            </div>
+            <div class="content">
+              <h2>Hello ${userName},</h2>
+              <p>Use the verification code below to ${actionLabel}. This code is valid for a limited time only.</p>
+              <div class="otp-box">
+                <div class="label">Your Verification Code</div>
+                <div class="otp-code">${otp}</div>
+              </div>
+              <div class="security-note">
+                <strong>Security Notice</strong>
+                <ul>
+                  <li>This code expires in <strong>${OTP_EXPIRY_MINUTES} minutes</strong></li>
+                  <li>Never share this code with anyone, including SkyWorld staff</li>
+                  <li>We will never ask for this code via phone or chat</li>
+                </ul>
+              </div>
+              <div class="divider"></div>
+              <p class="help-text">If you did not request this code, please ignore this email or <a href="mailto:support@skyworld.com">contact support</a> if you have concerns.</p>
+            </div>
+            <div class="footer">
+              <img src="${this.iconLogoUrl}" alt="SkyWorld" class="footer-logo" />
+              <p>&copy; 2026 SkyWorld Ventures. All rights reserved.</p>
+              <p>This is an automated message — please do not reply directly.</p>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
   }
 
-  /* ── Password reset ───────────────────────────────────────────────── */
   getPasswordResetTemplate(userName, resetUrl) {
-    const body = `
-            <p style="margin:0 0 20px;font-size:15px;color:#18181b;line-height:1.6;">Hi ${userName},</p>
-            <p style="margin:0 0 24px;font-size:15px;color:#3f3f46;line-height:1.6;">We received a request to reset the password for your SkyWorld account. Click the button below to choose a new password.</p>
-
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-              <tr><td align="center" style="padding:8px 0 24px;">
-                <a href="${resetUrl}" target="_blank" style="display:inline-block;padding:12px 28px;background:#0ea5e9;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;border-radius:6px;">Reset password</a>
-              </td></tr>
-            </table>
-
-            <p style="margin:0 0 6px;font-size:13px;color:#a1a1aa;">If the button doesn't work, copy and paste this link into your browser:</p>
-            <p style="margin:0 0 24px;font-size:13px;color:#0ea5e9;word-break:break-all;">${resetUrl}</p>
-
-            <p style="margin:0;font-size:13px;color:#71717a;line-height:1.6;">
-              This link expires in 10 minutes. If you didn't request a password reset, no action is needed — your password will stay the same.
-            </p>`;
-    return this._shell('Password Reset', body);
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Password Reset - SkyWorld</title>
+        <style>
+          body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f1f5f9; }
+          .wrapper { width: 100%; background-color: #f1f5f9; padding: 40px 0; }
+          .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08); }
+          .header { background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 50%, #0369A1 100%); color: white; padding: 40px 30px; text-align: center; }
+          .header img { max-height: 44px; width: auto; margin-bottom: 16px; }
+          .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+          .header p { margin: 6px 0 0; font-size: 14px; opacity: 0.85; }
+          .content { padding: 36px 32px; }
+          .content h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; color: #0f172a; }
+          .content > p { margin: 0 0 16px; font-size: 15px; color: #475569; }
+          .btn-reset { display: inline-block; background: linear-gradient(135deg, #0EA5E9, #0284C7); color: #ffffff !important; padding: 14px 40px; text-decoration: none; border-radius: 10px; font-size: 15px; font-weight: 600; letter-spacing: 0.3px; margin: 24px 0; box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35); }
+          .btn-reset:hover { background: linear-gradient(135deg, #0284C7, #0369A1); }
+          .link-fallback { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-top: 16px; word-break: break-all; }
+          .link-fallback p { margin: 0 0 6px; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+          .link-fallback a { font-size: 13px; color: #0EA5E9; text-decoration: none; }
+          .security-note { background: #fffbeb; border-left: 4px solid #f59e0b; border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 24px 0; }
+          .security-note strong { display: flex; align-items: center; font-size: 14px; color: #92400e; margin-bottom: 8px; }
+          .security-note ul { margin: 0; padding-left: 18px; }
+          .security-note li { font-size: 13px; color: #78716c; margin-bottom: 4px; }
+          .divider { height: 1px; background: #e2e8f0; margin: 28px 0; }
+          .help-text { font-size: 13px; color: #94a3b8; text-align: center; }
+          .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px 32px; text-align: center; }
+          .footer-logo { max-height: 28px; width: auto; margin-bottom: 12px; opacity: 0.7; }
+          .footer p { margin: 0 0 4px; font-size: 12px; color: #94a3b8; }
+          .footer a { color: #0EA5E9; text-decoration: none; }
+        </style>
+      </head>
+      <body>
+        <div class="wrapper">
+          <div class="container">
+            <div class="header">
+              <img src="${this.logoUrl}" alt="SkyWorld" />
+              <h1>Password Reset Request</h1>
+              <p>We received a request to reset your password</p>
+            </div>
+            <div class="content">
+              <h2>Hello ${userName},</h2>
+              <p>Someone requested a password reset for your SkyWorld account. If this was you, click the button below to set a new password.</p>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center">
+                <a href="${resetUrl}" class="btn-reset">Reset My Password</a>
+              </td></tr></table>
+              <div class="link-fallback">
+                <p>Button not working? Copy and paste this link:</p>
+                <a href="${resetUrl}">${resetUrl}</a>
+              </div>
+              <div class="security-note">
+                <strong>Security Notice</strong>
+                <ul>
+                  <li>This link expires in <strong>10 minutes</strong></li>
+                  <li>If you did not request a password reset, safely ignore this email</li>
+                  <li>Your password will not change until you create a new one</li>
+                </ul>
+              </div>
+              <div class="divider"></div>
+              <p class="help-text">Need help? <a href="mailto:support@skyworld.com">Contact our support team</a></p>
+            </div>
+            <div class="footer">
+              <img src="${this.iconLogoUrl}" alt="SkyWorld" class="footer-logo" />
+              <p>&copy; 2026 SkyWorld Ventures. All rights reserved.</p>
+              <p>This is an automated message — please do not reply directly.</p>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
   }
 
-  /* ── Password changed confirmation ────────────────────────────────── */
   getPasswordChangeTemplate(userName) {
-    const body = `
-            <p style="margin:0 0 20px;font-size:15px;color:#18181b;line-height:1.6;">Hi ${userName},</p>
-            <p style="margin:0 0 24px;font-size:15px;color:#3f3f46;line-height:1.6;">Your SkyWorld account password was changed successfully.</p>
-
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e4e4e7;border-radius:6px;padding:16px 20px;margin-bottom:24px;">
-              <tr><td style="font-size:13px;color:#71717a;line-height:1.6;">
-                If you made this change, no further action is required.<br/>
-                If you did <strong>not</strong> change your password, please <a href="mailto:support@skyworld.com" style="color:#0ea5e9;text-decoration:none;font-weight:600;">contact support</a> immediately to secure your account.
-              </td></tr>
-            </table>`;
-    return this._shell('Password Changed', body);
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Password Changed - SkyWorld</title>
+        <style>
+          body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f1f5f9; }
+          .wrapper { width: 100%; background-color: #f1f5f9; padding: 40px 0; }
+          .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08); }
+          .header { background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%); color: white; padding: 40px 30px; text-align: center; }
+          .header img { max-height: 44px; width: auto; margin-bottom: 16px; }
+          .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+          .header p { margin: 6px 0 0; font-size: 14px; opacity: 0.85; }
+          .content { padding: 36px 32px; }
+          .content h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; color: #0f172a; }
+          .content p { margin: 0 0 16px; font-size: 15px; color: #475569; }
+          .success-box { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 1px solid #6ee7b7; border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0; }
+          .success-box .label { font-size: 16px; font-weight: 600; color: #065f46; }
+          .warning-note { background: #fef2f2; border-left: 4px solid #ef4444; border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 24px 0; }
+          .warning-note strong { display: block; font-size: 14px; color: #991b1b; margin-bottom: 4px; }
+          .warning-note p { margin: 0; font-size: 13px; color: #7f1d1d; }
+          .divider { height: 1px; background: #e2e8f0; margin: 28px 0; }
+          .help-text { font-size: 13px; color: #94a3b8; text-align: center; }
+          .help-text a { color: #0EA5E9; text-decoration: none; }
+          .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px 32px; text-align: center; }
+          .footer-logo { max-height: 28px; width: auto; margin-bottom: 12px; opacity: 0.7; }
+          .footer p { margin: 0 0 4px; font-size: 12px; color: #94a3b8; }
+        </style>
+      </head>
+      <body>
+        <div class="wrapper">
+          <div class="container">
+            <div class="header">
+              <img src="${this.logoUrl}" alt="SkyWorld" />
+              <h1>Password Changed Successfully</h1>
+              <p>Your account security has been updated</p>
+            </div>
+            <div class="content">
+              <h2>Hello ${userName},</h2>
+              <p>Your SkyWorld account password has been changed successfully.</p>
+              <div class="success-box">
+                <div class="label">Password Updated</div>
+              </div>
+              <div class="warning-note">
+                <strong>Didn't make this change?</strong>
+                <p>If you did not change your password, your account may be compromised. Please <a href="mailto:support@skyworld.com" style="color: #dc2626; font-weight: 600;">contact support immediately</a>.</p>
+              </div>
+              <div class="divider"></div>
+              <p class="help-text">Need help? <a href="mailto:support@skyworld.com">Contact our support team</a></p>
+            </div>
+            <div class="footer">
+              <img src="${this.iconLogoUrl}" alt="SkyWorld" class="footer-logo" />
+              <p>&copy; 2026 SkyWorld Ventures. All rights reserved.</p>
+              <p>This is an automated message — please do not reply directly.</p>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
   }
 }
 
