@@ -96,7 +96,7 @@ const ServiceDetail = () => {
   };
 
   const handleCustom = () => {
-    const target = `/custom-request?service=${slug}`;
+    const target = `/request?service=${slug}`;
     if (!user) {
       navigate('/login', { state: { from: target } });
       return;

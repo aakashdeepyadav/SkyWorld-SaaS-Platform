@@ -95,9 +95,7 @@ const MonthlyPlanDetail = () => {
               <p className="text-gray-500 dark:text-gray-400 mt-3 text-lg leading-relaxed">
                 {plan.tagline}
               </p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                {plan.bestFor}
-              </p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">{plan.bestFor}</p>
             </div>
 
             <div className="flex flex-col items-end">
@@ -166,9 +164,7 @@ const MonthlyPlanDetail = () => {
           <div className="card dark:bg-surface-800 dark:border-surface-700">
             <div className="flex items-center gap-2 mb-5">
               <XMarkIcon className="w-5 h-5 text-gray-400" />
-              <h2 className="text-base font-bold text-gray-900 dark:text-white">
-                Not included
-              </h2>
+              <h2 className="text-base font-bold text-gray-900 dark:text-white">Not included</h2>
             </div>
             <div className="space-y-3">
               {plan.notIncluded.map((item) => (
@@ -191,7 +187,7 @@ const MonthlyPlanDetail = () => {
               </Link>{' '}
               or{' '}
               <Link
-                to={user ? '/custom-request' : '/register'}
+                to={user ? '/request' : '/register'}
                 className="text-sky-600 dark:text-sky-400 font-medium hover:underline"
               >
                 request a custom quote
@@ -219,9 +215,7 @@ const MonthlyPlanDetail = () => {
                       <h3 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                         {op.name}
                       </h3>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                        {op.tagline}
-                      </p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{op.tagline}</p>
                       <div className="flex flex-wrap gap-1.5 mt-2.5">
                         {op.highlights?.map((h) => (
                           <span

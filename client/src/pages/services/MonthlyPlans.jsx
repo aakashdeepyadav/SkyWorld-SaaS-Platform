@@ -42,8 +42,8 @@ const MonthlyPlans = () => {
             Monthly Maintenance Plans
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-3 max-w-2xl text-lg leading-relaxed">
-            Keep your website fast, updated, and growing — without lifting a finger.
-            Choose a plan that fits your pace.
+            Keep your website fast, updated, and growing — without lifting a finger. Choose a plan
+            that fits your pace.
           </p>
         </div>
       </div>
@@ -55,9 +55,7 @@ const MonthlyPlans = () => {
             <div
               key={plan.slug}
               className={`relative card dark:bg-surface-800 dark:border-surface-700 flex flex-col overflow-hidden transition-shadow hover:shadow-lg ${
-                plan.popular
-                  ? 'border-2 border-sky-200 dark:border-sky-500/30 shadow-md'
-                  : ''
+                plan.popular ? 'border-2 border-sky-200 dark:border-sky-500/30 shadow-md' : ''
               }`}
             >
               {plan.popular && (
@@ -107,7 +105,10 @@ const MonthlyPlans = () => {
               <div className="space-y-2.5 mb-5 flex-1">
                 {plan.features.map((f) => (
                   <div key={f} className="flex items-start gap-2.5 text-sm">
-                    <CheckIcon className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" strokeWidth={3} />
+                    <CheckIcon
+                      className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"
+                      strokeWidth={3}
+                    />
                     <span className="text-gray-700 dark:text-gray-300">{f}</span>
                   </div>
                 ))}
@@ -118,7 +119,10 @@ const MonthlyPlans = () => {
                 <div className="pt-4 border-t border-gray-100 dark:border-surface-700 mb-5 space-y-2">
                   {plan.notIncluded.map((item) => (
                     <div key={item} className="flex items-start gap-2.5 text-sm">
-                      <XMarkIcon className="w-4 h-4 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-0.5" strokeWidth={2.5} />
+                      <XMarkIcon
+                        className="w-4 h-4 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-0.5"
+                        strokeWidth={2.5}
+                      />
                       <span className="text-gray-400 dark:text-gray-500">{item}</span>
                     </div>
                   ))}
@@ -155,8 +159,14 @@ const MonthlyPlans = () => {
               How billing works
             </h3>
             <div className="space-y-3 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-              <p>Plans are billed monthly. No long-term contracts — you can pause or cancel anytime with 7 days notice.</p>
-              <p>First payment is collected when your plan starts. We&apos;ll send you a reminder before each billing cycle.</p>
+              <p>
+                Plans are billed monthly. No long-term contracts — you can pause or cancel anytime
+                with 7 days notice.
+              </p>
+              <p>
+                First payment is collected when your plan starts. We&apos;ll send you a reminder
+                before each billing cycle.
+              </p>
             </div>
           </div>
           <div className="card dark:bg-surface-800 dark:border-surface-700">
@@ -165,7 +175,16 @@ const MonthlyPlans = () => {
             </h3>
             <div className="space-y-3 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
               <p>Upgrade or downgrade anytime. Changes take effect from the next billing cycle.</p>
-              <p>Need something outside these plans? <Link to={user ? '/custom-request' : '/register'} className="text-sky-600 dark:text-sky-400 font-medium hover:underline">Request a custom quote</Link> and we&apos;ll work it out.</p>
+              <p>
+                Need something outside these plans?{' '}
+                <Link
+                  to={user ? '/request' : '/register'}
+                  className="text-sky-600 dark:text-sky-400 font-medium hover:underline"
+                >
+                  Request a custom quote
+                </Link>{' '}
+                and we&apos;ll work it out.
+              </p>
             </div>
           </div>
         </div>

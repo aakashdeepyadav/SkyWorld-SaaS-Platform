@@ -493,7 +493,7 @@ const Home = () => {
                     </li>
                   </ul>
                   <Link
-                    to={authed ? `/custom-request?service=${activeTab}` : '/register'}
+                    to={authed ? `/request?service=${activeTab}` : '/register'}
                     className="hp-plan__cta"
                   >
                     Request a Quote <span className="hp-btn__arr">&rarr;</span>
@@ -620,7 +620,14 @@ const Home = () => {
             </p>
             <Link
               to="/plans/monthly"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, marginTop: 8 }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: 13,
+                fontWeight: 600,
+                marginTop: 8,
+              }}
               className="text-sky-600 dark:text-sky-400 hover:underline"
             >
               Compare all plans <span>&rarr;</span>
@@ -712,12 +719,9 @@ const Home = () => {
                     Create your account <span className="hp-btn__arr">&rarr;</span>
                   </Link>
                 )}
-                <a
-                  href="mailto:ventures.skyworld@gmail.com"
-                  className="hp-btn hp-btn--ghost hp-btn--lg"
-                >
+                <Link to="/contact" className="hp-btn hp-btn--ghost hp-btn--lg">
                   Get in touch
-                </a>
+                </Link>
               </div>
             </div>
           </FadeIn>

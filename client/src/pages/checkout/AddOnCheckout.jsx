@@ -40,10 +40,7 @@ const AddOnCheckout = () => {
     }));
   }, []);
 
-  const selectedItems = useMemo(
-    () => ADD_ONS.filter((a) => selected[a.label] > 0),
-    [selected]
-  );
+  const selectedItems = useMemo(() => ADD_ONS.filter((a) => selected[a.label] > 0), [selected]);
 
   const totalAmount = useMemo(
     () => selectedItems.reduce((sum, a) => sum + a.price * selected[a.label], 0),
@@ -56,9 +53,7 @@ const AddOnCheckout = () => {
     return (
       <div className="min-h-screen bg-surface-50 dark:bg-surface-900 px-6 py-20">
         <div className="max-w-2xl mx-auto card dark:bg-surface-800 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Sign in to continue
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sign in to continue</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             You need an account to purchase add-on services.
           </p>
@@ -159,9 +154,7 @@ const AddOnCheckout = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white">Add-On Checkout</h1>
-                <p className="text-sm text-white/70">
-                  Select the extras you need
-                </p>
+                <p className="text-sm text-white/70">Select the extras you need</p>
               </div>
             </div>
           </div>
@@ -187,9 +180,7 @@ const AddOnCheckout = () => {
                   >
                     <div
                       className={`w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center transition-colors ${
-                        isSelected
-                          ? 'bg-amber-500 text-white'
-                          : 'bg-gray-200 dark:bg-surface-600'
+                        isSelected ? 'bg-amber-500 text-white' : 'bg-gray-200 dark:bg-surface-600'
                       }`}
                     >
                       {isSelected ? (
@@ -223,9 +214,7 @@ const AddOnCheckout = () => {
                     >
                       {formatINR(addon.price)}
                       {addon.unit && (
-                        <span className="text-[10px] font-normal text-gray-400">
-                          {addon.unit}
-                        </span>
+                        <span className="text-[10px] font-normal text-gray-400">{addon.unit}</span>
                       )}
                     </span>
                   </button>
@@ -242,10 +231,7 @@ const AddOnCheckout = () => {
               </h2>
               <div className="space-y-2">
                 {selectedItems.map((addon) => (
-                  <div
-                    key={addon.label}
-                    className="flex items-center justify-between text-sm"
-                  >
+                  <div key={addon.label} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <SparklesIcon className="w-4 h-4 text-amber-500 flex-shrink-0" />
                       <span className="text-gray-700 dark:text-gray-300">{addon.label}</span>
@@ -273,9 +259,7 @@ const AddOnCheckout = () => {
             {itemCount > 0 ? (
               <>
                 <div className="flex items-center justify-between mb-5">
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                    Total
-                  </span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Total</span>
                   <span className="text-2xl font-extrabold text-gray-900 dark:text-white">
                     {formatINR(totalAmount)}
                   </span>

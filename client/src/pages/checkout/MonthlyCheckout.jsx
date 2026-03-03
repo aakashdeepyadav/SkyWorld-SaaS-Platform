@@ -46,23 +46,15 @@ const MonthlyCheckout = () => {
     return (
       <div className="min-h-screen bg-surface-50 dark:bg-surface-900 px-6 py-20">
         <div className="max-w-2xl mx-auto card dark:bg-surface-800 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Sign in to continue
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sign in to continue</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             You need an account to subscribe to a maintenance plan.
           </p>
           <div className="mt-6 flex items-center justify-center gap-3">
-            <Link
-              to={`/login?redirect=/checkout/monthly/${slug}`}
-              className="btn-primary"
-            >
+            <Link to={`/login?redirect=/checkout/monthly/${slug}`} className="btn-primary">
               Sign In
             </Link>
-            <Link
-              to={`/register?redirect=/checkout/monthly/${slug}`}
-              className="btn-secondary"
-            >
+            <Link to={`/register?redirect=/checkout/monthly/${slug}`} className="btn-secondary">
               Create Account
             </Link>
           </div>
@@ -229,7 +221,10 @@ const MonthlyCheckout = () => {
               <div className="grid sm:grid-cols-2 gap-2">
                 {plan.notIncluded.map((item) => (
                   <div key={item} className="flex items-center gap-2 text-sm">
-                    <XMarkIcon className="w-4 h-4 text-gray-300 dark:text-gray-600 flex-shrink-0" strokeWidth={2.5} />
+                    <XMarkIcon
+                      className="w-4 h-4 text-gray-300 dark:text-gray-600 flex-shrink-0"
+                      strokeWidth={2.5}
+                    />
                     <span className="text-gray-400 dark:text-gray-500">{item}</span>
                   </div>
                 ))}

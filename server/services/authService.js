@@ -11,6 +11,25 @@ const AUTH_OTP_RESEND_COOLDOWN_MS = 30 * 1000;
 const AUTH_OTP_EMAIL_SEND_TIMEOUT_MS = 20 * 1000;
 
 /**
+ * Normalize an email address:
+ * - lowercase + trim
+ * - For Gmail/Googlemail: strip dots from the local part
+ *   (Gmail treats play.w@gmail.com and playw@gmail.com as identical)
+ */
+export const normalizeEmail = (email) => {
+  if (!email || typeof email !== 'string') return email;
+  const trimmed = email.trim().toLowerCase();
+  const atIdx = trimmed.lastIndexOf('@');
+  if (atIdx === -1) return trimmed;
+  const local = trimmed.slice(0, atIdx);
+  const domain = trimmed.slice(atIdx + 1);
+  if (domain === 'gmail.com' || domain === 'googlemail.com') {
+    return `${local.replace(/\./g, '')}@${domain}`;
+  }
+  return trimmed;
+};
+
+/**
  * Generate JWT tokens
  */
 export const generateTokens = (userId) => {
@@ -67,15 +86,16 @@ export const clearTokenCookies = (res) => {
  */
 export const registerUser = async (email, password, name) => {
   try {
+    const normalized = normalizeEmail(email);
     // Check if user exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: normalized });
     if (existingUser) {
       throw new Error('User with this email already exists');
     }
 
     // Create user with CLIENT role (default)
     const user = await User.create({
-      email,
+      email: normalized,
       password,
       name,
       role: ROLES.CLIENT,
@@ -94,8 +114,9 @@ export const registerUser = async (email, password, name) => {
  */
 export const loginUser = async (email, password) => {
   try {
+    const normalized = normalizeEmail(email);
     // Select password AND lockout fields (they are select: false)
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email: normalized })
       .select('+password +failedLoginAttempts +lockUntil');
 
     if (!user) {
@@ -160,7 +181,8 @@ export const verifyGoogleToken = async (googleId, email, name, avatar) => {
     }
 
     // Check if user exists with email (account linking)
-    user = await User.findOne({ email });
+    const normalizedEmail = normalizeEmail(email);
+    user = await User.findOne({ email: normalizedEmail });
     if (user) {
       // Link Google account
       user.googleId = googleId;
@@ -172,7 +194,7 @@ export const verifyGoogleToken = async (googleId, email, name, avatar) => {
 
     // Create new user with CLIENT role
     user = await User.create({
-      email,
+      email: normalizedEmail,
       googleId,
       name,
       avatar,
@@ -289,7 +311,8 @@ export const verifyEmailOtpChallenge = async (email, otp, purpose) => {
     throw appError('Invalid OTP purpose', 400);
   }
 
-  const user = await User.findOne({ email })
+  const normalized = normalizeEmail(email);
+  const user = await User.findOne({ email: normalized })
     .select('+emailOtpCodeHash +emailOtpPurpose +emailOtpExpiresAt +emailOtpAttempts +emailOtpLastSentAt');
 
   if (!user) {
@@ -340,7 +363,8 @@ export const verifyEmailOtpChallenge = async (email, otp, purpose) => {
 };
 
 export const getUserForOtp = async (email) => {
-  return User.findOne({ email })
+  const normalized = normalizeEmail(email);
+  return User.findOne({ email: normalized })
     .select('+password +emailOtpCodeHash +emailOtpPurpose +emailOtpExpiresAt +emailOtpAttempts +emailOtpLastSentAt');
 };
 
@@ -386,24 +410,18 @@ export const changePassword = async (userId, currentPassword, newPassword) => {
  */
 export const requestPasswordReset = async (email) => {
   try {
-    const genericResponse = {
-      success: true,
-      message: 'If an account exists and supports password login, a reset link has been sent.',
-      emailSent: false
-    };
+    const normalized = normalizeEmail(email);
 
     // Find user with password reset fields
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email: normalized })
       .select('+password +passwordResetToken +passwordResetExpires +passwordResetAttempts');
 
     if (!user) {
-      // Don't reveal if user exists for security
-      return genericResponse;
+      throw appError('No account found with this email address.', 404);
     }
 
-    // Check if user has password (Google OAuth users don't)
-    if (!user.password) {
-      return genericResponse;
+    if (!user.isActive) {
+      throw appError('This account has been deactivated. Contact support.', 403);
     }
 
     // Check if password reset is locked
@@ -417,7 +435,7 @@ export const requestPasswordReset = async (email) => {
       throw new Error('Too many password reset attempts. Please try again tomorrow.');
     }
 
-    // Generate reset token
+    // Generate reset token (works for both email/password AND Google OAuth users)
     const resetToken = user.createPasswordResetToken();
     await user.save();
 
@@ -428,7 +446,7 @@ export const requestPasswordReset = async (email) => {
       throw new Error('Failed to send reset email. Please try again.');
     }
 
-    logger.info(`Password reset requested for email: ${email}`);
+    logger.info(`Password reset requested for email: ${normalized}`);
 
     return { success: true, message: 'Password reset link sent to your email', emailSent: true };
   } catch (error) {
@@ -465,8 +483,9 @@ export const resetPassword = async (token, newPassword) => {
       throw new Error('Password must be at least 8 characters long');
     }
 
-    // Update password
+    // Update password (and ensure email is verified so user can log in with email+password)
     user.password = newPassword;
+    if (!user.emailVerified) user.emailVerified = true;
     user.clearPasswordResetFields();
     await user.save();
 

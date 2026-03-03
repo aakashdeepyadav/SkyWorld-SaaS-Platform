@@ -199,7 +199,7 @@ class EmailService {
 
   get logoUrl() {
     const base = (process.env.FRONTEND_URL || 'https://skyworld.com').replace(/\/$/, '');
-    return `${base}/wordmark_logo_coloured_fullname.png`;
+    return `${base}/wordmark_logo_white_fullname.png`;
   }
 
   get iconLogoUrl() {

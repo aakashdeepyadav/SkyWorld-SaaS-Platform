@@ -80,6 +80,7 @@ export const errorHandler = (err, req, res, next) => {
       err.message.includes('deactivated') ||
       err.message.includes('locked') ||
       err.message.includes('password') ||
+      err.message.includes('No account') ||
       err.message.includes('Google') ||
       err.message.includes('refresh token') ||
       err.message.includes('Authorization code')

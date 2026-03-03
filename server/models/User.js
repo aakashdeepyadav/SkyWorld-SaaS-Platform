@@ -132,6 +132,22 @@ userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ createdAt: -1 });
 
+// Normalize Gmail dots before password hashing
+userSchema.pre('save', function (next) {
+  if (this.isModified('email') || this.isNew) {
+    const email = (this.email || '').trim().toLowerCase();
+    const atIdx = email.lastIndexOf('@');
+    if (atIdx !== -1) {
+      const local = email.slice(0, atIdx);
+      const domain = email.slice(atIdx + 1);
+      if (domain === 'gmail.com' || domain === 'googlemail.com') {
+        this.email = `${local.replace(/\./g, '')}@${domain}`;
+      }
+    }
+  }
+  next();
+});
+
 // Hash password before saving (bcrypt cost factor 12)
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();

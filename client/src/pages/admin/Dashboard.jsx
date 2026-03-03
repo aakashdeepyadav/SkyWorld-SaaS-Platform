@@ -54,7 +54,7 @@ const AdminDashboard = () => {
       link: '/requests',
     },
     {
-      name: 'Pending Custom',
+      name: 'Pending Requests',
       value: stats?.pendingCustomRequests || 0,
       icon: DocumentTextIcon,
       bg: 'bg-sky-50 dark:bg-sky-500/10',

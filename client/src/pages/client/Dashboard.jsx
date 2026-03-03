@@ -96,7 +96,7 @@ const ClientDashboard = () => {
       ring: 'ring-blue-500/20',
     },
     {
-      name: 'Custom Requests',
+      name: 'Requests',
       value: customRequests?.requests?.length || 0,
       icon: DocumentTextIcon,
       bg: 'bg-sky-500/10',
@@ -159,9 +159,9 @@ const ClientDashboard = () => {
             <GlobeAltIcon className="w-4 h-4 mr-1.5" />
             Browse Services
           </Link>
-          <Link to="/custom-request" className="btn-secondary inline-flex items-center">
+          <Link to="/request" className="btn-secondary inline-flex items-center">
             <SparklesIcon className="w-4 h-4 mr-1.5" />
-            Custom Request
+            New Request
           </Link>
         </div>
       </div>
@@ -304,7 +304,7 @@ const ClientDashboard = () => {
               </div>
             </Link>
             <Link
-              to="/custom-request"
+              to="/request"
               className="flex items-center p-3 rounded-xl border border-gray-100 dark:border-surface-700 hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors group"
             >
               <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center mr-3">
@@ -312,10 +312,10 @@ const ClientDashboard = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">
-                  Custom Request
+                  New Request
                 </h3>
                 <p className="text-xs text-gray-400 dark:text-gray-500">
-                  Describe your project and get a tailored quote
+                  Pick a plan or describe a custom project
                 </p>
               </div>
             </Link>
@@ -328,7 +328,7 @@ const ClientDashboard = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">
-                  View Custom Requests
+                  View Requests
                 </h3>
                 <p className="text-xs text-gray-400 dark:text-gray-500">
                   Track quotes and pay for approved requests
@@ -339,7 +339,7 @@ const ClientDashboard = () => {
         </div>
 
         <div className="card">
-          <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Custom Requests</h2>
+          <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Requests</h2>
           {customRequestsLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -352,7 +352,7 @@ const ClientDashboard = () => {
           ) : customRequests?.requests?.length === 0 ? (
             <div className="text-center py-8">
               <DocumentTextIcon className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-              <p className="text-sm text-gray-400 dark:text-gray-500">No custom requests yet</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">No requests yet</p>
             </div>
           ) : (
             <div className="space-y-2">

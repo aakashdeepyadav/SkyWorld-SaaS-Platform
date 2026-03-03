@@ -51,23 +51,15 @@ const ComboCheckout = () => {
     return (
       <div className="min-h-screen bg-surface-50 dark:bg-surface-900 px-6 py-20">
         <div className="max-w-2xl mx-auto card dark:bg-surface-800 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Sign in to continue
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sign in to continue</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             You need an account to complete your purchase.
           </p>
           <div className="mt-6 flex items-center justify-center gap-3">
-            <Link
-              to={`/login?redirect=/checkout/combo/${slug}`}
-              className="btn-primary"
-            >
+            <Link to={`/login?redirect=/checkout/combo/${slug}`} className="btn-primary">
               Sign In
             </Link>
-            <Link
-              to={`/register?redirect=/checkout/combo/${slug}`}
-              className="btn-secondary"
-            >
+            <Link to={`/register?redirect=/checkout/combo/${slug}`} className="btn-secondary">
               Create Account
             </Link>
           </div>
@@ -86,7 +78,13 @@ const ComboCheckout = () => {
     if (item.addOn) return { ...item, type: 'addon' };
     const cat = PLAN_CATALOG[item.category];
     const plan = cat?.plans.find((p) => p.slug === item.plan);
-    return { ...item, type: 'plan', catName: cat?.name, planName: plan?.name, planPrice: plan?.price };
+    return {
+      ...item,
+      type: 'plan',
+      catName: cat?.name,
+      planName: plan?.name,
+      planPrice: plan?.price,
+    };
   });
 
   const handlePay = async () => {
@@ -189,15 +187,16 @@ const ComboCheckout = () => {
                     {item.type === 'addon' ? (
                       <SparklesIcon className="w-4 h-4 text-amber-500 flex-shrink-0" />
                     ) : (
-                      <CheckIcon className="w-4 h-4 text-emerald-500 flex-shrink-0" strokeWidth={3} />
+                      <CheckIcon
+                        className="w-4 h-4 text-emerald-500 flex-shrink-0"
+                        strokeWidth={3}
+                      />
                     )}
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         {item.label}
                       </p>
-                      {item.catName && (
-                        <p className="text-[11px] text-gray-400">{item.catName}</p>
-                      )}
+                      {item.catName && <p className="text-[11px] text-gray-400">{item.catName}</p>}
                     </div>
                   </div>
                   {item.planPrice ? (
@@ -302,9 +301,7 @@ const ComboCheckout = () => {
           {/* Pay button */}
           <div className="border-t border-gray-100 dark:border-surface-700 pt-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                Total Package Price
-              </span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Total Package Price</span>
               <span className="text-sm text-gray-500">{formatINR(combo.price)}</span>
             </div>
             <div className="flex items-center justify-between mb-5">

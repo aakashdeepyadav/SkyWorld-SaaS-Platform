@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { api } from '../../services/api';
 
-const GENERIC_RESET_MESSAGE = 'If an account exists and supports password login, a reset link has been sent.';
-
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,9 +19,9 @@ const ForgotPassword = () => {
 
       if (data.success) {
         setSubmitted(true);
-        setSubmittedMessage(data.message || GENERIC_RESET_MESSAGE);
+        setSubmittedMessage(data.message || 'Reset link sent to your email');
         setDidSendLink(Boolean(data.emailSent));
-        toast.success(data.message || GENERIC_RESET_MESSAGE);
+        toast.success(data.message || 'Reset link sent to your email');
       } else {
         toast.error(data.message || 'Failed to send reset email');
       }
@@ -38,12 +36,33 @@ const ForgotPassword = () => {
     return (
       <div className="min-h-screen flex">
         <div className="hidden lg:flex lg:w-[45%] bg-surface-900 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 30% 80%, rgba(14,165,233,.08) 0%, transparent 60%)' }} />
-          <div className="absolute top-0 right-0 w-80 h-80" style={{ background: 'radial-gradient(circle, rgba(14,165,233,.05) 0%, transparent 70%)' }} />
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+              backgroundSize: '24px 24px',
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse at 30% 80%, rgba(14,165,233,.08) 0%, transparent 60%)',
+            }}
+          />
+          <div
+            className="absolute top-0 right-0 w-80 h-80"
+            style={{
+              background: 'radial-gradient(circle, rgba(14,165,233,.05) 0%, transparent 70%)',
+            }}
+          />
           <div className="flex flex-col justify-between p-12 xl:p-16 w-full relative z-10">
             <div className="flex items-center">
-              <img src="/wordmark_logo_white_fullname.png" alt="SkyWorld Ventures" className="h-9 w-auto object-contain" />
+              <img
+                src="/wordmark_logo_white_fullname.png"
+                alt="SkyWorld Ventures"
+                className="h-9 w-auto object-contain"
+              />
             </div>
 
             <div>
@@ -62,19 +81,33 @@ const ForgotPassword = () => {
         <div className="flex-1 flex items-center justify-center px-6 sm:px-12 bg-white">
           <div className="w-full max-w-sm text-center">
             <div className="lg:hidden flex items-center justify-center mb-10">
-              <img src="/wordmark_logo_coloured_.png" alt="SkyWorld" className="h-7 w-auto object-contain" />
+              <img
+                src="/wordmark_logo_coloured_.png"
+                alt="SkyWorld"
+                className="h-7 w-auto object-contain"
+              />
             </div>
 
             <div className="mb-6">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg
+                  className="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 {didSendLink ? 'Email Sent' : 'Request Received'}
               </h2>
-              <p className="text-gray-600 mb-3">{submittedMessage || GENERIC_RESET_MESSAGE}</p>
+              <p className="text-gray-600 mb-3">{submittedMessage}</p>
               {didSendLink && (
                 <p className="text-gray-600">
                   Sent to: <span className="font-medium text-gray-900">{email}</span>
@@ -117,12 +150,33 @@ const ForgotPassword = () => {
   return (
     <div className="min-h-screen flex">
       <div className="hidden lg:flex lg:w-[45%] bg-surface-900 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 30% 80%, rgba(14,165,233,.08) 0%, transparent 60%)' }} />
-        <div className="absolute top-0 right-0 w-80 h-80" style={{ background: 'radial-gradient(circle, rgba(14,165,233,.05) 0%, transparent 70%)' }} />
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse at 30% 80%, rgba(14,165,233,.08) 0%, transparent 60%)',
+          }}
+        />
+        <div
+          className="absolute top-0 right-0 w-80 h-80"
+          style={{
+            background: 'radial-gradient(circle, rgba(14,165,233,.05) 0%, transparent 70%)',
+          }}
+        />
         <div className="flex flex-col justify-between p-12 xl:p-16 w-full relative z-10">
           <div className="flex items-center">
-            <img src="/wordmark_logo_white_fullname.png" alt="SkyWorld Ventures" className="h-9 w-auto object-contain" />
+            <img
+              src="/wordmark_logo_white_fullname.png"
+              alt="SkyWorld Ventures"
+              className="h-9 w-auto object-contain"
+            />
           </div>
 
           <div>
@@ -143,7 +197,11 @@ const ForgotPassword = () => {
       <div className="flex-1 flex items-center justify-center px-6 sm:px-12 bg-white">
         <div className="w-full max-w-sm">
           <div className="lg:hidden flex items-center mb-10">
-            <img src="/wordmark_logo_coloured_.png" alt="SkyWorld" className="h-7 w-auto object-contain" />
+            <img
+              src="/wordmark_logo_coloured_.png"
+              alt="SkyWorld"
+              className="h-7 w-auto object-contain"
+            />
           </div>
 
           <h2 className="text-2xl font-bold text-gray-900">Forgot Password?</h2>

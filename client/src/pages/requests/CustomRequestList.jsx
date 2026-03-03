@@ -76,7 +76,7 @@ const CustomRequestList = () => {
     },
     {
       onSuccess: () => {
-        toast.success('Custom request updated');
+        toast.success('Request updated');
         queryClient.invalidateQueries(['custom-requests']);
         setIsModalOpen(false);
         setSelected(null);
@@ -160,16 +160,14 @@ const CustomRequestList = () => {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Custom Requests</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Requests</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {isAdmin
-              ? 'Review custom requests and send quotes.'
-              : 'Track your custom plan requests.'}
+            {isAdmin ? 'Review requests and send quotes.' : 'Track your plan requests.'}
           </p>
         </div>
         {!isAdmin && (
-          <Link to="/custom-request" className="btn-primary inline-flex items-center self-start">
-            New Custom Request
+          <Link to="/request" className="btn-primary inline-flex items-center self-start">
+            New Request
           </Link>
         )}
       </div>
@@ -200,7 +198,7 @@ const CustomRequestList = () => {
         </div>
       ) : data?.requests?.length === 0 ? (
         <div className="card text-center py-16">
-          <p className="text-gray-500 dark:text-gray-400 font-medium">No custom requests yet</p>
+          <p className="text-gray-500 dark:text-gray-400 font-medium">No requests yet</p>
         </div>
       ) : (
         <div className="space-y-3">

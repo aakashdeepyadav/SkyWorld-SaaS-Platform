@@ -78,7 +78,7 @@ const RequestList = lazy(() => import('./pages/requests/RequestList'));
 const NewRequest = lazy(() => import('./pages/requests/NewRequest'));
 const RequestDetail = lazy(() => import('./pages/requests/RequestDetail'));
 const CustomRequestList = lazy(() => import('./pages/requests/CustomRequestList'));
-const CustomRequestForm = lazy(() => import('./pages/requests/CustomRequestForm'));
+const RequestForm = lazy(() => import('./pages/requests/RequestForm'));
 const CustomRequestThankYou = lazy(() => import('./pages/requests/CustomRequestThankYou'));
 
 // Projects
@@ -338,6 +338,22 @@ function App() {
             </RoleRoute>
           }
         />
+        <Route
+          path="/request"
+          element={
+            <RoleRoute allowedRoles={['client', 'admin']}>
+              <RequestForm />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/request/thanks"
+          element={
+            <RoleRoute allowedRoles={['client', 'admin']}>
+              <CustomRequestThankYou />
+            </RoleRoute>
+          }
+        />
 
         {/* Projects */}
         <Route path="/projects" element={<ProjectList />} />
@@ -382,22 +398,9 @@ function App() {
         {/* Profile & Settings */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
-        <Route
-          path="/custom-request"
-          element={
-            <RoleRoute allowedRoles={['client', 'admin']}>
-              <CustomRequestForm />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/custom-request/thanks"
-          element={
-            <RoleRoute allowedRoles={['client', 'admin']}>
-              <CustomRequestThankYou />
-            </RoleRoute>
-          }
-        />
+        {/* Legacy routes redirect to new paths */}
+        <Route path="/custom-request" element={<Navigate to="/request" replace />} />
+        <Route path="/custom-request/thanks" element={<Navigate to="/request/thanks" replace />} />
       </Route>
 
       {/* 404 */}
