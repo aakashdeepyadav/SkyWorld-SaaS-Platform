@@ -76,6 +76,9 @@ const AdminDashboard = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Link to="/admin/settings" className="btn-secondary !text-sm !py-2">
+            Settings
+          </Link>
           <Link to="/admin/users" className="btn-secondary !text-sm !py-2">
             Manage Users
           </Link>

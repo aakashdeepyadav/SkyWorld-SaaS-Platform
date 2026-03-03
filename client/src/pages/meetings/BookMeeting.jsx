@@ -45,10 +45,10 @@ const BookMeeting = () => {
   /* ── min date = today IST ── */
   const minDate = useMemo(() => toIST_YYYY_MM_DD(new Date()), []);
 
-  /* ── max date = 30 days from today ── */
+  /* ── max date = 15 days from today ── */
   const maxDate = useMemo(() => {
     const d = new Date();
-    d.setDate(d.getDate() + 30);
+    d.setDate(d.getDate() + 15);
     return toIST_YYYY_MM_DD(d);
   }, []);
 

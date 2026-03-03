@@ -3,12 +3,22 @@ import {
   getAvailableSlots,
   bookMeeting,
   checkMeetGenerationCapability,
+  isGoogleConnected,
 } from '../services/meetingService.js';
 import { authenticate } from '../middleware/auth.js';
 import Booking from '../models/Booking.js';
 import { logger } from '../utils/logger.js';
 
 const router = Router();
+const BOOKING_WINDOW_DAYS = 15;
+
+const getTodayInIST = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+
+const getMaxBookableDateInIST = () => {
+  const date = new Date();
+  date.setDate(date.getDate() + BOOKING_WINDOW_DAYS);
+  return date.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+};
 
 // ─── GET /api/v1/meetings/status ────────────────────────────────────────────
 // Public preflight check: verifies if Google Meet links can be generated right now.
@@ -38,12 +48,31 @@ router.get('/slots', async (req, res, next) => {
       });
     }
 
-    // Don't allow dates in the past
-    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    // Date must be within booking window (today to today + 15 days)
+    const today = getTodayInIST();
+    const maxDate = getMaxBookableDateInIST();
     if (date < today) {
       return res.status(400).json({
         success: false,
         message: 'Cannot query slots for a past date.',
+      });
+    }
+
+    if (date > maxDate) {
+      return res.status(400).json({
+        success: false,
+        message: `Slots are available only for the next ${BOOKING_WINDOW_DAYS} days.`,
+      });
+    }
+
+    const capability = await checkMeetGenerationCapability();
+    if (!capability.ok) {
+      return res.json({
+        success: true,
+        date,
+        slots: [],
+        meetReady: false,
+        message: capability.message,
       });
     }
 
@@ -53,6 +82,7 @@ router.get('/slots', async (req, res, next) => {
       success: true,
       date,
       slots,
+      meetReady: true,
     });
   } catch (error) {
     next(error);
@@ -76,10 +106,18 @@ router.post('/book', authenticate, async (req, res, next) => {
       return res.status(400).json({ success: false, message: errors.join('; ') });
     }
 
-    // Don't allow past dates
-    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    // Date must be within booking window (today to today + 15 days)
+    const today = getTodayInIST();
+    const maxDate = getMaxBookableDateInIST();
     if (date < today) {
       return res.status(400).json({ success: false, message: 'Cannot book a meeting in the past.' });
+    }
+
+    if (date > maxDate) {
+      return res.status(400).json({
+        success: false,
+        message: `Meetings can be booked only within the next ${BOOKING_WINDOW_DAYS} days.`,
+      });
     }
 
     const booking = await bookMeeting({

@@ -32,6 +32,7 @@ import statsRoutes from './routes/stats.js';
 import notificationRoutes from './routes/notifications.js';
 import adminRoutes from './routes/admin.js';
 import meetingRoutes from './routes/meetings.js';
+import oauthRoutes from './routes/oauth.js';
 import { initSentry } from './config/sentry.js';
 
 dotenv.config();
@@ -176,6 +177,7 @@ v1.use('/files', fileRoutes);
 v1.use('/admin', statsRoutes);
 v1.use('/admin', adminRoutes);
 v1.use('/meetings', meetingRoutes);
+v1.use('/oauth', oauthRoutes);
 v1.use('/notifications', notificationRoutes);
 
 // Versioned endpoint (canonical)

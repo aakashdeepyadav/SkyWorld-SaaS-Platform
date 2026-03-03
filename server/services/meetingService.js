@@ -2,6 +2,7 @@ import { google } from 'googleapis';
 import { Resend } from 'resend';
 import { logger } from '../utils/logger.js';
 import Booking from '../models/Booking.js';
+import IntegrationCredential from '../models/IntegrationCredential.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -15,57 +16,83 @@ const SLOT_WINDOWS = [
   { start: 13, end: 17 }, // 13:00 – 17:00
 ];
 
-// ─── Google Auth (Service Account) ───────────────────────────────────────────
+// ─── Google OAuth2 Auth ──────────────────────────────────────────────────────
 
-let _authClient = null;
 let _meetCapabilityCache = { checkedAt: 0, result: null };
 
-const getGoogleAuth = async () => {
-  // Reuse authorized client across calls
-  if (_authClient) return _authClient;
+/**
+ * Build an OAuth2 client using stored refresh token from IntegrationCredential.
+ * Throws if no credential is connected.
+ */
+const getOAuth2Client = async () => {
+  const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+  const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI;
 
-  const email = process.env.GOOGLE_SERVICE_EMAIL;
-  let privateKey = process.env.GOOGLE_PRIVATE_KEY;
-
-  logger.info(`Google Auth init — email: ${email || '(not set)'}, raw key length: ${privateKey ? privateKey.length : 0}`);
-
-  if (!email || !privateKey) {
-    throw new Error('Missing GOOGLE_SERVICE_EMAIL or GOOGLE_PRIVATE_KEY environment variables');
+  if (!clientId || !clientSecret) {
+    throw new Error('Google OAuth2 not configured (missing GOOGLE_OAUTH_CLIENT_ID / SECRET).');
   }
 
-  // Strip surrounding quotes (common when copy-pasted with quotes)
-  privateKey = privateKey.trim().replace(/^["']|["']$/g, '');
+  const cred = await IntegrationCredential.getGoogle();
+  if (!cred) {
+    throw new Error('Google Calendar is not connected. An admin must connect via Settings → Google Integration.');
+  }
 
-  // Replace literal \n sequences with real newlines
-  privateKey = privateKey.replace(/\\n/g, '\n');
+  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
 
-  logger.info(`Google Auth — processed key length: ${privateKey.length}, has BEGIN: ${privateKey.includes('-----BEGIN')}`);
-
-  // Use GoogleAuth with credentials object (more robust than JWT for env vars)
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: email,
-      private_key: privateKey,
-    },
-    scopes: [
-      'https://www.googleapis.com/auth/calendar',
-      'https://www.googleapis.com/auth/spreadsheets',
-    ],
+  // Set the refresh token — the library will auto-refresh the access token
+  oauth2Client.setCredentials({
+    refresh_token: cred.getRefreshToken(),
   });
 
-  _authClient = await auth.getClient();
-  logger.info('Google Auth — authorized successfully');
-  return _authClient;
+  // If we have a cached access token that is still valid, set it too
+  if (cred.accessTokenEncrypted && cred.accessTokenExpiresAt && new Date(cred.accessTokenExpiresAt) > new Date()) {
+    oauth2Client.setCredentials({
+      refresh_token: cred.getRefreshToken(),
+      access_token: cred.getAccessToken(),
+      expiry_date: new Date(cred.accessTokenExpiresAt).getTime(),
+    });
+  }
+
+  // Listen for token refresh events to persist new access tokens
+  oauth2Client.on('tokens', async (tokens) => {
+    try {
+      const freshCred = await IntegrationCredential.getGoogle();
+      if (freshCred && tokens.access_token) {
+        freshCred.setAccessToken(
+          tokens.access_token,
+          tokens.expiry_date ? new Date(tokens.expiry_date) : null
+        );
+        if (tokens.refresh_token) {
+          freshCred.setRefreshToken(tokens.refresh_token);
+        }
+        await freshCred.save();
+        logger.info('OAuth2 access token refreshed and persisted.');
+      }
+    } catch (err) {
+      logger.warn(`Failed to persist refreshed OAuth2 token: ${err.message}`);
+    }
+  });
+
+  return oauth2Client;
 };
 
 const getCalendar = async () => {
-  const auth = await getGoogleAuth();
+  const auth = await getOAuth2Client();
   return google.calendar({ version: 'v3', auth });
 };
 
 const getSheets = async () => {
-  const auth = await getGoogleAuth();
+  const auth = await getOAuth2Client();
   return google.sheets({ version: 'v4', auth });
+};
+
+/**
+ * Check if Google OAuth is connected (quick DB check, no API call).
+ */
+export const isGoogleConnected = async () => {
+  const cred = await IntegrationCredential.getGoogle();
+  return !!cred;
 };
 
 export const checkMeetGenerationCapability = async () => {
@@ -77,16 +104,18 @@ export const checkMeetGenerationCapability = async () => {
     return _meetCapabilityCache.result;
   }
 
-  const calendarId = process.env.GOOGLE_CALENDAR_ID;
-  if (!calendarId) {
+  // First check if OAuth is connected at all
+  const connected = await isGoogleConnected();
+  if (!connected) {
     const result = {
       ok: false,
-      message: 'GOOGLE_CALENDAR_ID is not configured.',
+      message: 'Google Calendar is not connected. An admin must connect via Settings → Google Integration.',
     };
     _meetCapabilityCache = { checkedAt: now, result };
     return result;
   }
 
+  const calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
   let probeEventId = null;
 
   try {
@@ -120,7 +149,7 @@ export const checkMeetGenerationCapability = async () => {
     if (!meetLink) {
       const result = {
         ok: false,
-        message: 'Calendar event was created but Google Meet link was not returned.',
+        message: 'Calendar event was created but Google Meet link was not returned. Ensure Google Meet is enabled for this account.',
       };
       _meetCapabilityCache = { checkedAt: now, result };
       return result;
@@ -138,9 +167,10 @@ export const checkMeetGenerationCapability = async () => {
       error?.errors?.[0]?.message ||
       error.message ||
       JSON.stringify(error);
+    logger.error(`Meet capability check failed: ${detail}`);
     const result = {
       ok: false,
-      message: detail,
+      message: `Google Meet check failed: ${detail}`,
     };
     _meetCapabilityCache = { checkedAt: now, result };
     return result;
@@ -149,7 +179,7 @@ export const checkMeetGenerationCapability = async () => {
       try {
         const calendar = await getCalendar();
         await calendar.events.delete({
-          calendarId: process.env.GOOGLE_CALENDAR_ID,
+          calendarId: calendarId,
           eventId: probeEventId,
         });
       } catch (cleanupError) {
@@ -157,6 +187,13 @@ export const checkMeetGenerationCapability = async () => {
       }
     }
   }
+};
+
+/**
+ * Invalidate the cached Meet capability result (called after OAuth connect/disconnect).
+ */
+export const invalidateMeetCapabilityCache = () => {
+  _meetCapabilityCache = { checkedAt: 0, result: null };
 };
 
 // ─── Resend ──────────────────────────────────────────────────────────────────
@@ -231,12 +268,7 @@ export const getAvailableSlots = async (dateStr) => {
  * Create Google Calendar event with Google Meet link.
  */
 const createCalendarEvent = async ({ clientName, clientEmail, date, startTime, endTime }) => {
-  const calendarId = process.env.GOOGLE_CALENDAR_ID;
-  if (!calendarId) {
-    const error = new Error('GOOGLE_CALENDAR_ID is not configured.');
-    error.statusCode = 500;
-    throw error;
-  }
+  const calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
 
   const startDateTime = `${date}T${startTime}:00`;
   const endDateTime = `${date}T${endTime}:00`;
@@ -246,6 +278,7 @@ const createCalendarEvent = async ({ clientName, clientEmail, date, startTime, e
     description: `Meeting with ${clientName} (${clientEmail}).\nBooked via SkyWorld Platform.`,
     start: { dateTime: startDateTime, timeZone: TIMEZONE },
     end: { dateTime: endDateTime, timeZone: TIMEZONE },
+    attendees: [{ email: clientEmail }],
     reminders: {
       useDefault: false,
       overrides: [
@@ -260,6 +293,7 @@ const createCalendarEvent = async ({ clientName, clientEmail, date, startTime, e
     const event = await calendar.events.insert({
       calendarId,
       conferenceDataVersion: 1,
+      sendUpdates: 'all',
       requestBody: {
         ...baseEvent,
         conferenceData: {
@@ -519,4 +553,6 @@ export default {
   generateSlots,
   getAvailableSlots,
   bookMeeting,
+  isGoogleConnected,
+  invalidateMeetCapabilityCache,
 };

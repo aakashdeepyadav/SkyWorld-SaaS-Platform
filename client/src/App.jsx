@@ -91,6 +91,7 @@ const ProjectDetail = lazy(() => import('./pages/projects/ProjectDetail'));
 // Admin
 const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
 const ServiceManagement = lazy(() => import('./pages/admin/ServiceManagement'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 
 // Payments
 const PaymentList = lazy(() => import('./pages/payments/PaymentList'));
@@ -402,6 +403,14 @@ function App() {
           element={
             <RoleRoute allowedRoles={['admin']}>
               <ServiceManagement />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/settings"
+          element={
+            <RoleRoute allowedRoles={['admin']}>
+              <AdminSettings />
             </RoleRoute>
           }
         />
