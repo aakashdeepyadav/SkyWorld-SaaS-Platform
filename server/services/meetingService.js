@@ -16,9 +16,6 @@ const SLOT_WINDOWS = [
 
 // ─── Google Auth (Service Account) ───────────────────────────────────────────
 
-let _calendarClient = null;
-let _sheetsClient = null;
-
 const getGoogleAuth = () => {
   const email = process.env.GOOGLE_SERVICE_EMAIL;
   let privateKey = process.env.GOOGLE_PRIVATE_KEY;
@@ -42,17 +39,14 @@ const getGoogleAuth = () => {
 };
 
 const getCalendar = () => {
-  if (!_calendarClient) {
-    _calendarClient = google.calendar({ version: 'v3', auth: getGoogleAuth() });
-  }
-  return _calendarClient;
+  // Don't cache — recreate if auth env vars change at runtime
+  const auth = getGoogleAuth();
+  return google.calendar({ version: 'v3', auth });
 };
 
 const getSheets = () => {
-  if (!_sheetsClient) {
-    _sheetsClient = google.sheets({ version: 'v4', auth: getGoogleAuth() });
-  }
-  return _sheetsClient;
+  const auth = getGoogleAuth();
+  return google.sheets({ version: 'v4', auth });
 };
 
 // ─── Resend ──────────────────────────────────────────────────────────────────
@@ -170,7 +164,8 @@ const createCalendarEvent = async ({ clientName, clientEmail, date, startTime, e
 
     return { meetLink, eventId: event.data.id };
   } catch (error) {
-    logger.error('Google Calendar event creation failed:', error.message);
+    const detail = error?.response?.data?.error?.message || error?.errors?.[0]?.message || error.message || JSON.stringify(error);
+    logger.error(`Google Calendar event creation failed: ${detail}`);
     return { meetLink: null, eventId: null };
   }
 };
@@ -206,7 +201,8 @@ const logToSheet = async (booking) => {
       },
     });
   } catch (error) {
-    logger.error('Google Sheets logging failed:', error.message);
+    const detail = error?.response?.data?.error?.message || error?.errors?.[0]?.message || error.message || JSON.stringify(error);
+    logger.error(`Google Sheets logging failed: ${detail}`);
     // Non-blocking — don't throw
   }
 };
