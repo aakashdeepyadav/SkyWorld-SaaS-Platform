@@ -1,4 +1,5 @@
 import { refreshTodaySnapshot, getSnapshotHistory, flushSnapshotToSheet } from '../services/dashboardAnalyticsService.js';
+import { setupSpreadsheetDashboard } from '../services/sheetDashboardService.js';
 import DailySnapshot from '../models/DailySnapshot.js';
 import { logger } from '../utils/logger.js';
 
@@ -48,6 +49,20 @@ export const pushToSheet = async (req, res, next) => {
     res.json({ success: true, message: `Snapshot for ${snapshot.date} pushed to Google Sheets` });
   } catch (error) {
     logger.error('Manual sheet push failed:', error.message);
+    next(error);
+  }
+};
+
+/**
+ * POST /api/v1/admin/dashboard/setup-sheet-dashboard
+ * Creates Dashboard + Monthly Summary tabs with charts, formatting & filters.
+ */
+export const setupSheetDashboard = async (req, res, next) => {
+  try {
+    const result = await setupSpreadsheetDashboard();
+    res.json(result);
+  } catch (error) {
+    logger.error('Sheet dashboard setup failed:', error.message);
     next(error);
   }
 };

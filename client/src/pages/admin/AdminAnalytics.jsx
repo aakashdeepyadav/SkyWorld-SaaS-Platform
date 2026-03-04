@@ -33,6 +33,7 @@ import {
   ChartBarIcon,
   ArrowTrendingUpIcon,
   CloudArrowUpIcon,
+  PresentationChartBarIcon,
 } from '@heroicons/react/24/outline';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -183,6 +184,18 @@ const AdminAnalytics = () => {
     }
   );
 
+  // Setup sheet dashboard mutation
+  const setupDashboard = useMutation(
+    async () => {
+      const res = await api.post('/admin/dashboard/setup-sheet-dashboard');
+      return res.data;
+    },
+    {
+      onSuccess: (data) => toast.success(data.message || 'Sheet dashboard created'),
+      onError: (err) => toast.error(err?.response?.data?.message || 'Dashboard setup failed'),
+    }
+  );
+
   // Live dashboard
   const {
     data: liveData,
@@ -289,6 +302,16 @@ const AdminAnalytics = () => {
           </div>
           {tab === 'live' && (
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setupDashboard.mutate()}
+                disabled={setupDashboard.isLoading}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 transition-colors disabled:opacity-50"
+              >
+                <PresentationChartBarIcon
+                  className={`h-3.5 w-3.5 ${setupDashboard.isLoading ? 'animate-pulse' : ''}`}
+                />
+                {setupDashboard.isLoading ? 'Building...' : 'Sheet Dashboard'}
+              </button>
               <button
                 onClick={() => pushToSheet.mutate()}
                 disabled={pushToSheet.isLoading}
