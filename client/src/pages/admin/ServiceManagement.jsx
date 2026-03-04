@@ -53,8 +53,11 @@ const ServiceManagement = () => {
     const [showInactive, setShowInactive] = useState(true);
 
     const { data: allServices, isLoading } = useQuery('admin-services', async () => {
-        const res = await api.get('/services?isActive=all');
-        return res.data.services || [];
+        const [activeRes, inactiveRes] = await Promise.all([
+            api.get('/services?isActive=true'),
+            api.get('/services?isActive=false'),
+        ]);
+        return [...(activeRes.data.services || []), ...(inactiveRes.data.services || [])];
     });
 
     const data = showInactive ? allServices : allServices?.filter(s => s.isActive);
