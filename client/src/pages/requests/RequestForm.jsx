@@ -3,13 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { formatINR } from '../../utils/currency';
-import {
-  PLAN_CATALOG,
-  COMBO_PACKAGES,
-  MONTHLY_PLANS,
-  ADD_ONS,
-  CATEGORY_ORDER,
-} from '../../utils/planCatalog';
+import { useCatalog } from '../../context/CatalogContext';
 import toast from 'react-hot-toast';
 import {
   ArrowLeftIcon,
@@ -20,7 +14,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 /* ─── Flatten every purchasable option into a single array ─── */
-const buildOptions = () => {
+const buildOptions = (CATEGORY_ORDER, PLAN_CATALOG, COMBO_PACKAGES, MONTHLY_PLANS, ADD_ONS) => {
   const options = [];
 
   /* Service plans */
@@ -104,8 +98,6 @@ const buildOptions = () => {
   return options;
 };
 
-const ALL_OPTIONS = buildOptions();
-
 /* Group labels are ordered for the picker */
 const GROUP_ORDER = [
   'Web Development',
@@ -127,6 +119,12 @@ const RequestForm = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { PLAN_CATALOG, COMBO_PACKAGES, MONTHLY_PLANS, ADD_ONS, CATEGORY_ORDER } = useCatalog();
+
+  const ALL_OPTIONS = useMemo(
+    () => buildOptions(CATEGORY_ORDER, PLAN_CATALOG, COMBO_PACKAGES, MONTHLY_PLANS, ADD_ONS),
+    [CATEGORY_ORDER, PLAN_CATALOG, COMBO_PACKAGES, MONTHLY_PLANS, ADD_ONS]
+  );
 
   /* Pre-select from URL: ?service=web-development or ?plan=combo-restaurant-starter */
   const urlService = searchParams.get('service') || '';
@@ -142,14 +140,14 @@ const RequestForm = () => {
       if (found) return found.id;
     }
     return '';
-  }, [urlService, urlPlan]);
+  }, [urlService, urlPlan, ALL_OPTIONS]);
 
   const [selectedId, setSelectedId] = useState(defaultSelection);
   const [loading, setLoading] = useState(false);
 
   const selectedOption = useMemo(
     () => ALL_OPTIONS.find((o) => o.id === selectedId) || null,
-    [selectedId]
+    [selectedId, ALL_OPTIONS]
   );
 
   const isCustom = selectedOption?.type === 'custom' || !selectedOption;

@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
-import { PLAN_CATALOG } from '../../utils/planCatalog';
+import { useCatalog } from '../../context/CatalogContext';
 import {
   CheckIcon,
   XMarkIcon,
@@ -35,6 +35,7 @@ const PROCESS_STEPS = {
 
 /* ─── Component ─── */
 const ServiceDetail = () => {
+  const { PLAN_CATALOG } = useCatalog();
   const { slug } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();

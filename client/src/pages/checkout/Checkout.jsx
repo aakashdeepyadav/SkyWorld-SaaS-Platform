@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { findPlan, PLAN_CATALOG } from '../../utils/planCatalog';
+import { useCatalog } from '../../context/CatalogContext';
 import toast from 'react-hot-toast';
 import { formatINR } from '../../utils/currency';
 import MeetingPopup from '../../components/common/MeetingPopup';
@@ -45,6 +45,7 @@ const SERVICE_META = {
 };
 
 const Checkout = () => {
+  const { findPlan, PLAN_CATALOG } = useCatalog();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const navigate = useNavigate();

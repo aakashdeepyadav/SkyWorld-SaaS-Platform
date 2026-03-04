@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
-import { findMonthlyPlan, MONTHLY_PLANS } from '../../utils/planCatalog';
+import { useCatalog } from '../../context/CatalogContext';
 import {
   ArrowLeftIcon,
   CheckIcon,
@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const MonthlyPlanDetail = () => {
+  const { findMonthlyPlan, MONTHLY_PLANS } = useCatalog();
   const { slug } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();

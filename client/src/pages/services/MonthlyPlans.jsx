@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
-import { MONTHLY_PLANS } from '../../utils/planCatalog';
+import { useCatalog } from '../../context/CatalogContext';
 import {
   ArrowLeftIcon,
   CheckIcon,
@@ -11,6 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const MonthlyPlans = () => {
+  const { MONTHLY_PLANS } = useCatalog();
   const { user } = useAuth();
   const navigate = useNavigate();
 

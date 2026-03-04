@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
-import { findMonthlyPlan } from '../../utils/planCatalog';
+import { useCatalog } from '../../context/CatalogContext';
 import { api } from '../../services/api';
 import toast from 'react-hot-toast';
 import MeetingPopup from '../../components/common/MeetingPopup';
@@ -18,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const MonthlyCheckout = () => {
+  const { findMonthlyPlan } = useCatalog();
   const { slug } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();

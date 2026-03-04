@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { formatINR } from '../utils/currency';
-import { PLAN_CATALOG, COMBO_PACKAGES, MONTHLY_PLANS, CATEGORY_ORDER } from '../utils/planCatalog';
+import { useCatalog } from '../context/CatalogContext';
 
 /* ─── Scroll-triggered entrance ─── */
 const FadeIn = ({ children, className = '', delay = 0, as: Tag = 'div' }) => {
@@ -151,6 +151,7 @@ const STEPS = [
 ];
 
 const Home = () => {
+  const { PLAN_CATALOG, COMBO_PACKAGES, MONTHLY_PLANS, CATEGORY_ORDER } = useCatalog();
   const [scrolled, setScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState('web-development');
   const { user, logout } = useAuth();

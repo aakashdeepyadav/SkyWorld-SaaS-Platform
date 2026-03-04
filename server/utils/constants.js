@@ -12,6 +12,42 @@ export const SERVICE_CATEGORIES = {
   BRANDING_CREATIVE: 'branding-creative'
 };
 
+// Category display metadata (used by catalog endpoint)
+export const CATEGORY_META = {
+  'web-development': {
+    name: 'Web Development',
+    tagline: 'Professional websites that bring customers to your door.',
+    icon: 'web',
+    color: '139,92,246',
+    gradient: 'from-violet-500 to-purple-600',
+    gradientCSS: 'linear-gradient(135deg, #8b5cf6, #a78bfa)',
+    lightBg: 'bg-violet-50 dark:bg-violet-500/10',
+    accentText: 'text-violet-600 dark:text-violet-400',
+  },
+  'branding-creative': {
+    name: 'Branding & Design',
+    tagline: 'Stand out with a professional identity your customers remember.',
+    icon: 'brand',
+    color: '245,158,11',
+    gradient: 'from-amber-500 to-orange-600',
+    gradientCSS: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+    lightBg: 'bg-amber-50 dark:bg-amber-500/10',
+    accentText: 'text-amber-600 dark:text-amber-400',
+  },
+  'app-development': {
+    name: 'App Development',
+    tagline: 'Take your business mobile with apps customers love to use.',
+    icon: 'app',
+    color: '14,165,233',
+    gradient: 'from-sky-500 to-blue-600',
+    gradientCSS: 'linear-gradient(135deg, #0ea5e9, #38bdf8)',
+    lightBg: 'bg-sky-50 dark:bg-sky-500/10',
+    accentText: 'text-sky-600 dark:text-sky-400',
+  },
+};
+
+export const CATEGORY_ORDER = ['web-development', 'branding-creative', 'app-development'];
+
 // Plan prices (server-side price validation — must match frontend planCatalog.js)
 export const PLAN_PRICES = {
   'web-development': {

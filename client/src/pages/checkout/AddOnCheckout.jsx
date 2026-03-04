@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
-import { ADD_ONS } from '../../utils/planCatalog';
+import { useCatalog } from '../../context/CatalogContext';
 import { api } from '../../services/api';
 import toast from 'react-hot-toast';
 import MeetingPopup from '../../components/common/MeetingPopup';
@@ -18,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const AddOnCheckout = () => {
+  const { ADD_ONS } = useCatalog();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

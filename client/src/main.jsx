@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { SocketProvider } from './context/SocketContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { CatalogProvider } from './context/CatalogContext';
 import CommandPalette from './components/common/CommandPalette';
 import './index.css';
 
@@ -28,9 +29,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <ThemeProvider>
             <AuthProvider>
               <SocketProvider>
-                <App />
-                <CommandPalette />
-                <Toaster position="top-right" />
+                <CatalogProvider>
+                  <App />
+                  <CommandPalette />
+                  <Toaster position="top-right" />
+                </CatalogProvider>
               </SocketProvider>
             </AuthProvider>
           </ThemeProvider>

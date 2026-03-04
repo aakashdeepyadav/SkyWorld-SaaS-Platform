@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
-import { ADD_ONS } from '../../utils/planCatalog';
+import { useCatalog } from '../../context/CatalogContext';
 import {
   ArrowLeftIcon,
   SparklesIcon,
@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const AddOns = () => {
+  const { ADD_ONS } = useCatalog();
   const { user } = useAuth();
   const navigate = useNavigate();
 

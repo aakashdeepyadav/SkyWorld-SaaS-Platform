@@ -245,7 +245,7 @@ export const createRazorpayOrder = async (req, res, next) => {
           starterService = await Service.findOne({
             _id: serviceId,
             isActive: true
-          }).select('category basePrice');
+          }).select('category basePrice slug type');
 
           if (!starterService) {
             return res.status(404).json({
@@ -263,12 +263,23 @@ export const createRazorpayOrder = async (req, res, next) => {
 
           resolvedServiceType = starterService.category;
         } else {
+          // Look up plan by type + category + slug in expanded model
           starterService = await Service.findOne({
+            type: 'plan',
             category: resolvedServiceType,
+            slug: resolvedPlan,
             isActive: true
-          })
-            .sort({ updatedAt: -1, _id: -1 })
-            .select('category basePrice');
+          }).select('category basePrice slug type');
+
+          // Fallback: any active service in category (backwards compat)
+          if (!starterService) {
+            starterService = await Service.findOne({
+              category: resolvedServiceType,
+              isActive: true
+            })
+              .sort({ updatedAt: -1, _id: -1 })
+              .select('category basePrice slug type');
+          }
 
           if (!starterService) {
             return res.status(404).json({
@@ -277,10 +288,19 @@ export const createRazorpayOrder = async (req, res, next) => {
             });
           }
         }
+      } else {
+        // Virtual types: look up by type + slug in expanded model
+        const typeMap = { combo: 'combo', monthly: 'monthly', addon: 'addon' };
+        const dbType = typeMap[resolvedServiceType] || resolvedServiceType;
+        starterService = await Service.findOne({
+          type: dbType,
+          slug: resolvedPlan,
+          isActive: true,
+        }).select('basePrice slug type');
       }
 
-      // Use the server-side validated plan price (never trust client-sent amount)
-      derivedAmount = categoryPrices[resolvedPlan];
+      // Prefer DB price, fall back to hardcoded PLAN_PRICES
+      derivedAmount = starterService?.basePrice ?? categoryPrices[resolvedPlan];
     } else if (customRequest) {
       derivedAmount = customRequest.quotedPrice;
     }

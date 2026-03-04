@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
-import { COMBO_PACKAGES, findCombo, PLAN_CATALOG } from '../../utils/planCatalog';
+import { useCatalog } from '../../context/CatalogContext';
 import {
   CheckIcon,
   ArrowLeftIcon,
@@ -27,6 +27,7 @@ const GRADIENT_MAP = {
 };
 
 const ComboDetail = () => {
+  const { findCombo, COMBO_PACKAGES, PLAN_CATALOG } = useCatalog();
   const { slug } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
