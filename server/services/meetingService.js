@@ -386,6 +386,10 @@ const sendConfirmationEmail = async (booking) => {
       return `${hour12}:${String(m).padStart(2, '0')} ${ampm}`;
     };
 
+    const frontendBaseUrl = (process.env.FRONTEND_URL || 'https://skyworld.buzz').replace(/\/$/, '');
+    const brandWordmarkUrl = `${frontendBaseUrl}/wordmark_logo_coloured_fullname.png`;
+    const brandHomeUrl = process.env.BRAND_WEBSITE_URL || frontendBaseUrl;
+
     const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -397,11 +401,19 @@ const sendConfirmationEmail = async (booking) => {
 
   <!-- Header -->
   <tr>
-    <td style="background:linear-gradient(135deg,#0ea5e9,#6366f1);padding:32px 40px;text-align:center;">
-      <img src="https://res.cloudinary.com/dkkzhqs3z/image/upload/v1749316338/wordmark_logo_coloured_fullname_bpnbml.png"
-           alt="SkyWorld" width="160" style="display:block;margin:0 auto 16px;" />
-      <h1 style="color:#ffffff;font-size:22px;font-weight:700;margin:0;">Meeting Confirmed</h1>
-      <p style="color:rgba(255,255,255,0.8);font-size:14px;margin:8px 0 0;">Your meeting has been booked successfully.</p>
+    <td style="background:linear-gradient(135deg,#0ea5e9,#6366f1);padding:36px 40px 34px;text-align:center;">
+      <table cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 18px;background:rgba(255,255,255,0.95);border-radius:12px;">
+        <tr>
+          <td style="padding:12px 18px;text-align:center;">
+            <a href="${brandHomeUrl}" target="_blank" style="text-decoration:none;display:inline-block;">
+              <img src="${brandWordmarkUrl}" alt="SkyWorld Ventures" width="168" style="display:block;margin:0 auto;width:168px;max-width:168px;height:auto;border:0;outline:none;text-decoration:none;" />
+            </a>
+          </td>
+        </tr>
+      </table>
+      <p style="color:#ffffff;font-size:12px;letter-spacing:1.3px;font-weight:700;text-transform:uppercase;margin:0 0 10px;">SkyWorld Ventures</p>
+      <h1 style="color:#ffffff;font-size:24px;font-weight:800;line-height:1.2;margin:0;">Meeting Confirmed</h1>
+      <p style="color:rgba(255,255,255,0.88);font-size:14px;line-height:1.6;margin:10px 0 0;">Your session is locked in. We’re looking forward to meeting you.</p>
     </td>
   </tr>
 
