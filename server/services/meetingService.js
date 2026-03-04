@@ -472,14 +472,21 @@ const sendConfirmationEmail = async (booking) => {
 </body>
 </html>`;
 
-    await resend.emails.send({
+    logger.info(`Sending meeting confirmation email to ${booking.clientEmail} from ${fromEmail}`);
+
+    const { data, error: resendError } = await resend.emails.send({
       from: `SkyWorld <${fromEmail}>`,
       to: [booking.clientEmail],
       subject: `Meeting Confirmed — ${formattedDate} at ${formatTime12(booking.startTime)} IST`,
       html,
     });
 
-    logger.info(`Meeting confirmation email sent to ${booking.clientEmail}`);
+    if (resendError) {
+      logger.error('Resend API returned error:', JSON.stringify(resendError));
+      return;
+    }
+
+    logger.info(`Meeting confirmation email sent to ${booking.clientEmail} — id: ${data?.id}`);
   } catch (error) {
     logger.error('Meeting confirmation email failed:', error.message);
     // Non-blocking
