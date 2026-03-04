@@ -7,9 +7,10 @@ import { logger } from '../utils/logger.js';
 const router = Router();
 
 const SCOPES = [
+  'openid',
+  'https://www.googleapis.com/auth/userinfo.email',
   'https://www.googleapis.com/auth/calendar',
   'https://www.googleapis.com/auth/spreadsheets',
-  'https://www.googleapis.com/auth/userinfo.email',
 ];
 
 /**
@@ -87,7 +88,23 @@ router.get('/google/callback', async (req, res) => {
     }
 
     const oauth2Client = getOAuth2Client();
-    const { tokens } = await oauth2Client.getToken(code);
+
+    logger.info(`OAuth callback — exchanging code (length: ${code.length}), redirect_uri: ${process.env.GOOGLE_OAUTH_REDIRECT_URI}`);
+
+    let tokens;
+    try {
+      const tokenResponse = await oauth2Client.getToken(code);
+      tokens = tokenResponse.tokens;
+    } catch (tokenErr) {
+      const detail = tokenErr?.response?.data?.error_description
+        || tokenErr?.response?.data?.error
+        || tokenErr.message;
+      logger.error(`OAuth getToken failed: ${detail}`);
+      logger.error(`OAuth getToken full error: ${JSON.stringify(tokenErr?.response?.data || tokenErr.message)}`);
+      return res.redirect(`${frontendUrl}/admin/settings?oauth=error&reason=${encodeURIComponent(detail)}`);
+    }
+
+    logger.info(`OAuth tokens received — has refresh_token: ${!!tokens.refresh_token}, has access_token: ${!!tokens.access_token}, has id_token: ${!!tokens.id_token}`);
 
     if (!tokens.refresh_token) {
       logger.error('Google OAuth: No refresh_token received. Was prompt=consent used?');
