@@ -58,7 +58,7 @@ const checkGoogleOAuth = async () => {
 // ─── Email Quota Checks ─────────────────────────────────────────────────────
 
 const getBrevoQuota = async () => {
-  const apiKey = process.env.BREVO_API_KEY || process.env.SENDINBLUE_API_KEY;
+  const apiKey = process.env.BREVO_API_KEY || process.env.SENDINBLUE_API_KEY || process.env.BREVO_SMTP_PASS;
   if (!apiKey) return { sent: 0, limit: 300, remaining: 300 };
   try {
     const res = await fetch('https://api.brevo.com/v3/account', {
@@ -66,10 +66,15 @@ const getBrevoQuota = async () => {
     });
     if (!res.ok) throw new Error(`Brevo API ${res.status}`);
     const data = await res.json();
-    const plan = data.plan?.[0] || {};
-    const limit = plan.credits ?? 300;
-    const remaining = plan.creditsRemaining ?? plan.credits ?? 300;
+
+    // Brevo free plan: credits are in plan[0] or plan array
+    const plans = data.plan || [];
+    const freePlan = plans.find(p => p.type === 'free') || plans[0] || {};
+    const limit = freePlan.credits ?? 300;
+    const remaining = freePlan.creditsRemaining ?? freePlan.credits ?? 300;
     const sent = limit - remaining;
+
+    logger.info(`Brevo quota: ${sent} sent / ${limit} limit / ${remaining} remaining`);
     return { sent: Math.max(sent, 0), limit, remaining: Math.max(remaining, 0) };
   } catch (err) {
     logger.warn('Brevo quota check failed:', err.message);
