@@ -72,7 +72,6 @@ const dailySnapshotSchema = new mongoose.Schema({
   flushedToSheet: { type: Boolean, default: false },
 }, { timestamps: true });
 
-dailySnapshotSchema.index({ date: 1 });
 dailySnapshotSchema.index({ flushedToSheet: 1 });
 
 const DailySnapshot = mongoose.model('DailySnapshot', dailySnapshotSchema);
