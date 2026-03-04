@@ -67,10 +67,10 @@ const getBrevoQuota = async () => {
     if (!res.ok) throw new Error(`Brevo API ${res.status}`);
     const data = await res.json();
 
-    // Brevo free plan: credits are in plan[0] or plan array
+    // Brevo free plan: `credits` = remaining credits today, daily cap is always 300
     const plans = data.plan || [];
     const freePlan = plans.find(p => p.type === 'free') || plans[0] || {};
-    const limit = freePlan.credits ?? 300;
+    const limit = freePlan.creditLimit ?? 300; // daily cap (free = 300)
     const remaining = freePlan.creditsRemaining ?? freePlan.credits ?? 300;
     const sent = limit - remaining;
 
