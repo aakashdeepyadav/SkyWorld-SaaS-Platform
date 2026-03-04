@@ -274,16 +274,21 @@ export const getCatalog = async (req, res, next) => {
 
     const allActive = await Service.find({ isActive: true }).sort({ sortOrder: 1, name: 1 }).lean();
 
+    // Helper: ensure every item carries a `price` alias for frontend compat
+    const withPrice = (doc) => ({ ...doc, price: doc.basePrice });
+
     // Group plans by category
     const planCatalog = {};
     for (const cat of CATEGORY_ORDER) {
       const meta = CATEGORY_META[cat];
-      const plans = allActive.filter(s => s.type === 'plan' && s.category === cat);
+      const plans = allActive
+        .filter(s => s.type === 'plan' && s.category === cat)
+        .map(withPrice);
       if (plans.length) planCatalog[cat] = { ...meta, plans };
     }
 
-    const combos = allActive.filter(s => s.type === 'combo');
-    const monthlyPlans = allActive.filter(s => s.type === 'monthly');
+    const combos = allActive.filter(s => s.type === 'combo').map(withPrice);
+    const monthlyPlans = allActive.filter(s => s.type === 'monthly').map(withPrice);
     const addOns = allActive
       .filter(s => s.type === 'addon')
       .map(a => ({ ...a, label: a.name, price: a.basePrice }));
