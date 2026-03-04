@@ -39,16 +39,16 @@ const Layout = () => {
 
   const mainNavigation = [
     { name: 'Dashboard', href: `/dashboard/${user?.role}`, icon: HomeIcon },
-    ...(user?.role !== 'developer'
-      ? [{ name: 'Requests', href: '/custom-requests', icon: DocumentTextIcon }]
-      : []),
-    ...(user?.role !== 'client'
-      ? [{ name: 'Requests', href: '/requests', icon: ClipboardDocumentListIcon }]
-      : []),
+    ...(isAdmin
+      ? [
+          { name: 'Requests', href: '/requests', icon: ClipboardDocumentListIcon },
+          { name: 'Custom Requests', href: '/custom-requests', icon: DocumentTextIcon },
+        ]
+      : isDeveloper
+        ? [{ name: 'Requests', href: '/requests', icon: ClipboardDocumentListIcon }]
+        : [{ name: 'My Requests', href: '/custom-requests', icon: DocumentTextIcon }]),
     { name: 'Projects', href: '/projects', icon: FolderIcon },
-    ...(user?.role !== 'developer'
-      ? [{ name: 'Payments', href: '/payments', icon: CreditCardIcon }]
-      : []),
+    ...(!isDeveloper ? [{ name: 'Payments', href: '/payments', icon: CreditCardIcon }] : []),
   ];
 
   const adminNavigation = [

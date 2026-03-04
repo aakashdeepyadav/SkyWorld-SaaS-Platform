@@ -9,6 +9,7 @@ const router = Router();
 const SCOPES = [
   'https://www.googleapis.com/auth/calendar',
   'https://www.googleapis.com/auth/spreadsheets',
+  'https://www.googleapis.com/auth/userinfo.email',
 ];
 
 /**
@@ -93,11 +94,31 @@ router.get('/google/callback', async (req, res) => {
       return res.redirect(`${frontendUrl}/admin/settings?oauth=error&reason=no_refresh_token`);
     }
 
-    // Get user info (email) from the token
-    oauth2Client.setCredentials(tokens);
-    const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
-    const userInfo = await oauth2.userinfo.get();
-    const email = userInfo.data.email;
+    // Extract email from the id_token (avoids a separate API call)
+    let email = 'unknown';
+    if (tokens.id_token) {
+      try {
+        // Decode the JWT payload (base64url)
+        const payload = JSON.parse(
+          Buffer.from(tokens.id_token.split('.')[1], 'base64url').toString()
+        );
+        email = payload.email || 'unknown';
+      } catch (decodeErr) {
+        logger.warn(`Failed to decode id_token: ${decodeErr.message}`);
+      }
+    }
+
+    // Fallback: if id_token didn't have email, try userinfo API
+    if (email === 'unknown') {
+      try {
+        oauth2Client.setCredentials(tokens);
+        const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+        const userInfo = await oauth2.userinfo.get();
+        email = userInfo.data.email || 'unknown';
+      } catch (infoErr) {
+        logger.warn(`userinfo fallback failed: ${infoErr.message}`);
+      }
+    }
 
     // Upsert the credential (singleton per provider)
     let cred = await IntegrationCredential.getGoogle();
