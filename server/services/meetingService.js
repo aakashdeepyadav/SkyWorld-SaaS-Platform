@@ -83,9 +83,9 @@ const getCalendar = async () => {
 };
 
 const getSheetsServiceAccount = () => {
-  const keyJson = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+  const keyJson = process.env.GOOGLE_PRIVATE_KEY;
   if (!keyJson) {
-    throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY not set — cannot access Google Sheets.');
+    throw new Error('GOOGLE_PRIVATE_KEY not set — cannot access Google Sheets.');
   }
   const key = JSON.parse(keyJson);
   const auth = new google.auth.GoogleAuth({
