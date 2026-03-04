@@ -30,7 +30,9 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    trim: true
+    trim: true,
+    maxlength: [20, 'Phone number cannot exceed 20 characters'],
+    match: [/^\+?[1-9]\d{1,14}$/, 'Please provide a valid phone number']
   },
   company: {
     type: String,
@@ -39,7 +41,8 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: null
+    default: null,
+    maxlength: [2048, 'Avatar URL is too long']
   },
   role: {
     type: String,

@@ -7,11 +7,13 @@ const attachmentSchema = new mongoose.Schema({
   },
   fileName: {
     type: String,
-    required: true
+    required: true,
+    maxlength: [500, 'File name cannot exceed 500 characters']
   },
   fileUrl: {
     type: String,
-    required: true
+    required: true,
+    maxlength: [2048, 'File URL cannot exceed 2048 characters']
   }
 }, { _id: false });
 
@@ -33,7 +35,8 @@ const messageSchema = new mongoose.Schema({
   content: {
     type: String,
     required: [true, 'Message content is required'],
-    trim: true
+    trim: true,
+    maxlength: [10000, 'Message content cannot exceed 10000 characters']
   },
   attachments: [attachmentSchema],
   isRead: {

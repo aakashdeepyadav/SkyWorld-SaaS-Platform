@@ -16,12 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
   const checkAuth = useCallback(async () => {
-    // Skip auth check if user has never logged in (avoids console 401 errors)
     const hasSession = localStorage.getItem('hasSession');
     if (!hasSession) {
       setUser(null);
@@ -37,6 +32,20 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  // Listen for auth:expired from api interceptor
+  useEffect(() => {
+    const handleExpired = () => {
+      setUser(null);
+      localStorage.removeItem('hasSession');
+    };
+    window.addEventListener('auth:expired', handleExpired);
+    return () => window.removeEventListener('auth:expired', handleExpired);
   }, []);
 
   const login = useCallback(async (email, password) => {
@@ -109,11 +118,12 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback(async () => {
     try {
       await api.post('/auth/logout');
-      setUser(null);
-      localStorage.removeItem('hasSession');
       toast.success('Logged out successfully');
     } catch (error) {
+      // Server unreachable — still clean up locally
+    } finally {
       setUser(null);
+      localStorage.removeItem('hasSession');
     }
   }, []);
 

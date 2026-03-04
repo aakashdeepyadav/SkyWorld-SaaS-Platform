@@ -15,7 +15,7 @@ const getBaseUrl = () =>
 
 const normalizeFolder = (folder = 'skyworld') => {
     const trimmed = folder.replace(/^skyworld\/?/, '').replace(/^\/+/, '');
-    return trimmed.replace(/[^a-zA-Z0-9/_-]/g, '');
+    return trimmed.replace(/\.\.+/g, '').replace(/[^a-zA-Z0-9/_-]/g, '');
 };
 
 const getExtension = (mimetype, originalName) => {
@@ -173,9 +173,12 @@ export const uploadToCloudinary = async (fileBuffer, options = {}) => {
 export const deleteFromCloudinary = async (publicId, resourceType = 'image') => {
     try {
         if (!isCloudinaryConfigured()) {
-            const filePath = path.join(uploadsRoot, publicId);
-            if (fs.existsSync(filePath)) {
-                await fs.promises.unlink(filePath);
+            const resolved = path.resolve(uploadsRoot, publicId);
+            if (!resolved.startsWith(uploadsRoot)) {
+                throw new Error('Invalid file path');
+            }
+            if (fs.existsSync(resolved)) {
+                await fs.promises.unlink(resolved);
             }
             return { result: 'ok' };
         }

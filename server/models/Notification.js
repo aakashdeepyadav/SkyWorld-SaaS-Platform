@@ -6,7 +6,6 @@ const notificationSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             required: true,
-            index: true,
         },
         type: {
             type: String,
@@ -32,8 +31,9 @@ const notificationSchema = new mongoose.Schema(
             maxlength: 500,
         },
         link: {
-            type: String,         // Frontend route, e.g. "/projects/abc123"
+            type: String,
             default: null,
+            maxlength: 500,
         },
         read: {
             type: Boolean,

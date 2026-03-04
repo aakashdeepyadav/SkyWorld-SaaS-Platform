@@ -1,7 +1,10 @@
 import { Router } from 'express';
+import crypto from 'crypto';
 import { google } from 'googleapis';
 import IntegrationCredential from '../models/IntegrationCredential.js';
 import { authenticate } from '../middleware/auth.js';
+import { adminOnly } from '../middleware/rbac.js';
+import { apiRateLimiter } from '../middleware/rateLimiter.js';
 import { logger } from '../utils/logger.js';
 
 const router = Router();
@@ -30,7 +33,7 @@ const getOAuth2Client = () => {
 
 // ─── GET /api/v1/oauth/google/status ───────────────────────────────────────
 // Public — check if Google Calendar OAuth is connected.
-router.get('/google/status', async (req, res, next) => {
+router.get('/google/status', apiRateLimiter, async (req, res, next) => {
   try {
     const cred = await IntegrationCredential.getGoogle();
     if (!cred) {
@@ -38,8 +41,6 @@ router.get('/google/status', async (req, res, next) => {
     }
     return res.json({
       connected: true,
-      email: cred.email || null,
-      calendarId: cred.calendarId || null,
       connectedAt: cred.connectedAt,
     });
   } catch (error) {
@@ -49,18 +50,26 @@ router.get('/google/status', async (req, res, next) => {
 
 // ─── GET /api/v1/oauth/google/url ──────────────────────────────────────────
 // Admin only — generate the Google OAuth consent URL.
-router.get('/google/url', authenticate, async (req, res, next) => {
-  try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Admin access required.' });
-    }
+// Temporary in-memory store for OAuth CSRF state tokens (TTL: 10 min)
+const oauthStateTokens = new Map();
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, ts] of oauthStateTokens) {
+    if (now - ts > 10 * 60 * 1000) oauthStateTokens.delete(key);
+  }
+}, 60_000);
 
+router.get('/google/url', authenticate, adminOnly, apiRateLimiter, async (req, res, next) => {
+  try {
     const oauth2Client = getOAuth2Client();
+    const stateNonce = crypto.randomBytes(16).toString('hex');
+    oauthStateTokens.set(stateNonce, Date.now());
+
     const url = oauth2Client.generateAuthUrl({
       access_type: 'offline',
-      prompt: 'consent', // Force consent to always get refresh_token
+      prompt: 'consent',
       scope: SCOPES,
-      state: req.user._id.toString(), // Pass admin user ID as state
+      state: stateNonce,
     });
 
     return res.json({ success: true, url });
@@ -86,6 +95,13 @@ router.get('/google/callback', async (req, res) => {
     if (!code) {
       return res.redirect(`${frontendUrl}/admin/settings?oauth=error&reason=no_code`);
     }
+
+    // Validate CSRF state nonce
+    if (!state || !oauthStateTokens.has(state)) {
+      logger.warn('OAuth callback with invalid or missing state parameter');
+      return res.redirect(`${frontendUrl}/admin/settings?oauth=error&reason=invalid_state`);
+    }
+    oauthStateTokens.delete(state);
 
     const oauth2Client = getOAuth2Client();
 
@@ -150,13 +166,11 @@ router.get('/google/callback', async (req, res) => {
       cred.email = email;
       cred.calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
       cred.scopes = SCOPES;
-      cred.ownerUserId = state; // admin who connected
       cred.connectedAt = new Date();
       await cred.save();
     } else {
       cred = new IntegrationCredential({
         provider: 'google',
-        ownerUserId: state,
         calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
         email,
         scopes: SCOPES,
@@ -184,11 +198,8 @@ router.get('/google/callback', async (req, res) => {
 
 // ─── DELETE /api/v1/oauth/google/disconnect ────────────────────────────────
 // Admin only — remove stored Google OAuth credential.
-router.delete('/google/disconnect', authenticate, async (req, res, next) => {
+router.delete('/google/disconnect', authenticate, adminOnly, apiRateLimiter, async (req, res, next) => {
   try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Admin access required.' });
-    }
 
     const cred = await IntegrationCredential.getGoogle();
     if (!cred) {

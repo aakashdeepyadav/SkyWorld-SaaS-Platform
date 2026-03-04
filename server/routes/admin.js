@@ -1,11 +1,14 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
+import { adminOnly } from '../middleware/rbac.js';
+import { apiRateLimiter } from '../middleware/rateLimiter.js';
 import { getAnalytics } from '../controllers/analyticsController.js';
 
 const router = Router();
 
-// All routes require auth + admin role
 router.use(authenticate);
+router.use(adminOnly);
+router.use(apiRateLimiter);
 
 // GET /api/v1/admin/analytics?period=30d
 router.get('/analytics', getAnalytics);

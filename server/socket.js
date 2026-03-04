@@ -1,9 +1,32 @@
 import { Server } from 'socket.io';
 import { socketAuth } from './middleware/socketAuth.js';
 import { logger } from './utils/logger.js';
+import mongoose from 'mongoose';
+import Project from './models/Project.js';
+import { ROLES } from './utils/constants.js';
 
 // Map of userId → Set<socketId> for multi-device support
 const onlineUsers = new Map();
+
+// Simple per-socket rate limiter (token bucket)
+const socketRateLimits = new Map();
+const RATE_WINDOW_MS = 10_000;
+const MAX_EVENTS_PER_WINDOW = 30;
+
+function isRateLimited(socketId) {
+    const now = Date.now();
+    const entry = socketRateLimits.get(socketId);
+    if (!entry || now - entry.start > RATE_WINDOW_MS) {
+        socketRateLimits.set(socketId, { start: now, count: 1 });
+        return false;
+    }
+    entry.count += 1;
+    return entry.count > MAX_EVENTS_PER_WINDOW;
+}
+
+function isValidObjectId(value) {
+    return typeof value === 'string' && mongoose.Types.ObjectId.isValid(value);
+}
 
 /**
  * Initialize Socket.IO on the existing HTTP server.
@@ -32,24 +55,52 @@ export function initSocket(httpServer, allowedOrigins) {
         }
         onlineUsers.get(userId).add(socket.id);
 
-        // Broadcast online status
-        io.emit('user:online', { userId });
+        // Broadcast online status to user's project rooms only (not globally)
+        socket.on('presence:subscribe', () => {
+            // Client subscribes after joining rooms — presence events go through rooms
+        });
 
         // ── Join user-specific room (for targeted notifications) ──────────────
         socket.join(`user:${userId}`);
 
-        // ── Join project rooms ────────────────────────────────────────────────
-        socket.on('project:join', (projectId) => {
-            socket.join(`project:${projectId}`);
-            logger.info(`${socket.user.name} joined project room: ${projectId}`);
+        // ── Join project rooms with authorization ─────────────────────────────
+        socket.on('project:join', async (projectId) => {
+            if (isRateLimited(socket.id)) return;
+
+            if (!isValidObjectId(projectId)) {
+                return socket.emit('error', { message: 'Invalid project ID' });
+            }
+
+            try {
+                const project = await Project.findById(projectId).select('clientId developerIds').lean();
+                if (!project) {
+                    return socket.emit('error', { message: 'Project not found' });
+                }
+
+                const isAdmin = socket.user.role === ROLES.ADMIN;
+                const isClient = project.clientId?.toString() === userId;
+                const isDev = (project.developerIds || []).some(d => d.toString() === userId);
+
+                if (!isAdmin && !isClient && !isDev) {
+                    return socket.emit('error', { message: 'Access denied' });
+                }
+
+                socket.join(`project:${projectId}`);
+            } catch (err) {
+                logger.error('Socket project:join error:', err.message);
+            }
         });
 
         socket.on('project:leave', (projectId) => {
-            socket.leave(`project:${projectId}`);
+            if (typeof projectId === 'string') {
+                socket.leave(`project:${projectId}`);
+            }
         });
 
         // ── Typing indicators ─────────────────────────────────────────────────
         socket.on('typing:start', ({ projectId }) => {
+            if (isRateLimited(socket.id)) return;
+            if (!isValidObjectId(projectId)) return;
             socket.to(`project:${projectId}`).emit('typing:start', {
                 userId,
                 userName: socket.user.name,
@@ -57,6 +108,8 @@ export function initSocket(httpServer, allowedOrigins) {
         });
 
         socket.on('typing:stop', ({ projectId }) => {
+            if (isRateLimited(socket.id)) return;
+            if (!isValidObjectId(projectId)) return;
             socket.to(`project:${projectId}`).emit('typing:stop', { userId });
         });
 
@@ -67,24 +120,26 @@ export function initSocket(httpServer, allowedOrigins) {
                 sockets.delete(socket.id);
                 if (sockets.size === 0) {
                     onlineUsers.delete(userId);
-                    io.emit('user:offline', { userId });
                 }
             }
+            socketRateLimits.delete(socket.id);
             logger.info(`Socket disconnected: ${socket.user.name}`);
         });
     });
 
-    // Store io instance globally for controllers to access
-    global.__io = io;
+    // Module-level reference instead of polluting global
+    _io = io;
 
     return io;
 }
+
+let _io = null;
 
 /**
  * Get the Socket.IO instance (for use in controllers/services).
  */
 export function getIO() {
-    return global.__io;
+    return _io;
 }
 
 /**

@@ -93,10 +93,13 @@ export const login = async (req, res, next) => {
 
     // ── 2FA Challenge ────────────────────────────────────────────────────
     if (user.twoFactorEnabled) {
-      // Don't issue tokens yet — return a temp token for the 2FA verify step
-      const tempToken = Buffer.from(
-        JSON.stringify({ uid: user._id.toString(), ts: Date.now() })
-      ).toString('base64');
+      // Issue a short-lived signed JWT so the 2FA step can't be forged
+      const jwt = await import('jsonwebtoken');
+      const tempToken = jwt.default.sign(
+        { uid: user._id.toString(), purpose: '2fa' },
+        process.env.JWT_ACCESS_SECRET,
+        { algorithm: 'HS256', expiresIn: '5m' }
+      );
 
       return res.json({
         success: true,
@@ -266,14 +269,9 @@ export const googleAuth = async (req, res, next) => {
     logger.error(`Google auth error: ${errMsg} | Status: ${errStatus} | Data: ${errData}`);
     await createAuditLog(req, 'user_login', 'auth', null, { method: 'google', success: false, error: errMsg });
 
-    // Return a more specific error message for known Google OAuth errors
-    const googleError = error.response?.data?.error || error.message || 'Unknown error';
-    const googleErrorDescription = error.response?.data?.error_description || '';
-
     res.status(401).json({
       success: false,
-      message: 'Google authentication failed',
-      error: `${googleError}: ${googleErrorDescription}`.trim()
+      message: 'Google authentication failed. Please try again.'
     });
   }
 };

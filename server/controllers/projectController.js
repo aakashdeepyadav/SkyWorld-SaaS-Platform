@@ -202,9 +202,18 @@ export const updateProject = async (req, res, next) => {
       req.body = updates;
     }
 
+    // Admin: allowlisted fields only (prevent overwriting _id, clientId, etc.)
+    const adminAllowed = ['status', 'progress', 'milestones', 'description', 'developerIds',
+      'deliveryStatus', 'startDate', 'endDate', 'title', 'serviceType', 'plan',
+      'advancePaid', 'finalPaid', 'totalPlanPrice', 'paymentStatus'];
+    const safeUpdates = {};
+    adminAllowed.forEach(field => {
+      if (req.body[field] !== undefined) safeUpdates[field] = req.body[field];
+    });
+
     const updatedProject = await Project.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      safeUpdates,
       { new: true, runValidators: true }
     )
       .populate('clientId', 'name email')

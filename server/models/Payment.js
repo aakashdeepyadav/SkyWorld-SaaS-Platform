@@ -21,11 +21,13 @@ const paymentSchema = new mongoose.Schema({
   },
   serviceType: {
     type: String,
-    trim: true
+    trim: true,
+    maxlength: [100, 'Service type cannot exceed 100 characters']
   },
   plan: {
     type: String,
-    trim: true
+    trim: true,
+    maxlength: [100, 'Plan name cannot exceed 100 characters']
   },
   paymentPhase: {
     type: String,
@@ -44,7 +46,8 @@ const paymentSchema = new mongoose.Schema({
   currency: {
     type: String,
     default: 'INR',
-    uppercase: true
+    uppercase: true,
+    enum: ['INR', 'USD', 'EUR', 'GBP']
   },
   status: {
     type: String,
@@ -53,7 +56,8 @@ const paymentSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    trim: true
+    trim: true,
+    enum: ['razorpay', 'stripe', 'manual', 'bank_transfer', null]
   },
   transactionId: {
     type: String,

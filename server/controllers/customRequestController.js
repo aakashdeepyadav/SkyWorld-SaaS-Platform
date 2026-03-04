@@ -49,7 +49,7 @@ export const getCustomRequest = async (req, res, next) => {
       });
     }
 
-    if (req.user.role === ROLES.CLIENT && request.clientId.toString() !== req.user._id.toString()) {
+    if (req.user.role === ROLES.CLIENT && request.clientId?._id?.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Access denied'

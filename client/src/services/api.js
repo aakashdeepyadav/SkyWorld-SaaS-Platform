@@ -65,6 +65,15 @@ export const api = axios.create({
 
 // Track if we're already refreshing to prevent multiple simultaneous refresh calls
 let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error = null) => {
+  failedQueue.forEach(({ resolve, reject, config }) => {
+    if (error) reject(error);
+    else resolve(api(config));
+  });
+  failedQueue = [];
+};
 
 // Auth endpoints that should NEVER trigger the refresh interceptor
 const AUTH_ENDPOINTS = [
@@ -78,12 +87,8 @@ const AUTH_ENDPOINTS = [
 
 // Request interceptor
 api.interceptors.request.use(
-  (config) => {
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (config) => config,
+  (error) => Promise.reject(error)
 );
 
 // Response interceptor
@@ -96,26 +101,31 @@ api.interceptors.response.use(
     // Skip refresh logic for auth endpoints (prevents infinite loop)
     const isAuthEndpoint = AUTH_ENDPOINTS.some(ep => requestUrl.includes(ep));
 
-    // If 401, not an auth endpoint, not already retried, and not already refreshing
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !isAuthEndpoint &&
-      !isRefreshing
+      !isAuthEndpoint
     ) {
+      // If already refreshing, queue this request
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject, config: originalRequest });
+        });
+      }
+
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
         await api.post('/auth/refresh');
         isRefreshing = false;
+        processQueue();
         return api(originalRequest);
       } catch (refreshError) {
         isRefreshing = false;
-        // Only redirect from protected pages (dashboard), not public pages
-        if (window.location.pathname.startsWith('/dashboard')) {
-          window.location.href = '/login';
-        }
+        processQueue(refreshError);
+        // Dispatch event so AuthContext can handle logout cleanly
+        window.dispatchEvent(new Event('auth:expired'));
         return Promise.reject(refreshError);
       }
     }

@@ -28,9 +28,15 @@ export async function initSentry() {
             tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.2 : 1.0,
             integrations: [],
             beforeSend(event) {
-                // Scrub sensitive data
-                if (event.request?.cookies) {
+                if (event.request) {
                     event.request.cookies = '[Redacted]';
+                    if (event.request.headers) {
+                        delete event.request.headers.authorization;
+                        delete event.request.headers.cookie;
+                    }
+                    if (event.request.data) {
+                        event.request.data = '[Redacted]';
+                    }
                 }
                 return event;
             },
@@ -49,7 +55,7 @@ export function captureException(error, context = {}) {
     if (!Sentry) return;
     Sentry.withScope((scope) => {
         if (context.user) {
-            scope.setUser({ id: context.user._id, email: context.user.email });
+            scope.setUser({ id: context.user._id });
         }
         if (context.tags) {
             Object.entries(context.tags).forEach(([key, value]) => scope.setTag(key, value));

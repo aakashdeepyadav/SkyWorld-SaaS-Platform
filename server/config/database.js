@@ -3,8 +3,11 @@ import { logger } from '../utils/logger.js';
 
 export const connectDB = async () => {
   try {
-    // Mongoose 8+ no longer needs useNewUrlParser/useUnifiedTopology
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
 
     logger.info(`MongoDB Connected: ${conn.connection.host}`);
 

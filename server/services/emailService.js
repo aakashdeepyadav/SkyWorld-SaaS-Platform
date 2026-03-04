@@ -15,6 +15,19 @@ class EmailService {
     this.initializeTransporter();
   }
 
+  /**
+   * Escape HTML entities to prevent XSS in email templates.
+   */
+  escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   cleanEnvValue(value) {
     if (typeof value !== 'string') return value;
     return value.trim().replace(/^['"]|['"]$/g, '');
@@ -134,6 +147,12 @@ class EmailService {
       return false;
     }
 
+    // Guard against SMTP header injection
+    if (typeof to === 'string' && /[\r\n]/.test(to)) {
+      logger.warn(`Rejected email to address containing CRLF: ${to.slice(0, 50)}`);
+      return false;
+    }
+
     try {
       const info = await this.transporter.sendMail({
         from: `${this.fromName} <${this.fromEmail}>`,
@@ -208,6 +227,8 @@ class EmailService {
   }
 
   getAuthOtpTemplate(userName, otp, actionLabel) {
+    const safeName = this.escapeHtml(userName);
+    const safeAction = this.escapeHtml(actionLabel);
     return `
       <!DOCTYPE html>
       <html>
@@ -250,8 +271,8 @@ class EmailService {
               <p>Secure access to your SkyWorld account</p>
             </div>
             <div class="content">
-              <h2>Hello ${userName},</h2>
-              <p>Use the verification code below to ${actionLabel}. This code is valid for a limited time only.</p>
+              <h2>Hello ${safeName},</h2>
+              <p>Use the verification code below to ${safeAction}. This code is valid for a limited time only.</p>
               <div class="otp-box">
                 <div class="label">Your Verification Code</div>
                 <div class="otp-code">${otp}</div>
@@ -280,6 +301,7 @@ class EmailService {
   }
 
   getPasswordResetTemplate(userName, resetUrl) {
+    const safeName = this.escapeHtml(userName);
     return `
       <!DOCTYPE html>
       <html>
@@ -324,7 +346,7 @@ class EmailService {
               <p>We received a request to reset your password</p>
             </div>
             <div class="content">
-              <h2>Hello ${userName},</h2>
+              <h2>Hello ${safeName},</h2>
               <p>Someone requested a password reset for your SkyWorld account. If this was you, click the button below to set a new password.</p>
               <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center">
                 <a href="${resetUrl}" class="btn-reset">Reset My Password</a>
@@ -357,6 +379,7 @@ class EmailService {
   }
 
   getPasswordChangeTemplate(userName) {
+    const safeName = this.escapeHtml(userName);
     return `
       <!DOCTYPE html>
       <html>
@@ -397,7 +420,7 @@ class EmailService {
               <p>Your account security has been updated</p>
             </div>
             <div class="content">
-              <h2>Hello ${userName},</h2>
+              <h2>Hello ${safeName},</h2>
               <p>Your SkyWorld account password has been changed successfully.</p>
               <div class="success-box">
                 <div class="label">Password Updated</div>

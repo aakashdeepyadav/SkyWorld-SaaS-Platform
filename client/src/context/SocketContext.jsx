@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import { api } from '../services/api';
@@ -38,13 +38,21 @@ export const SocketProvider = ({ children }) => {
                 socketRef.current = null;
                 setConnected(false);
             }
+            setNotifications([]);
+            setUnreadCount(0);
             return;
         }
 
         // Determine server URL (same origin in production, explicit in dev)
-        const serverUrl = import.meta.env.VITE_API_URL
-            ? new URL(import.meta.env.VITE_API_URL).origin
-            : window.location.origin;
+        let serverUrl;
+        const raw = import.meta.env.VITE_API_URL;
+        try {
+            serverUrl = raw && /^https?:\/\//i.test(raw)
+                ? new URL(raw).origin
+                : window.location.origin;
+        } catch {
+            serverUrl = window.location.origin;
+        }
 
         const socket = io(serverUrl, {
             withCredentials: true,
@@ -111,7 +119,7 @@ export const SocketProvider = ({ children }) => {
         } catch { /* silent */ }
     }, []);
 
-    const value = {
+    const value = useMemo(() => ({
         socket: socketRef.current,
         connected,
         notifications,
@@ -122,7 +130,7 @@ export const SocketProvider = ({ children }) => {
         stopTyping,
         markNotificationRead,
         markAllRead,
-    };
+    }), [connected, notifications, unreadCount, joinProject, leaveProject, startTyping, stopTyping, markNotificationRead, markAllRead]);
 
     return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>;
 };

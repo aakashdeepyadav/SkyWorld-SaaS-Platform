@@ -22,7 +22,7 @@ export const socketAuth = async (socket, next) => {
             return next(new Error('Access token not found'));
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET, { algorithms: ['HS256'] });
         const user = await User.findById(decoded.userId).select('_id name email role avatar isActive');
 
         if (!user || !user.isActive) {

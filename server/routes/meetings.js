@@ -6,6 +6,8 @@ import {
   isGoogleConnected,
 } from '../services/meetingService.js';
 import { authenticate } from '../middleware/auth.js';
+import { adminOnly } from '../middleware/rbac.js';
+import { apiRateLimiter, sensitiveRateLimiter } from '../middleware/rateLimiter.js';
 import Booking from '../models/Booking.js';
 import { logger } from '../utils/logger.js';
 
@@ -22,7 +24,7 @@ const getMaxBookableDateInIST = () => {
 
 // ─── GET /api/v1/meetings/status ────────────────────────────────────────────
 // Public preflight check: verifies if Google Meet links can be generated right now.
-router.get('/status', async (req, res, next) => {
+router.get('/status', apiRateLimiter, async (req, res, next) => {
   try {
     const capability = await checkMeetGenerationCapability();
     return res.json({
@@ -37,7 +39,7 @@ router.get('/status', async (req, res, next) => {
 
 // ─── GET /api/v1/meetings/slots?date=YYYY-MM-DD ─────────────────────────────
 // Public — no auth required so users can check availability before login.
-router.get('/slots', async (req, res, next) => {
+router.get('/slots', apiRateLimiter, async (req, res, next) => {
   try {
     const { date } = req.query;
 
@@ -91,7 +93,7 @@ router.get('/slots', async (req, res, next) => {
 
 // ─── POST /api/v1/meetings/book ─────────────────────────────────────────────
 // Requires authentication.
-router.post('/book', authenticate, async (req, res, next) => {
+router.post('/book', authenticate, sensitiveRateLimiter, async (req, res, next) => {
   try {
     const { clientName, clientEmail, date, startTime } = req.body;
 
@@ -161,24 +163,24 @@ router.post('/book', authenticate, async (req, res, next) => {
 
 // ─── GET /api/v1/meetings/admin/bookings ────────────────────────────────────
 // Admin only — list all bookings with optional date filter.
-router.get('/admin/bookings', authenticate, async (req, res, next) => {
+router.get('/admin/bookings', authenticate, adminOnly, apiRateLimiter, async (req, res, next) => {
   try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Admin access required.' });
-    }
-
     const { date, status, page = 1, limit = 50 } = req.query;
+
+    // Cap limit to prevent abuse
+    const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
+    const safePage = Math.max(Number(page) || 1, 1);
 
     const filter = {};
     if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) filter.date = date;
     if (status && ['confirmed', 'cancelled', 'completed'].includes(status)) filter.status = status;
 
-    const skip = (Number(page) - 1) * Number(limit);
+    const skip = (safePage - 1) * safeLimit;
     const [bookings, total] = await Promise.all([
       Booking.find(filter)
         .sort({ date: -1, startTime: -1 })
         .skip(skip)
-        .limit(Number(limit))
+        .limit(safeLimit)
         .populate('userId', 'name email'),
       Booking.countDocuments(filter),
     ]);
@@ -187,8 +189,8 @@ router.get('/admin/bookings', authenticate, async (req, res, next) => {
       success: true,
       bookings,
       total,
-      page: Number(page),
-      totalPages: Math.ceil(total / Number(limit)),
+      page: safePage,
+      totalPages: Math.ceil(total / safeLimit),
     });
   } catch (error) {
     next(error);
@@ -197,11 +199,8 @@ router.get('/admin/bookings', authenticate, async (req, res, next) => {
 
 // ─── PATCH /api/v1/meetings/admin/bookings/:id/cancel ───────────────────────
 // Admin only — cancel a booking.
-router.patch('/admin/bookings/:id/cancel', authenticate, async (req, res, next) => {
+router.patch('/admin/bookings/:id/cancel', authenticate, adminOnly, async (req, res, next) => {
   try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Admin access required.' });
-    }
 
     const booking = await Booking.findById(req.params.id);
     if (!booking) {

@@ -107,7 +107,10 @@ export const getService = async (req, res, next) => {
  */
 export const createService = async (req, res, next) => {
   try {
-    const service = await Service.create(req.body);
+    const { name, description, features, pricing, category, isActive, icon, image } = req.body;
+    const service = await Service.create({
+      name, description, features, pricing, category, isActive, icon, image
+    });
 
     await createAuditLog(req, 'service_created', 'service', service._id);
 
@@ -128,9 +131,15 @@ export const createService = async (req, res, next) => {
  */
 export const updateService = async (req, res, next) => {
   try {
+    const allowedFields = ['name', 'description', 'features', 'pricing', 'category', 'isActive', 'icon', 'image'];
+    const updates = {};
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) updates[field] = req.body[field];
+    });
+
     const service = await Service.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updates,
       { new: true, runValidators: true }
     );
 

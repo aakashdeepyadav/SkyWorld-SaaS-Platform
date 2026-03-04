@@ -18,7 +18,7 @@ export const authenticate = async (req, res, next) => {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET, { algorithms: ['HS256'] });
       
       // Get user from database
       const user = await User.findById(decoded.userId).select('-password');
@@ -66,7 +66,7 @@ export const optionalAuth = async (req, res, next) => {
 
     if (token) {
       try {
-        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET, { algorithms: ['HS256'] });
         const user = await User.findById(decoded.userId).select('-password');
         if (user && user.isActive) {
           req.user = user;

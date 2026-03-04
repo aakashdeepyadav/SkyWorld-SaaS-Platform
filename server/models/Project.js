@@ -35,11 +35,13 @@ const projectSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, 'Title is required'],
-    trim: true
+    trim: true,
+    maxlength: [200, 'Title cannot exceed 200 characters']
   },
   description: {
     type: String,
-    trim: true
+    trim: true,
+    maxlength: [10000, 'Description cannot exceed 10000 characters']
   },
   clientId: {
     type: mongoose.Schema.Types.ObjectId,

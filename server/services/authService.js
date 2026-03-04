@@ -36,13 +36,13 @@ export const generateTokens = (userId) => {
   const accessToken = jwt.sign(
     { userId },
     process.env.JWT_ACCESS_SECRET,
-    { expiresIn: process.env.JWT_ACCESS_EXPIRY || '15m' }
+    { algorithm: 'HS256', expiresIn: process.env.JWT_ACCESS_EXPIRY || '15m' }
   );
 
   const refreshToken = jwt.sign(
     { userId },
     process.env.JWT_REFRESH_SECRET,
-    { expiresIn: process.env.JWT_REFRESH_EXPIRY || '7d' }
+    { algorithm: 'HS256', expiresIn: process.env.JWT_REFRESH_EXPIRY || '7d' }
   );
 
   return { accessToken, refreshToken };
@@ -214,7 +214,7 @@ export const verifyGoogleToken = async (googleId, email, name, avatar) => {
  */
 export const refreshAccessToken = async (refreshToken) => {
   try {
-    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, { algorithms: ['HS256'] });
     const user = await User.findById(decoded.userId);
 
     if (!user || !user.isActive) {
@@ -238,7 +238,7 @@ function appError(message, statusCode = 400) {
   return err;
 }
 
-const generateSixDigitOtp = () => String(Math.floor(100000 + Math.random() * 900000));
+const generateSixDigitOtp = () => String(crypto.randomInt(100000, 999999));
 
 const hashOtp = (otp) => crypto.createHash('sha256').update(String(otp)).digest('hex');
 
@@ -426,13 +426,14 @@ export const requestPasswordReset = async (email) => {
 
     // Check if password reset is locked
     if (user.passwordResetExpires && user.passwordResetExpires > Date.now()) {
-      const minutesLeft = Math.ceil((user.passwordResetExpires - Date.now()) / (60 * 1000));
-      throw new Error(`Password reset is locked. Try again in ${minutesLeft} minutes.`);
-    }
-
-    // Check reset attempts
-    if (user.passwordResetAttempts >= 2) {
-      throw new Error('Too many password reset attempts. Please try again tomorrow.');
+      if (user.passwordResetAttempts >= 2) {
+        const minutesLeft = Math.ceil((user.passwordResetExpires - Date.now()) / (60 * 1000));
+        throw new Error(`Too many reset attempts. Try again in ${minutesLeft} minutes.`);
+      }
+    } else if (user.passwordResetAttempts >= 2) {
+      // Lockout expired — reset counter
+      user.passwordResetAttempts = 0;
+      await user.save({ validateBeforeSave: false });
     }
 
     // Generate reset token (works for both email/password AND Google OAuth users)

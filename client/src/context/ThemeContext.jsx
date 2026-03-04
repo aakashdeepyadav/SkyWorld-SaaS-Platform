@@ -1,22 +1,32 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 const ThemeContext = createContext(null);
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within ThemeProvider');
+  }
+  return context;
+};
 
 /**
  * ThemeProvider — follows system appearance by default,
  * but allows manual override via toggleTheme.
- * Manual override is cleared on next visit (system takes over again).
  */
 export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState(() =>
         window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
     );
+    const userOverrideRef = useRef(false);
 
-    // Listen for system preference changes — only applies if user hasn't manually toggled
+    // Listen for system preference changes — only if user hasn't manually toggled
     useEffect(() => {
         const mq = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleChange = (e) => setTheme(e.matches ? 'dark' : 'light');
+        const handleChange = (e) => {
+            if (!userOverrideRef.current) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        };
         mq.addEventListener('change', handleChange);
         return () => mq.removeEventListener('change', handleChange);
     }, []);
@@ -30,7 +40,10 @@ export const ThemeProvider = ({ children }) => {
         }
     }, [theme]);
 
-    const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    const toggleTheme = () => {
+        userOverrideRef.current = true;
+        setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    };
     const isDark = theme === 'dark';
 
     return (

@@ -96,7 +96,16 @@ export const updateMyProfile = async (req, res, next) => {
     if (phone !== undefined) updates.phone = phone;
     if (avatar !== undefined) updates.avatar = avatar;
     if (company !== undefined) updates.company = company;
-    if (notificationPreferences !== undefined) updates.notificationPreferences = notificationPreferences;
+    if (notificationPreferences !== undefined) {
+      const allowed = ['email', 'projectUpdates', 'marketing'];
+      const sanitized = {};
+      allowed.forEach(key => {
+        if (typeof notificationPreferences[key] === 'boolean') {
+          sanitized[key] = notificationPreferences[key];
+        }
+      });
+      updates.notificationPreferences = sanitized;
+    }
 
     const user = await User.findByIdAndUpdate(
       req.user._id,
@@ -130,6 +139,14 @@ export const updateUserRole = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: 'Invalid role'
+      });
+    }
+
+    // Prevent admin from changing their own role
+    if (userId === req.user._id.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot change your own role'
       });
     }
 
@@ -177,25 +194,23 @@ export const updateUserStatus = async (req, res, next) => {
       });
     }
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { isActive },
-      { new: true }
-    ).select('-password');
-
-    if (!user) {
+    const targetUser = await User.findById(userId);
+    if (!targetUser) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
 
-    await createAuditLog(req, 'user_status_updated', 'user', user._id, { isActive, updatedBy: req.user._id });
+    targetUser.isActive = isActive;
+    await targetUser.save({ validateBeforeSave: false });
+
+    await createAuditLog(req, 'user_status_updated', 'user', targetUser._id, { isActive, updatedBy: req.user._id });
 
     res.json({
       success: true,
       message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
-      user: user.toPublicJSON()
+      user: targetUser.toPublicJSON()
     });
   } catch (error) {
     next(error);

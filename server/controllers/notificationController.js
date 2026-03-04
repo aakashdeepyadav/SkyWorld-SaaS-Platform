@@ -7,20 +7,22 @@ import Notification from '../models/Notification.js';
  */
 export const getNotifications = async (req, res, next) => {
     try {
-        const { page = 1, limit = 20, unreadOnly } = req.query;
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+        const { unreadOnly } = req.query;
         const query = { userId: req.user._id };
 
         if (unreadOnly === 'true') {
             query.read = false;
         }
 
-        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const skip = (page - 1) * limit;
 
         const [notifications, total, unreadCount] = await Promise.all([
             Notification.find(query)
                 .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(parseInt(limit))
+                .limit(limit)
                 .lean(),
             Notification.countDocuments(query),
             Notification.countDocuments({ userId: req.user._id, read: false }),
@@ -31,8 +33,8 @@ export const getNotifications = async (req, res, next) => {
             notifications,
             unreadCount,
             meta: {
-                page: parseInt(page),
-                limit: parseInt(limit),
+                page,
+                limit,
                 total,
                 pages: Math.ceil(total / parseInt(limit)),
             },

@@ -1,6 +1,7 @@
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { AppError } from '../utils/AppError.js';
 import { generateTokens, setTokenCookies } from '../services/authService.js';
@@ -149,16 +150,16 @@ export const verify2FALogin = async (req, res, next) => {
         // Decode the temp token to get user ID
         let userId;
         try {
-            const decoded = JSON.parse(
-                Buffer.from(tempToken, 'base64').toString('utf-8')
-            );
-            // Validate temp token hasn't expired (5 minutes)
-            if (Date.now() - decoded.ts > 5 * 60 * 1000) {
-                throw AppError.unauthorized('2FA session expired, please login again');
+            const decoded = jwt.verify(tempToken, process.env.JWT_ACCESS_SECRET, { algorithms: ['HS256'] });
+            if (decoded.purpose !== '2fa') {
+                throw AppError.badRequest('Invalid temporary token');
             }
             userId = decoded.uid;
         } catch (err) {
             if (err instanceof AppError) throw err;
+            if (err.name === 'TokenExpiredError') {
+                throw AppError.unauthorized('2FA session expired, please login again');
+            }
             throw AppError.badRequest('Invalid temporary token');
         }
 
@@ -180,11 +181,17 @@ export const verify2FALogin = async (req, res, next) => {
         } else if (backupCode) {
             // Verify backup code (one-time use)
             const hashedInput = crypto.createHash('sha256').update(backupCode).digest('hex');
-            const codeIndex = user.twoFactorBackupCodes.indexOf(hashedInput);
-            if (codeIndex !== -1) {
+            const hashedBuf = Buffer.from(hashedInput, 'hex');
+            let matchIndex = -1;
+            for (let i = 0; i < user.twoFactorBackupCodes.length; i++) {
+                const storedBuf = Buffer.from(user.twoFactorBackupCodes[i], 'hex');
+                if (storedBuf.length === hashedBuf.length && crypto.timingSafeEqual(hashedBuf, storedBuf)) {
+                    matchIndex = i;
+                }
+            }
+            if (matchIndex !== -1) {
                 verified = true;
-                // Remove used backup code
-                user.twoFactorBackupCodes.splice(codeIndex, 1);
+                user.twoFactorBackupCodes.splice(matchIndex, 1);
                 await user.save({ validateBeforeSave: false });
             }
         }
