@@ -385,9 +385,26 @@ const sendConfirmationEmail = async (booking) => {
       return `${hour12}:${String(m).padStart(2, '0')} ${ampm}`;
     };
 
+    const toGoogleUtcStamp = (dateStr, timeStr) => {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      const [hour, minute] = timeStr.split(':').map(Number);
+      const utcDate = new Date(Date.UTC(year, month - 1, day, hour - 5, minute - 30, 0));
+      return utcDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+    };
+
     const frontendBaseUrl = (process.env.FRONTEND_URL || 'https://skyworld.buzz').replace(/\/$/, '');
-    const brandWordmarkUrl = `${frontendBaseUrl}/wordmark_logo_coloured_fullname.png`;
+    const brandWordmarkUrl = `${frontendBaseUrl}/wordmark_logo_black_fullname.png`;
+    const brandIconUrl = `${frontendBaseUrl}/icon_logo_coloured.png`;
     const brandHomeUrl = process.env.BRAND_WEBSITE_URL || frontendBaseUrl;
+
+    const googleEventTitle = `SkyWorld Meeting — ${booking.clientName}`;
+    const googleEventDetails = booking.meetLink
+      ? `Meeting with SkyWorld Ventures.\n\nJoin Google Meet: ${booking.meetLink}`
+      : 'Meeting with SkyWorld Ventures.';
+    const googleEventLocation = booking.meetLink || 'Online meeting';
+    const googleStart = toGoogleUtcStamp(booking.date, booking.startTime);
+    const googleEnd = toGoogleUtcStamp(booking.date, booking.endTime);
+    const addToCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(googleEventTitle)}&dates=${googleStart}%2F${googleEnd}&details=${encodeURIComponent(googleEventDetails)}&location=${encodeURIComponent(googleEventLocation)}`;
 
     const html = `
 <!DOCTYPE html>
@@ -401,11 +418,20 @@ const sendConfirmationEmail = async (booking) => {
   <!-- Header -->
   <tr>
     <td style="background:linear-gradient(135deg,#0ea5e9,#6366f1);padding:36px 40px 34px;text-align:center;">
-      <table cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 18px;background:rgba(255,255,255,0.95);border-radius:12px;">
+      <table cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 18px;background:#ffffff;border-radius:14px;">
         <tr>
-          <td style="padding:12px 18px;text-align:center;">
+          <td style="padding:10px 14px 10px 10px;text-align:center;">
             <a href="${brandHomeUrl}" target="_blank" style="text-decoration:none;display:inline-block;">
-              <img src="${brandWordmarkUrl}" alt="SkyWorld Ventures" width="168" style="display:block;margin:0 auto;width:168px;max-width:168px;height:auto;border:0;outline:none;text-decoration:none;" />
+              <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                <tr>
+                  <td style="padding:0 10px 0 0;vertical-align:middle;">
+                    <img src="${brandIconUrl}" alt="SkyWorld" width="28" style="display:block;width:28px;max-width:28px;height:auto;border:0;outline:none;text-decoration:none;" />
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <img src="${brandWordmarkUrl}" alt="SkyWorld Ventures" width="162" style="display:block;width:162px;max-width:162px;height:auto;border:0;outline:none;text-decoration:none;" />
+                  </td>
+                </tr>
+              </table>
             </a>
           </td>
         </tr>
@@ -460,6 +486,15 @@ const sendConfirmationEmail = async (booking) => {
           </a>
         </td></tr>
       </table>` : ''}
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr><td align="center" style="padding:0 0 24px;">
+          <a href="${addToCalendarUrl}"
+             style="display:inline-block;background:#0f172a;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:8px;">
+            Add to Google Calendar
+          </a>
+        </td></tr>
+      </table>
 
       <p style="color:#64748b;font-size:13px;line-height:1.6;margin:0;">
         This email contains your official meeting details and join link. Please keep it safe and join on time.<br/>
