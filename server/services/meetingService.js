@@ -278,7 +278,6 @@ const createCalendarEvent = async ({ clientName, clientEmail, date, startTime, e
     description: `Meeting with ${clientName} (${clientEmail}).\nBooked via SkyWorld Platform.`,
     start: { dateTime: startDateTime, timeZone: TIMEZONE },
     end: { dateTime: endDateTime, timeZone: TIMEZONE },
-    attendees: [{ email: clientEmail }],
     reminders: {
       useDefault: false,
       overrides: [
@@ -293,7 +292,7 @@ const createCalendarEvent = async ({ clientName, clientEmail, date, startTime, e
     const event = await calendar.events.insert({
       calendarId,
       conferenceDataVersion: 1,
-      sendUpdates: 'all',
+      sendUpdates: 'none',
       requestBody: {
         ...baseEvent,
         conferenceData: {
@@ -463,8 +462,8 @@ const sendConfirmationEmail = async (booking) => {
       </table>` : ''}
 
       <p style="color:#64748b;font-size:13px;line-height:1.6;margin:0;">
-        A calendar invitation has been sent to your email. Please make sure to join on time.<br/>
-        If you need to reschedule, please contact us at support@skyworld.buzz.
+        This email contains your official meeting details and join link. Please keep it safe and join on time.<br/>
+        If you need to reschedule, contact us at support@skyworld.buzz.
       </p>
     </td>
   </tr>
