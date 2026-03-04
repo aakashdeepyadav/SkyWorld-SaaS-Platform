@@ -240,20 +240,21 @@ export const refreshTodaySnapshot = async ({ force = false } = {}) => {
 
 // ─── Flush to Google Sheets ──────────────────────────────────────────────────
 
-const getOAuth2Client = async () => {
-  const cred = await IntegrationCredential.getGoogle();
-  if (!cred) throw new Error('Google OAuth not connected');
-  const oauth2 = new google.auth.OAuth2(
-    process.env.GOOGLE_OAUTH_CLIENT_ID,
-    process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-    process.env.GOOGLE_OAUTH_REDIRECT_URI,
-  );
-  oauth2.setCredentials({
-    refresh_token: cred.refreshToken,
-    access_token: cred.accessToken,
-    expiry_date: cred.expiresAt ? new Date(cred.expiresAt).getTime() : undefined,
+/**
+ * Service-account auth for Google Sheets.
+ * Uses GOOGLE_SERVICE_ACCOUNT_KEY env var (JSON key file contents).
+ * This is separate from the OAuth2 flow used for Calendar + Meet.
+ */
+const getSheetsAuth = () => {
+  const keyJson = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+  if (!keyJson) {
+    throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY not set — cannot access Google Sheets.');
+  }
+  const key = JSON.parse(keyJson);
+  return new google.auth.GoogleAuth({
+    credentials: key,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
-  return oauth2;
 };
 
 export const flushSnapshotToSheet = async (snapshot) => {
@@ -264,7 +265,7 @@ export const flushSnapshotToSheet = async (snapshot) => {
   }
 
   try {
-    const auth = await getOAuth2Client();
+    const auth = getSheetsAuth();
     const sheets = google.sheets({ version: 'v4', auth });
 
     // Ensure header row exists

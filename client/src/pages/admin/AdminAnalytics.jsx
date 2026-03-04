@@ -180,7 +180,7 @@ const AdminAnalytics = () => {
     {
       onSuccess: (data) => toast.success(data.message || 'Exported to Google Sheets'),
       onError: () => toast.error('Export to Google Sheets failed'),
-    },
+    }
   );
 
   // Live dashboard
@@ -294,7 +294,9 @@ const AdminAnalytics = () => {
                 disabled={pushToSheet.isLoading}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-500/10 dark:text-green-400 dark:hover:bg-green-500/20 transition-colors disabled:opacity-50"
               >
-                <CloudArrowUpIcon className={`h-3.5 w-3.5 ${pushToSheet.isLoading ? 'animate-bounce' : ''}`} />
+                <CloudArrowUpIcon
+                  className={`h-3.5 w-3.5 ${pushToSheet.isLoading ? 'animate-bounce' : ''}`}
+                />
                 {pushToSheet.isLoading ? 'Exporting...' : 'Export to Sheet'}
               </button>
               <button
@@ -561,7 +563,10 @@ const AdminAnalytics = () => {
                 <input
                   type="date"
                   value={historyStart}
-                  onChange={(e) => { setHistoryStart(e.target.value); setHistoryPage(1); }}
+                  onChange={(e) => {
+                    setHistoryStart(e.target.value);
+                    setHistoryPage(1);
+                  }}
                   className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-sky-500/30 outline-none"
                 />
               </div>
@@ -572,12 +577,18 @@ const AdminAnalytics = () => {
                 <input
                   type="date"
                   value={historyEnd}
-                  onChange={(e) => { setHistoryEnd(e.target.value); setHistoryPage(1); }}
+                  onChange={(e) => {
+                    setHistoryEnd(e.target.value);
+                    setHistoryPage(1);
+                  }}
                   className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-sky-500/30 outline-none"
                 />
               </div>
               <button
-                onClick={() => { setHistoryPage(1); refetchHistory(); }}
+                onClick={() => {
+                  setHistoryPage(1);
+                  refetchHistory();
+                }}
                 className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-semibold rounded-lg bg-sky-500 text-white hover:bg-sky-600 transition-colors"
               >
                 <ArrowPathIcon className="h-3.5 w-3.5" />
@@ -585,7 +596,11 @@ const AdminAnalytics = () => {
               </button>
               {(historyStart || historyEnd) && (
                 <button
-                  onClick={() => { setHistoryStart(''); setHistoryEnd(''); setHistoryPage(1); }}
+                  onClick={() => {
+                    setHistoryStart('');
+                    setHistoryEnd('');
+                    setHistoryPage(1);
+                  }}
                   className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                 >
                   <XCircleIcon className="h-3.5 w-3.5" />
@@ -652,13 +667,17 @@ const AdminAnalytics = () => {
                             <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
                               <span className="font-semibold">{sm.total || 0}</span>
                               {sm.confirmed > 0 && (
-                                <span className="text-xs text-green-500 ml-1">({sm.confirmed} conf.)</span>
+                                <span className="text-xs text-green-500 ml-1">
+                                  ({sm.confirmed} conf.)
+                                </span>
                               )}
                             </td>
                             <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
                               <span className="font-semibold">{sp.total || 0}</span>
                               {sp.completed > 0 && (
-                                <span className="text-xs text-green-500 ml-1">({sp.completed} done)</span>
+                                <span className="text-xs text-green-500 ml-1">
+                                  ({sp.completed} done)
+                                </span>
                               )}
                             </td>
                             <td className="py-2.5 px-4 font-semibold text-green-600 dark:text-green-400">
@@ -698,7 +717,8 @@ const AdminAnalytics = () => {
                               </span>
                             </td>
                             <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
-                              {(snap.serviceRequests?.total || 0) + (snap.customRequests?.total || 0)}
+                              {(snap.serviceRequests?.total || 0) +
+                                (snap.customRequests?.total || 0)}
                             </td>
                             <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
                               {snap.projects?.active || 0}
@@ -719,7 +739,8 @@ const AdminAnalytics = () => {
               {historyTotalPages > 1 && (
                 <div className="flex items-center justify-between bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-2xl px-5 py-3">
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Page {historyPage} of {historyTotalPages} &middot; {historyTotal} total snapshots
+                    Page {historyPage} of {historyTotalPages} &middot; {historyTotal} total
+                    snapshots
                   </p>
                   <div className="flex items-center gap-2">
                     <button
@@ -730,7 +751,9 @@ const AdminAnalytics = () => {
                       Previous
                     </button>
                     <button
-                      onClick={() => setHistoryPage((prev) => Math.min(prev + 1, historyTotalPages))}
+                      onClick={() =>
+                        setHistoryPage((prev) => Math.min(prev + 1, historyTotalPages))
+                      }
                       disabled={historyPage >= historyTotalPages}
                       className="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >

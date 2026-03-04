@@ -82,8 +82,16 @@ const getCalendar = async () => {
   return google.calendar({ version: 'v3', auth });
 };
 
-const getSheets = async () => {
-  const auth = await getOAuth2Client();
+const getSheetsServiceAccount = () => {
+  const keyJson = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+  if (!keyJson) {
+    throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY not set — cannot access Google Sheets.');
+  }
+  const key = JSON.parse(keyJson);
+  const auth = new google.auth.GoogleAuth({
+    credentials: key,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  });
   return google.sheets({ version: 'v4', auth });
 };
 
@@ -336,7 +344,7 @@ const logToSheet = async (booking) => {
   }
 
   try {
-    const sheets = await getSheets();
+    const sheets = getSheetsServiceAccount();
     await sheets.spreadsheets.values.append({
       spreadsheetId,
       range: 'Sheet1!A:H',
