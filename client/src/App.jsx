@@ -92,6 +92,7 @@ const ProjectDetail = lazy(() => import('./pages/projects/ProjectDetail'));
 const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
 const ServiceManagement = lazy(() => import('./pages/admin/ServiceManagement'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const AdminMeetings = lazy(() => import('./pages/admin/AdminMeetings'));
 
 // Payments
 const PaymentList = lazy(() => import('./pages/payments/PaymentList'));
@@ -411,6 +412,14 @@ function App() {
           element={
             <RoleRoute allowedRoles={['admin']}>
               <AdminSettings />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/admin/meetings"
+          element={
+            <RoleRoute allowedRoles={['admin']}>
+              <AdminMeetings />
             </RoleRoute>
           }
         />

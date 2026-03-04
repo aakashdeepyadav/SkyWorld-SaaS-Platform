@@ -17,6 +17,8 @@ import {
   DocumentTextIcon,
   SunIcon,
   MoonIcon,
+  CalendarDaysIcon,
+  AdjustmentsHorizontalIcon,
 } from '@heroicons/react/24/outline';
 
 const Layout = () => {
@@ -52,6 +54,8 @@ const Layout = () => {
   const adminNavigation = [
     { name: 'Users', href: '/admin/users', icon: UsersIcon },
     { name: 'Services', href: '/admin/services', icon: WrenchScrewdriverIcon },
+    { name: 'Meetings', href: '/admin/meetings', icon: CalendarDaysIcon },
+    { name: 'Integrations', href: '/admin/settings', icon: AdjustmentsHorizontalIcon },
   ];
 
   const accountNavigation = [
