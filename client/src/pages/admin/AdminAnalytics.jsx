@@ -169,6 +169,7 @@ const AdminAnalytics = () => {
   const [tab, setTab] = useState('live');
   const [historyStart, setHistoryStart] = useState('');
   const [historyEnd, setHistoryEnd] = useState('');
+  const [historyPage, setHistoryPage] = useState(1);
 
   // Push to sheet mutation
   const pushToSheet = useMutation(
@@ -177,8 +178,8 @@ const AdminAnalytics = () => {
       return res.data;
     },
     {
-      onSuccess: (data) => toast.success(data.message || 'Pushed to Google Sheets'),
-      onError: () => toast.error('Failed to push to Google Sheets'),
+      onSuccess: (data) => toast.success(data.message || 'Exported to Google Sheets'),
+      onError: () => toast.error('Export to Google Sheets failed'),
     },
   );
 
@@ -195,33 +196,40 @@ const AdminAnalytics = () => {
       return res.data.data;
     },
     {
-      refetchInterval: 5 * 60_000, // auto-refresh every 5 min (server caches too)
+      refetchInterval: 5 * 60_000,
       staleTime: 4 * 60_000,
       retry: 2,
       onError: () => toast.error('Failed to load dashboard'),
     }
   );
 
-  // History
+  // History (from MongoDB snapshots)
   const {
-    data: historyData,
+    data: historyResult,
     isLoading: historyLoading,
     refetch: refetchHistory,
   } = useQuery(
-    ['admin-dashboard-history', historyStart, historyEnd],
+    ['admin-dashboard-history', historyStart, historyEnd, historyPage],
     async () => {
       const params = new URLSearchParams();
       if (historyStart) params.set('start', historyStart);
       if (historyEnd) params.set('end', historyEnd);
+      params.set('page', historyPage);
+      params.set('limit', 30);
       const res = await api.get(`/admin/dashboard/history?${params.toString()}`);
       return res.data.data;
     },
     {
       enabled: tab === 'history',
       staleTime: 120_000,
+      keepPreviousData: true,
       retry: 1,
     }
   );
+
+  const historyData = historyResult?.rows || [];
+  const historyTotal = historyResult?.total || 0;
+  const historyTotalPages = historyResult?.totalPages || 0;
 
   const d = liveData || {};
   const m = d.meetings || {};
@@ -258,8 +266,8 @@ const AdminAnalytics = () => {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Analytics Dashboard</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             {tab === 'live'
-              ? `Live insights for ${d.date || 'today'}`
-              : 'Historical analytics from daily snapshots'}
+              ? `Real-time insights for ${d.date || 'today'}`
+              : `Historical snapshots \u00b7 ${historyTotal} record${historyTotal !== 1 ? 's' : ''}`}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -287,7 +295,7 @@ const AdminAnalytics = () => {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-500/10 dark:text-green-400 dark:hover:bg-green-500/20 transition-colors disabled:opacity-50"
               >
                 <CloudArrowUpIcon className={`h-3.5 w-3.5 ${pushToSheet.isLoading ? 'animate-bounce' : ''}`} />
-                {pushToSheet.isLoading ? 'Pushing...' : 'Push to Sheet'}
+                {pushToSheet.isLoading ? 'Exporting...' : 'Export to Sheet'}
               </button>
               <button
                 onClick={() => refetch()}
@@ -553,7 +561,7 @@ const AdminAnalytics = () => {
                 <input
                   type="date"
                   value={historyStart}
-                  onChange={(e) => setHistoryStart(e.target.value)}
+                  onChange={(e) => { setHistoryStart(e.target.value); setHistoryPage(1); }}
                   className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-sky-500/30 outline-none"
                 />
               </div>
@@ -564,17 +572,26 @@ const AdminAnalytics = () => {
                 <input
                   type="date"
                   value={historyEnd}
-                  onChange={(e) => setHistoryEnd(e.target.value)}
+                  onChange={(e) => { setHistoryEnd(e.target.value); setHistoryPage(1); }}
                   className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-sky-500/30 outline-none"
                 />
               </div>
               <button
-                onClick={() => refetchHistory()}
+                onClick={() => { setHistoryPage(1); refetchHistory(); }}
                 className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-semibold rounded-lg bg-sky-500 text-white hover:bg-sky-600 transition-colors"
               >
                 <ArrowPathIcon className="h-3.5 w-3.5" />
                 Load
               </button>
+              {(historyStart || historyEnd) && (
+                <button
+                  onClick={() => { setHistoryStart(''); setHistoryEnd(''); setHistoryPage(1); }}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <XCircleIcon className="h-3.5 w-3.5" />
+                  Clear
+                </button>
+              )}
             </div>
           </div>
 
@@ -582,99 +599,155 @@ const AdminAnalytics = () => {
           {historyLoading ? (
             <div className="text-center py-16">
               <ArrowPathIcon className="h-8 w-8 animate-spin text-sky-500 mx-auto mb-3" />
-              <p className="text-sm text-slate-500">Loading history from Google Sheets...</p>
+              <p className="text-sm text-slate-500">Loading historical snapshots&hellip;</p>
             </div>
-          ) : historyData && historyData.length > 0 ? (
-            <div className="bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-2xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="bg-slate-50 dark:bg-slate-700/40 border-b border-slate-200 dark:border-slate-700">
-                      {[
-                        'Date',
-                        'Meetings',
-                        'Payments',
-                        'Revenue',
-                        'Brevo',
-                        'Resend',
-                        'Backend',
-                        'Frontend',
-                        'New Users',
-                      ].map((col) => (
-                        <th
-                          key={col}
-                          className="py-3 px-4 font-semibold text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 whitespace-nowrap"
-                        >
-                          {col}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
-                    {historyData.map((row, idx) => (
-                      <tr
-                        key={idx}
-                        className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
-                      >
-                        <td className="py-2.5 px-4 font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">
-                          {row.Date || row.date}
-                        </td>
-                        <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
-                          {row['Meetings Total'] ?? '—'}
-                        </td>
-                        <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
-                          {row['Payments Total'] ?? '—'}
-                        </td>
-                        <td className="py-2.5 px-4 font-semibold text-green-600 dark:text-green-400">
-                          ₹{Number(row['Revenue (₹)'] || 0).toLocaleString('en-IN')}
-                        </td>
-                        <td className="py-2.5 px-4 text-slate-600 dark:text-slate-400">
-                          {row['Brevo Sent'] ?? '—'} / {row['Brevo Remaining'] ?? '—'}
-                        </td>
-                        <td className="py-2.5 px-4 text-slate-600 dark:text-slate-400">
-                          {row['Resend Sent'] ?? '—'} / {row['Resend Remaining'] ?? '—'}
-                        </td>
-                        <td className="py-2.5 px-4">
-                          <span
-                            className={`inline-flex items-center gap-1 text-xs font-semibold ${row.Backend === 'up' ? 'text-green-500' : 'text-red-500'}`}
+          ) : historyData.length > 0 ? (
+            <>
+              <div className="bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="bg-slate-50 dark:bg-slate-700/40 border-b border-slate-200 dark:border-slate-700">
+                        {[
+                          'Date',
+                          'Meetings',
+                          'Payments',
+                          'Revenue',
+                          'Emails',
+                          'Backend',
+                          'Frontend',
+                          'Requests',
+                          'Projects',
+                          'New Users',
+                        ].map((col) => (
+                          <th
+                            key={col}
+                            className="py-3 px-4 font-semibold text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 whitespace-nowrap"
                           >
-                            {row.Backend === 'up' ? (
-                              <CheckCircleIcon className="h-3.5 w-3.5" />
-                            ) : (
-                              <XCircleIcon className="h-3.5 w-3.5" />
-                            )}
-                            {row.Backend || '—'}
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-4">
-                          <span
-                            className={`inline-flex items-center gap-1 text-xs font-semibold ${row.Frontend === 'up' ? 'text-green-500' : 'text-red-500'}`}
-                          >
-                            {row.Frontend === 'up' ? (
-                              <CheckCircleIcon className="h-3.5 w-3.5" />
-                            ) : (
-                              <XCircleIcon className="h-3.5 w-3.5" />
-                            )}
-                            {row.Frontend || '—'}
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
-                          {row['New Users'] ?? '—'}
-                        </td>
+                            {col}
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
+                      {historyData.map((snap) => {
+                        const sm = snap.meetings || {};
+                        const sp = snap.payments || {};
+                        const se = snap.emails || {};
+                        const sh = snap.health || {};
+                        const totalEmails = (se.brevo?.sent || 0) + (se.resend?.sent || 0);
+
+                        return (
+                          <tr
+                            key={snap.date}
+                            className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
+                          >
+                            <td className="py-2.5 px-4 font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">
+                              {new Date(snap.date + 'T00:00:00').toLocaleDateString('en-IN', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              })}
+                            </td>
+                            <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
+                              <span className="font-semibold">{sm.total || 0}</span>
+                              {sm.confirmed > 0 && (
+                                <span className="text-xs text-green-500 ml-1">({sm.confirmed} conf.)</span>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
+                              <span className="font-semibold">{sp.total || 0}</span>
+                              {sp.completed > 0 && (
+                                <span className="text-xs text-green-500 ml-1">({sp.completed} done)</span>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-4 font-semibold text-green-600 dark:text-green-400">
+                              ₹{Number(sp.revenue || 0).toLocaleString('en-IN')}
+                            </td>
+                            <td className="py-2.5 px-4 text-slate-600 dark:text-slate-400">
+                              {totalEmails > 0 ? (
+                                <span className="text-xs">
+                                  <span className="font-medium">{totalEmails}</span> sent
+                                </span>
+                              ) : (
+                                <span className="text-slate-400">—</span>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-4">
+                              <span
+                                className={`inline-flex items-center gap-1 text-xs font-semibold ${sh.backend === 'up' ? 'text-green-500' : 'text-red-500'}`}
+                              >
+                                {sh.backend === 'up' ? (
+                                  <CheckCircleIcon className="h-3.5 w-3.5" />
+                                ) : (
+                                  <XCircleIcon className="h-3.5 w-3.5" />
+                                )}
+                                {sh.backend === 'up' ? 'Online' : sh.backend || '—'}
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-4">
+                              <span
+                                className={`inline-flex items-center gap-1 text-xs font-semibold ${sh.frontend === 'up' ? 'text-green-500' : 'text-red-500'}`}
+                              >
+                                {sh.frontend === 'up' ? (
+                                  <CheckCircleIcon className="h-3.5 w-3.5" />
+                                ) : (
+                                  <XCircleIcon className="h-3.5 w-3.5" />
+                                )}
+                                {sh.frontend === 'up' ? 'Online' : sh.frontend || '—'}
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
+                              {(snap.serviceRequests?.total || 0) + (snap.customRequests?.total || 0)}
+                            </td>
+                            <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
+                              {snap.projects?.active || 0}
+                              <span className="text-xs text-slate-400 ml-0.5">active</span>
+                            </td>
+                            <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
+                              {snap.users?.newToday || 0}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+
+              {/* Pagination */}
+              {historyTotalPages > 1 && (
+                <div className="flex items-center justify-between bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-2xl px-5 py-3">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Page {historyPage} of {historyTotalPages} &middot; {historyTotal} total snapshots
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setHistoryPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={historyPage <= 1}
+                      className="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => setHistoryPage((prev) => Math.min(prev + 1, historyTotalPages))}
+                      disabled={historyPage >= historyTotalPages}
+                      className="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-16 bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-2xl">
               <ChartBarIcon className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-              <p className="text-sm text-slate-400">
-                No historical data yet. Snapshots are saved nightly at 11:59 PM IST.
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                No snapshots found for the selected range
               </p>
-              <p className="text-xs text-slate-400 mt-1">
-                Select a date range and click Load, or wait for the first nightly flush.
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                Snapshots are recorded daily. Adjust the date range or check back later.
               </p>
             </div>
           )}

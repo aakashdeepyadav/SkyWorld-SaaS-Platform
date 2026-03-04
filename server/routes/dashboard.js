@@ -11,7 +11,7 @@ router.use(adminOnly);
 // Live daily dashboard
 router.get('/', getLiveDashboard);
 
-// Historical data from Google Sheets
+// Historical snapshots from MongoDB
 router.get('/history', getDashboardHistory);
 
 // Manual push to Google Sheets

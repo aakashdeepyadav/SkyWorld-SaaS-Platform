@@ -363,16 +363,8 @@ export const nightlyFlushAndReset = async () => {
     // Flush to Google Sheets
     await flushSnapshotToSheet(snapshot);
 
-    // Mark as flushed
+    // Mark as flushed (snapshots kept permanently — storage is negligible)
     await DailySnapshot.updateOne({ date: dateStr }, { $set: { flushedToSheet: true } });
-
-    // Delete snapshots older than 2 days (history is in the sheet)
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-    await DailySnapshot.deleteMany({
-      flushedToSheet: true,
-      createdAt: { $lt: twoDaysAgo },
-    });
 
     logger.info(`[CRON] Nightly analytics flush complete for ${dateStr}`);
   } catch (error) {
@@ -380,46 +372,34 @@ export const nightlyFlushAndReset = async () => {
   }
 };
 
-// ─── Fetch Sheet History (for admin "history" tab) ───────────────────────────
+// ─── Fetch Snapshot History (from MongoDB) ───────────────────────────────────
 
-export const getSheetHistory = async (startDate, endDate) => {
-  const spreadsheetId = process.env.GOOGLE_ANALYTICS_SHEET_ID || process.env.GOOGLE_SHEET_ID;
-  if (!spreadsheetId) return [];
-
+export const getSnapshotHistory = async (startDate, endDate, { page = 1, limit = 30 } = {}) => {
   try {
-    const auth = await getOAuth2Client();
-    const sheets = google.sheets({ version: 'v4', auth });
-    const SHEET_NAME = 'DailyAnalytics';
+    const filter = {};
+    if (startDate) filter.date = { ...filter.date, $gte: startDate };
+    if (endDate) filter.date = { ...filter.date, $lte: endDate };
 
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${SHEET_NAME}!A:V`,
-    });
+    const skip = (page - 1) * limit;
 
-    const rows = response.data.values || [];
-    if (rows.length < 2) return []; // header only
+    const [snapshots, total] = await Promise.all([
+      DailySnapshot.find(filter)
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select('-meetings.list -__v') // exclude per-meeting details for speed
+        .lean(),
+      DailySnapshot.countDocuments(filter),
+    ]);
 
-    const headers = rows[0];
-    const dataRows = rows.slice(1);
-
-    // Filter by date range if provided
-    return dataRows
-      .filter((row) => {
-        const d = row[0];
-        if (startDate && d < startDate) return false;
-        if (endDate && d > endDate) return false;
-        return true;
-      })
-      .map((row) => {
-        const obj = {};
-        headers.forEach((h, i) => {
-          obj[h] = row[i] ?? '';
-        });
-        return obj;
-      })
-      .reverse(); // newest first
+    return {
+      rows: snapshots,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   } catch (error) {
-    logger.error('Failed to fetch sheet history:', error.message);
-    return [];
+    logger.error('Failed to fetch snapshot history:', error.message);
+    return { rows: [], total: 0, page: 1, totalPages: 0 };
   }
 };

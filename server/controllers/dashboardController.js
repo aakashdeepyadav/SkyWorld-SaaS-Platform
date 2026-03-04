@@ -1,4 +1,4 @@
-import { refreshTodaySnapshot, getSheetHistory, flushSnapshotToSheet } from '../services/dashboardAnalyticsService.js';
+import { refreshTodaySnapshot, getSnapshotHistory, flushSnapshotToSheet } from '../services/dashboardAnalyticsService.js';
 import DailySnapshot from '../models/DailySnapshot.js';
 import { logger } from '../utils/logger.js';
 
@@ -17,14 +17,18 @@ export const getLiveDashboard = async (req, res, next) => {
 };
 
 /**
- * GET /api/v1/admin/dashboard/history?start=YYYY-MM-DD&end=YYYY-MM-DD
- * Returns historical analytics from Google Sheets.
+ * GET /api/v1/admin/dashboard/history?start=YYYY-MM-DD&end=YYYY-MM-DD&page=1&limit=30
+ * Returns historical analytics from MongoDB snapshots.
  */
 export const getDashboardHistory = async (req, res, next) => {
   try {
-    const { start, end } = req.query;
-    const rows = await getSheetHistory(start || null, end || null);
-    res.json({ success: true, data: rows });
+    const { start, end, page, limit } = req.query;
+    const result = await getSnapshotHistory(
+      start || null,
+      end || null,
+      { page: parseInt(page) || 1, limit: Math.min(parseInt(limit) || 30, 100) },
+    );
+    res.json({ success: true, data: result });
   } catch (error) {
     logger.error('Dashboard history fetch failed:', error.message);
     next(error);
