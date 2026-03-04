@@ -401,8 +401,7 @@ const sendConfirmationEmail = async (booking) => {
     };
 
     const frontendBaseUrl = (process.env.FRONTEND_URL || 'https://skyworld.buzz').replace(/\/$/, '');
-    const brandWordmarkUrl = `${frontendBaseUrl}/wordmark_logo_black_fullname.png`;
-    const brandIconUrl = `${frontendBaseUrl}/icon_logo_coloured.png`;
+    const brandLogoUrl = `${frontendBaseUrl}/wordmark_logo_coloured_fullname.png`;
     const brandHomeUrl = process.env.BRAND_WEBSITE_URL || frontendBaseUrl;
 
     const googleEventTitle = `SkyWorld Meeting — ${booking.clientName}`;
@@ -426,20 +425,11 @@ const sendConfirmationEmail = async (booking) => {
   <!-- Header -->
   <tr>
     <td style="background:linear-gradient(135deg,#0ea5e9,#6366f1);padding:36px 40px 34px;text-align:center;">
-      <table cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 18px;background:#ffffff;border-radius:14px;">
+      <table cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 18px;">
         <tr>
-          <td style="padding:10px 14px 10px 10px;text-align:center;">
+          <td style="text-align:center;">
             <a href="${brandHomeUrl}" target="_blank" style="text-decoration:none;display:inline-block;">
-              <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
-                <tr>
-                  <td style="padding:0 10px 0 0;vertical-align:middle;">
-                    <img src="${brandIconUrl}" alt="SkyWorld" width="28" style="display:block;width:28px;max-width:28px;height:auto;border:0;outline:none;text-decoration:none;" />
-                  </td>
-                  <td style="vertical-align:middle;">
-                    <img src="${brandWordmarkUrl}" alt="SkyWorld Ventures" width="162" style="display:block;width:162px;max-width:162px;height:auto;border:0;outline:none;text-decoration:none;" />
-                  </td>
-                </tr>
-              </table>
+              <img src="${brandLogoUrl}" alt="SkyWorld Ventures" width="200" style="display:block;width:200px;max-width:200px;height:auto;border:0;outline:none;text-decoration:none;" />
             </a>
           </td>
         </tr>

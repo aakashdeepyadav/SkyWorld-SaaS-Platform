@@ -347,7 +347,8 @@ export const flushSnapshotToSheet = async (snapshot) => {
 
     logger.info(`Analytics snapshot for ${snapshot.date} flushed to Google Sheets`);
   } catch (error) {
-    logger.error('Analytics sheet flush failed:', error.message);
+    const detail = error?.response?.data?.error?.message || error.message || String(error);
+    logger.error(`Analytics sheet flush failed: ${detail}`);
   }
 };
 
