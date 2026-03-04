@@ -513,7 +513,7 @@ export const setupSpreadsheetDashboard = async () => {
           ranges: [healthRange],
           booleanRule: {
             condition: { type: 'TEXT_EQ', values: [{ userEnteredValue: val }] },
-            format: { textFormat: { foregroundColor: color, bold: true, fontSize: 13 } },
+            format: { textFormat: { foregroundColor: color, bold: true } },
           },
         },
         index: idx,
