@@ -131,19 +131,32 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   }, []);
 
-  const value = useMemo(() => ({
-    user,
-    loading,
-    login,
-    register,
-    verifyOtp,
-    resendOtp,
-    googleLogin,
-    logout,
-    updateUser,
-    checkAuth,
-  }), [user, loading, login, register, verifyOtp, resendOtp, googleLogin, logout, updateUser, checkAuth]);
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      login,
+      register,
+      verifyOtp,
+      resendOtp,
+      googleLogin,
+      logout,
+      updateUser,
+      checkAuth,
+    }),
+    [
+      user,
+      loading,
+      login,
+      register,
+      verifyOtp,
+      resendOtp,
+      googleLogin,
+      logout,
+      updateUser,
+      checkAuth,
+    ]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
