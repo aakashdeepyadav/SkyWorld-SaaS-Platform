@@ -33,7 +33,10 @@ import notificationRoutes from './routes/notifications.js';
 import adminRoutes from './routes/admin.js';
 import meetingRoutes from './routes/meetings.js';
 import oauthRoutes from './routes/oauth.js';
+import dashboardRoutes from './routes/dashboard.js';
 import { initSentry } from './config/sentry.js';
+import cron from 'node-cron';
+import { nightlyFlushAndReset } from './services/dashboardAnalyticsService.js';
 
 dotenv.config();
 
@@ -176,6 +179,7 @@ v1.use('/messages', messageRoutes);
 v1.use('/files', fileRoutes);
 v1.use('/admin', statsRoutes);
 v1.use('/admin', adminRoutes);
+v1.use('/admin/dashboard', dashboardRoutes);
 v1.use('/meetings', meetingRoutes);
 v1.use('/oauth', oauthRoutes);
 v1.use('/notifications', notificationRoutes);
@@ -209,6 +213,15 @@ const startServer = async () => {
       logger.info('Socket.IO attached and ready');
     });
     await connectDB();
+
+    // ── Cron: Flush daily analytics at 11:59 PM IST (18:29 UTC) ──────────
+    cron.schedule('59 23 * * *', () => {
+      logger.info('[CRON] Triggering nightly analytics flush (11:59 PM IST)');
+      nightlyFlushAndReset().catch((err) =>
+        logger.error('[CRON] Nightly flush error:', err.message)
+      );
+    }, { timezone: 'Asia/Kolkata' });
+    logger.info('Cron job scheduled: nightly analytics flush at 11:59 PM IST');
   } catch (error) {
     logger.error('Failed to start server:', error);
     process.exit(1);

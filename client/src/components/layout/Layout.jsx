@@ -19,6 +19,7 @@ import {
   MoonIcon,
   CalendarDaysIcon,
   AdjustmentsHorizontalIcon,
+  ChartBarSquareIcon,
 } from '@heroicons/react/24/outline';
 
 const Layout = () => {
@@ -52,6 +53,7 @@ const Layout = () => {
   ];
 
   const adminNavigation = [
+    { name: 'Analytics', href: '/admin/analytics', icon: ChartBarSquareIcon },
     { name: 'Users', href: '/admin/users', icon: UsersIcon },
     { name: 'Services', href: '/admin/services', icon: WrenchScrewdriverIcon },
     { name: 'Meetings', href: '/admin/meetings', icon: CalendarDaysIcon },
