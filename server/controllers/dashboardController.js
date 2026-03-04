@@ -1,4 +1,5 @@
-import { refreshTodaySnapshot, getSheetHistory } from '../services/dashboardAnalyticsService.js';
+import { refreshTodaySnapshot, getSheetHistory, flushSnapshotToSheet } from '../services/dashboardAnalyticsService.js';
+import DailySnapshot from '../models/DailySnapshot.js';
 import { logger } from '../utils/logger.js';
 
 /**
@@ -26,6 +27,23 @@ export const getDashboardHistory = async (req, res, next) => {
     res.json({ success: true, data: rows });
   } catch (error) {
     logger.error('Dashboard history fetch failed:', error.message);
+    next(error);
+  }
+};
+
+/**
+ * POST /api/v1/admin/dashboard/push-to-sheet
+ * Manually flush today's snapshot to Google Sheets. Uses cached data to avoid extra DB queries.
+ */
+export const pushToSheet = async (req, res, next) => {
+  try {
+    // Use cached snapshot — no extra DB reads
+    const snapshot = await refreshTodaySnapshot();
+    await flushSnapshotToSheet(snapshot);
+    await DailySnapshot.updateOne({ date: snapshot.date }, { $set: { flushedToSheet: true } });
+    res.json({ success: true, message: `Snapshot for ${snapshot.date} pushed to Google Sheets` });
+  } catch (error) {
+    logger.error('Manual sheet push failed:', error.message);
     next(error);
   }
 };

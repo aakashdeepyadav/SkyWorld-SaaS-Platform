@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, useMutation } from 'react-query';
 import { api } from '../../services/api';
 import toast from 'react-hot-toast';
 import {
@@ -32,6 +32,7 @@ import {
   ExclamationTriangleIcon,
   ChartBarIcon,
   ArrowTrendingUpIcon,
+  CloudArrowUpIcon,
 } from '@heroicons/react/24/outline';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -169,6 +170,18 @@ const AdminAnalytics = () => {
   const [historyStart, setHistoryStart] = useState('');
   const [historyEnd, setHistoryEnd] = useState('');
 
+  // Push to sheet mutation
+  const pushToSheet = useMutation(
+    async () => {
+      const res = await api.post('/admin/dashboard/push-to-sheet');
+      return res.data;
+    },
+    {
+      onSuccess: (data) => toast.success(data.message || 'Pushed to Google Sheets'),
+      onError: () => toast.error('Failed to push to Google Sheets'),
+    },
+  );
+
   // Live dashboard
   const {
     data: liveData,
@@ -267,14 +280,24 @@ const AdminAnalytics = () => {
             ))}
           </div>
           {tab === 'live' && (
-            <button
-              onClick={() => refetch()}
-              disabled={isFetching}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 dark:hover:bg-sky-500/20 transition-colors disabled:opacity-50"
-            >
-              <ArrowPathIcon className={`h-3.5 w-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => pushToSheet.mutate()}
+                disabled={pushToSheet.isLoading}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-500/10 dark:text-green-400 dark:hover:bg-green-500/20 transition-colors disabled:opacity-50"
+              >
+                <CloudArrowUpIcon className={`h-3.5 w-3.5 ${pushToSheet.isLoading ? 'animate-bounce' : ''}`} />
+                {pushToSheet.isLoading ? 'Pushing...' : 'Push to Sheet'}
+              </button>
+              <button
+                onClick={() => refetch()}
+                disabled={isFetching}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 dark:hover:bg-sky-500/20 transition-colors disabled:opacity-50"
+              >
+                <ArrowPathIcon className={`h-3.5 w-3.5 ${isFetching ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
+            </div>
           )}
         </div>
       </div>
