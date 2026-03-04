@@ -207,15 +207,34 @@ export const collectDailyMetrics = async () => {
   };
 };
 
-// ─── Upsert Today's Snapshot ─────────────────────────────────────────────────
+// ─── Upsert Today's Snapshot (with 5-min server-side cache) ──────────────────
 
-export const refreshTodaySnapshot = async () => {
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+let _snapshotCache = { data: null, date: null, refreshedAt: 0 };
+
+export const refreshTodaySnapshot = async ({ force = false } = {}) => {
+  const dateStr = todayIST();
+  const now = Date.now();
+
+  // Serve cached snapshot if still fresh (avoids 14 DB queries)
+  if (
+    !force &&
+    _snapshotCache.data &&
+    _snapshotCache.date === dateStr &&
+    now - _snapshotCache.refreshedAt < CACHE_TTL_MS
+  ) {
+    return _snapshotCache.data;
+  }
+
+  // Cache expired or date changed — refresh from live data
   const metrics = await collectDailyMetrics();
   const snapshot = await DailySnapshot.findOneAndUpdate(
     { date: metrics.date },
     { $set: metrics },
     { upsert: true, new: true, setDefaultsOnInsert: true },
   );
+
+  _snapshotCache = { data: snapshot, date: dateStr, refreshedAt: now };
   return snapshot;
 };
 
@@ -338,8 +357,8 @@ export const nightlyFlushAndReset = async () => {
   logger.info(`[CRON] Starting nightly analytics flush for ${dateStr}`);
 
   try {
-    // Refresh one final time to ensure latest data
-    const snapshot = await refreshTodaySnapshot();
+    // Refresh one final time to ensure latest data (bypass cache)
+    const snapshot = await refreshTodaySnapshot({ force: true });
 
     // Flush to Google Sheets
     await flushSnapshotToSheet(snapshot);
