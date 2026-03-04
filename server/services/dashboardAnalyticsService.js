@@ -252,12 +252,16 @@ const getSheetsAuth = () => {
   }
 
   let credentials;
-  try {
-    credentials = JSON.parse(raw); // full JSON key file
-  } catch {
+  const trimmed = raw.trim();
+  if (trimmed.startsWith('{')) {
+    // Full JSON key file
+    credentials = JSON.parse(trimmed);
+  } else {
     // Raw PEM string — pair with service account email
     const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || 'auto-meet@meeting-489120.iam.gserviceaccount.com';
-    credentials = { client_email: clientEmail, private_key: raw.replace(/\\n/g, '\n') };
+    const privateKey = trimmed.replace(/\\n/g, '\n');
+    credentials = { client_email: clientEmail, private_key: privateKey };
+    logger.info(`Sheets auth: using PEM key with ${clientEmail}`);
   }
 
   return new google.auth.GoogleAuth({
@@ -358,6 +362,7 @@ export const flushSnapshotToSheet = async (snapshot) => {
   } catch (error) {
     const detail = error?.response?.data?.error?.message || error.message || String(error);
     logger.error(`Analytics sheet flush failed: ${detail}`);
+    throw error; // propagate so the controller can return a proper error
   }
 };
 
