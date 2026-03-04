@@ -86,7 +86,7 @@ const lineChart = (title, sheetId, anchorSheetId, anchorRow, anchorCol, dataShee
         basicChart: {
           chartType: type,
           legendPosition: 'NO_LEGEND',
-          lineSmoothing: true,
+          ...(type === 'LINE' ? { lineSmoothing: true } : {}),
           axis: [
             { position: 'BOTTOM_AXIS' },
             { position: 'LEFT_AXIS' },
