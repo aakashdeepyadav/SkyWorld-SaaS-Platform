@@ -10,6 +10,9 @@ import {
     WrenchScrewdriverIcon,
     CurrencyRupeeIcon,
     TagIcon,
+    ArrowPathIcon,
+    EyeIcon,
+    EyeSlashIcon,
 } from '@heroicons/react/24/outline';
 import { formatINR } from '../../utils/currency';
 
@@ -47,10 +50,14 @@ const ServiceManagement = () => {
     const [formData, setFormData] = useState({ name: '', description: '', category: '', basePrice: '' });
     const [errors, setErrors] = useState({});
 
-    const { data, isLoading } = useQuery('admin-services', async () => {
-        const res = await api.get('/services?isActive=true');
+    const [showInactive, setShowInactive] = useState(true);
+
+    const { data: allServices, isLoading } = useQuery('admin-services', async () => {
+        const res = await api.get('/services?isActive=all');
         return res.data.services || [];
     });
+
+    const data = showInactive ? allServices : allServices?.filter(s => s.isActive);
 
     const validate = () => {
         const errs = {};
@@ -94,6 +101,17 @@ const ServiceManagement = () => {
         }
     );
 
+    const reactivateMutation = useMutation(
+        async (id) => api.put(`/services/${id}`, { isActive: true }),
+        {
+            onSuccess: () => {
+                toast.success('Service reactivated');
+                queryClient.invalidateQueries('admin-services');
+            },
+            onError: (err) => toast.error(err.response?.data?.message || 'Failed to reactivate'),
+        }
+    );
+
     const openCreate = () => {
         setEditing(null);
         setFormData({ name: '', description: '', category: '', basePrice: '' });
@@ -126,6 +144,8 @@ const ServiceManagement = () => {
     };
 
     const serviceCount = data?.length || 0;
+    const inactiveCount = allServices?.filter(s => !s.isActive)?.length || 0;
+    const activeCount = allServices?.filter(s => s.isActive)?.length || 0;
 
     return (
         <div className="space-y-6 animate-fade-in">
@@ -134,12 +154,27 @@ const ServiceManagement = () => {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Service Management</h1>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {serviceCount > 0 ? `${serviceCount} active service${serviceCount > 1 ? 's' : ''}` : 'Manage platform services offered to clients.'}
+                        {activeCount > 0 ? `${activeCount} active` : '0 active'}{inactiveCount > 0 ? `, ${inactiveCount} inactive` : ''} — Manage platform services offered to clients.
                     </p>
                 </div>
-                <button onClick={openCreate} className="btn-primary inline-flex items-center gap-1.5">
-                    <PlusIcon className="w-4 h-4" /> Add Service
-                </button>
+                <div className="flex items-center gap-2">
+                    {inactiveCount > 0 && (
+                        <button
+                            onClick={() => setShowInactive(!showInactive)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border transition-colors ${
+                                showInactive
+                                    ? 'border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300'
+                                    : 'border-gray-200 dark:border-surface-600 bg-white dark:bg-surface-700 text-gray-500 dark:text-gray-400'
+                            }`}
+                        >
+                            {showInactive ? <EyeIcon className="w-3.5 h-3.5" /> : <EyeSlashIcon className="w-3.5 h-3.5" />}
+                            {showInactive ? 'Showing All' : 'Active Only'}
+                        </button>
+                    )}
+                    <button onClick={openCreate} className="btn-primary inline-flex items-center gap-1.5">
+                        <PlusIcon className="w-4 h-4" /> Add Service
+                    </button>
+                </div>
             </div>
 
             {/* Grid */}
@@ -168,31 +203,51 @@ const ServiceManagement = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {data.map(service => {
                         const styles = CATEGORY_STYLES[service.category] || CATEGORY_STYLES['web-development'];
+                        const isInactive = !service.isActive;
                         return (
                             <div
                                 key={service._id}
-                                className={`card dark:bg-surface-800 dark:border-surface-700 group relative border-l-4 ${styles.border} hover:shadow-md transition-all duration-200`}
+                                className={`card dark:bg-surface-800 dark:border-surface-700 group relative border-l-4 ${styles.border} hover:shadow-md transition-all duration-200 ${isInactive ? 'opacity-50 grayscale' : ''}`}
                             >
+                                {/* Inactive badge */}
+                                {isInactive && (
+                                    <div className="absolute top-2 right-2 px-2 py-0.5 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 text-[10px] font-bold uppercase rounded-md tracking-wide">
+                                        Inactive
+                                    </div>
+                                )}
+
                                 {/* Top row: name + actions */}
                                 <div className="flex items-start justify-between mb-3">
                                     <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-snug pr-2">{service.name}</h3>
-                                    <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                            onClick={() => openEdit(service)}
-                                            className="p-1.5 hover:bg-gray-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
-                                            title="Edit"
-                                        >
-                                            <PencilSquareIcon className="w-4 h-4 text-gray-400" />
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                if (window.confirm(`Deactivate "${service.name}"?`)) deleteMutation.mutate(service._id);
-                                            }}
-                                            className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
-                                            title="Deactivate"
-                                        >
-                                            <TrashIcon className="w-4 h-4 text-red-400" />
-                                        </button>
+                                    <div className={`flex gap-0.5 ${isInactive ? '' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
+                                        {isInactive ? (
+                                            <button
+                                                onClick={() => reactivateMutation.mutate(service._id)}
+                                                className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-colors"
+                                                title="Reactivate"
+                                            >
+                                                <ArrowPathIcon className="w-4 h-4 text-emerald-500" />
+                                            </button>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    onClick={() => openEdit(service)}
+                                                    className="p-1.5 hover:bg-gray-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                                                    title="Edit"
+                                                >
+                                                    <PencilSquareIcon className="w-4 h-4 text-gray-400" />
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        if (window.confirm(`Deactivate "${service.name}"?`)) deleteMutation.mutate(service._id);
+                                                    }}
+                                                    className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                                                    title="Deactivate"
+                                                >
+                                                    <TrashIcon className="w-4 h-4 text-red-400" />
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
 

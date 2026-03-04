@@ -58,12 +58,17 @@ export const getServices = async (req, res, next) => {
   try {
     await ensureActiveServices();
 
-    const { category, isActive = true } = req.query;
-    const query = { isActive: isActive === 'true' || isActive === true };
+    const { category, isActive = 'true' } = req.query;
+    const query = {};
+
+    // Allow admin to fetch all services with isActive=all
+    if (isActive !== 'all') {
+      query.isActive = isActive === 'true' || isActive === true;
+    }
 
     if (category) query.category = category;
 
-    const services = await Service.find(query).sort({ name: 1 });
+    const services = await Service.find(query).sort({ isActive: -1, name: 1 });
 
     res.json({
       success: true,
