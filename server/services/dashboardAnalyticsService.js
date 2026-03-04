@@ -242,17 +242,26 @@ export const refreshTodaySnapshot = async ({ force = false } = {}) => {
 
 /**
  * Service-account auth for Google Sheets.
- * Uses GOOGLE_SERVICE_ACCOUNT_KEY env var (JSON key file contents).
+ * Supports GOOGLE_PRIVATE_KEY as either the full JSON key file or a raw PEM string.
  * This is separate from the OAuth2 flow used for Calendar + Meet.
  */
 const getSheetsAuth = () => {
-  const keyJson = process.env.GOOGLE_PRIVATE_KEY;
-  if (!keyJson) {
+  const raw = process.env.GOOGLE_PRIVATE_KEY;
+  if (!raw) {
     throw new Error('GOOGLE_PRIVATE_KEY not set — cannot access Google Sheets.');
   }
-  const key = JSON.parse(keyJson);
+
+  let credentials;
+  try {
+    credentials = JSON.parse(raw); // full JSON key file
+  } catch {
+    // Raw PEM string — pair with service account email
+    const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || 'auto-meet@meeting-489120.iam.gserviceaccount.com';
+    credentials = { client_email: clientEmail, private_key: raw.replace(/\\n/g, '\n') };
+  }
+
   return new google.auth.GoogleAuth({
-    credentials: key,
+    credentials,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
 };
