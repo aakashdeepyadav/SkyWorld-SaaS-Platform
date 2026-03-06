@@ -29,7 +29,6 @@ const MonthlyPlans = () => {
       {/* Hero */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-sky-500/[0.05] to-indigo-500/[0.05] dark:from-sky-500/[0.10] dark:to-indigo-500/[0.10]" />
-        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-sky-200/20 dark:bg-sky-800/10 rounded-full blur-3xl" />
 
         <div className="relative max-w-5xl mx-auto px-6 pt-10 pb-14">
           <Link
@@ -43,8 +42,7 @@ const MonthlyPlans = () => {
             Monthly Maintenance Plans
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-3 max-w-2xl text-lg leading-relaxed">
-            Keep your website fast, updated, and growing — without lifting a finger. Choose a plan
-            that fits your pace.
+            Optional plans for ongoing updates, monitoring, and support.
           </p>
         </div>
       </div>
@@ -55,9 +53,8 @@ const MonthlyPlans = () => {
           {MONTHLY_PLANS.map((plan) => (
             <div
               key={plan.slug}
-              className={`relative card dark:bg-surface-800 dark:border-surface-700 flex flex-col overflow-hidden transition-shadow hover:shadow-lg ${
-                plan.popular ? 'border-2 border-sky-200 dark:border-sky-500/30 shadow-md' : ''
-              }`}
+              className={`relative card dark:bg-surface-800 dark:border-surface-700 flex flex-col overflow-hidden transition-shadow hover:shadow-lg ${plan.popular ? 'border-2 border-sky-200 dark:border-sky-500/30 shadow-md' : ''
+                }`}
             >
               {plan.popular && (
                 <div className="absolute top-0 right-0 bg-gradient-to-l from-sky-500 to-indigo-500 text-white text-[10px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-bl-xl">
@@ -116,29 +113,16 @@ const MonthlyPlans = () => {
               </div>
 
               {/* Not included */}
-              {plan.notIncluded?.length > 0 && (
-                <div className="pt-4 border-t border-gray-100 dark:border-surface-700 mb-5 space-y-2">
-                  {plan.notIncluded.map((item) => (
-                    <div key={item} className="flex items-start gap-2.5 text-sm">
-                      <XMarkIcon
-                        className="w-4 h-4 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-0.5"
-                        strokeWidth={2.5}
-                      />
-                      <span className="text-gray-400 dark:text-gray-500">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+
 
               {/* Actions */}
               <div className="mt-auto space-y-2.5">
                 <button
                   onClick={() => handleGetStarted(plan)}
-                  className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 active:scale-[0.98] ${
-                    plan.popular
-                      ? 'text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:shadow-lg hover:shadow-sky-500/25'
-                      : 'text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-surface-700 hover:bg-gray-200 dark:hover:bg-surface-600'
-                  }`}
+                  className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 active:scale-[0.98] ${plan.popular
+                    ? 'text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:shadow-lg hover:shadow-sky-500/25'
+                    : 'text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-surface-700 hover:bg-gray-200 dark:hover:bg-surface-600'
+                    }`}
                 >
                   Get Started
                 </button>

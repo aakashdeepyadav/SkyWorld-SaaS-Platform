@@ -30,7 +30,6 @@ const AddOns = () => {
       {/* ── Hero ── */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.06] to-orange-500/[0.06] dark:from-amber-500/[0.12] dark:to-orange-500/[0.12]" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-white/30 to-transparent rounded-full -translate-y-1/2 translate-x-1/3 blur-3xl" />
 
         <div className="relative max-w-5xl mx-auto px-6 pt-10 pb-16">
           <Link
@@ -49,8 +48,7 @@ const AddOns = () => {
                 Add-On Services
               </h1>
               <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-2xl text-lg leading-relaxed">
-                Boost any project with targeted extras — add these on top of any plan or combo for
-                even better results.
+                Extras you can add to any plan or combo.
               </p>
             </div>
           </div>
@@ -104,50 +102,15 @@ const AddOns = () => {
           </div>
         </section>
 
-        {/* ── Benefits Section ── */}
-        <section className="card dark:bg-surface-800 dark:border-surface-700">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">How add-ons work</h2>
-          <div className="grid sm:grid-cols-3 gap-5">
-            {[
-              {
-                icon: PlusIcon,
-                title: 'Stack with any plan',
-                desc: 'Add-ons can be combined with any individual plan or combo package.',
-              },
-              {
-                icon: ClockIcon,
-                title: 'Quick turnaround',
-                desc: 'Most add-ons are delivered within 1–3 business days alongside your project.',
-              },
-              {
-                icon: ShieldCheckIcon,
-                title: 'Quality guaranteed',
-                desc: 'Every add-on undergoes the same quality checks as our core services.',
-              },
-            ].map(({ icon: Ic, title, desc }) => (
-              <div key={title} className="text-center p-4">
-                <div className="w-10 h-10 rounded-xl mx-auto mb-3 bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
-                  <Ic className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                </div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{title}</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+
 
         {/* ── CTA ── */}
         <section className="text-center">
-          <p className="text-gray-500 dark:text-gray-400 mb-4">
-            Not sure what you need? Tell us about your project and we&apos;ll recommend the right
-            extras.
-          </p>
           <Link
             to={user ? '/checkout/addons' : '/register'}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl text-white font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300 active:scale-[0.98]"
           >
-            <ChatBubbleLeftRightIcon className="w-5 h-5" />
-            Browse &amp; Checkout Add-Ons
+            Checkout Add-Ons
           </Link>
         </section>
       </div>

@@ -235,11 +235,7 @@ const Home = () => {
         <div className="hp-hero__glow" />
 
         <div className="hp-hero__content">
-          <p className="hp-hero__pill" style={{ animationDelay: '.12s' }}>
-            Digital Studio
-          </p>
-
-          <h1 className="hp-hero__h1">
+          <h1 className="hp-hero__h1" style={{ marginTop: 100 }}>
             <span className="hp-hero__ln" style={{ animationDelay: '.2s' }}>
               We design &amp; build
             </span>
@@ -253,10 +249,7 @@ const Home = () => {
             </span>
           </h1>
 
-          <p className="hp-hero__sub" style={{ animationDelay: '.62s' }}>
-            A transparent, milestone-based process &mdash; so you always know what&rsquo;s
-            happening, what&rsquo;s next, and what it costs.
-          </p>
+
 
           <div className="hp-hero__btns" style={{ animationDelay: '.76s' }}>
             {authed ? (
@@ -308,10 +301,6 @@ const Home = () => {
           <FadeIn>
             <div className="hp-svc__header">
               <h2 className="hp-sect-h">What we do</h2>
-              <p className="hp-sect-sub">
-                Three core services — each with clear, fixed-price plans so you know exactly what
-                you get and what it costs.
-              </p>
             </div>
           </FadeIn>
 
@@ -377,9 +366,6 @@ const Home = () => {
         <div className="hp-wrap">
           <FadeIn>
             <h2 className="hp-sect-h">Transparent, fixed-price plans</h2>
-            <p className="hp-sect-sub">
-              Choose a service, pick your plan, and get started — no hidden fees.
-            </p>
           </FadeIn>
 
           {/* Segmented tabs */}
@@ -449,10 +435,10 @@ const Home = () => {
                   )}
 
                   <Link
-                    to={`/services/${activeTab}`}
+                    to={`/services/${activeTab}/${plan.slug}`}
                     className={`hp-plan__cta ${plan.popular ? 'hp-plan__cta--pop' : ''}`}
                   >
-                    Choose {plan.name} <span className="hp-btn__arr">&rarr;</span>
+                    View {plan.name} <span className="hp-btn__arr">&rarr;</span>
                   </Link>
                 </div>
               </FadeIn>
@@ -511,9 +497,6 @@ const Home = () => {
         <div className="hp-wrap">
           <FadeIn>
             <h2 className="hp-sect-h">Bundle &amp; save</h2>
-            <p className="hp-sect-sub">
-              Pre-built service combinations for common business needs — at a bundled discount.
-            </p>
           </FadeIn>
 
           <div className="hp-combos__grid">
@@ -557,68 +540,13 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ═══ ADD-ONS TEASER ═══ */}
-      <section className="hp-combos" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
-        <div className="hp-wrap">
-          <FadeIn>
-            <div
-              className="card dark:bg-surface-800 dark:border-surface-700"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-                padding: '40px 24px',
-              }}
-            >
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 12,
-                  background: 'rgba(245,158,11,0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: 16,
-                }}
-              >
-                <Icon name="sparkle" size={22} className="text-amber-500" />
-              </div>
-              <h3
-                style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}
-                className="text-gray-900 dark:text-white"
-              >
-                Need extras?
-              </h3>
-              <p
-                style={{ fontSize: 14, maxWidth: 480, marginBottom: 20 }}
-                className="text-gray-500 dark:text-gray-400"
-              >
-                From Google Business Profile setup to extra pages and priority updates — browse all
-                add-on services.
-              </p>
-              <Link
-                to="/addons"
-                className="hp-combo__cta"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
-              >
-                View Add-On Services <span className="hp-btn__arr">&rarr;</span>
-              </Link>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
+
 
       {/* ═══ MONTHLY PLANS ═══ */}
       <section className="hp-monthly">
         <div className="hp-wrap">
           <FadeIn>
             <h2 className="hp-monthly__h2">Keep your site running smoothly</h2>
-            <p className="hp-monthly__sub">
-              Optional monthly plans for updates, monitoring, and creatives — so you can focus on
-              your business.
-            </p>
             <Link
               to="/plans/monthly"
               style={{
@@ -899,7 +827,7 @@ const Home = () => {
 }
 .hp-sect-sub {
   font-size: 16px; line-height: 1.7; color: var(--muted);
-  margin-top: 14px; max-width: 520px;
+  margin-top: 14px; max-width: 520px; display: none;
 }
 
 /* ══════════════════════════════════════════

@@ -73,7 +73,6 @@ const MonthlyPlanDetail = () => {
       {/* Hero */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-sky-500/[0.05] to-indigo-500/[0.05] dark:from-sky-500/[0.10] dark:to-indigo-500/[0.10]" />
-        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-sky-200/20 dark:bg-sky-800/10 rounded-full blur-3xl" />
 
         <div className="relative max-w-4xl mx-auto px-6 pt-10 pb-14">
           <Link
@@ -140,8 +139,8 @@ const MonthlyPlanDetail = () => {
           ))}
         </div>
 
-        {/* Features & Not included side by side */}
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
+        {/* Features */}
+        <div className="mb-12">
           <div className="card dark:bg-surface-800 dark:border-surface-700">
             <div className="flex items-center gap-2 mb-5">
               <SparklesIcon className="w-5 h-5 text-emerald-500" />
@@ -149,7 +148,7 @@ const MonthlyPlanDetail = () => {
                 What&apos;s included
               </h2>
             </div>
-            <div className="space-y-3">
+            <div className="grid sm:grid-cols-2 gap-3">
               {plan.features.map((f) => (
                 <div key={f} className="flex items-start gap-3 text-sm">
                   <CheckIcon
@@ -160,41 +159,6 @@ const MonthlyPlanDetail = () => {
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className="card dark:bg-surface-800 dark:border-surface-700">
-            <div className="flex items-center gap-2 mb-5">
-              <XMarkIcon className="w-5 h-5 text-gray-400" />
-              <h2 className="text-base font-bold text-gray-900 dark:text-white">Not included</h2>
-            </div>
-            <div className="space-y-3">
-              {plan.notIncluded.map((item) => (
-                <div key={item} className="flex items-start gap-3 text-sm">
-                  <XMarkIcon
-                    className="w-4 h-4 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-0.5"
-                    strokeWidth={2.5}
-                  />
-                  <span className="text-gray-400 dark:text-gray-500">{item}</span>
-                </div>
-              ))}
-            </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-5 leading-relaxed">
-              Need any of these? Check our{' '}
-              <Link
-                to="/addons"
-                className="text-sky-600 dark:text-sky-400 font-medium hover:underline"
-              >
-                add-ons
-              </Link>{' '}
-              or{' '}
-              <Link
-                to={user ? '/request' : '/register'}
-                className="text-sky-600 dark:text-sky-400 font-medium hover:underline"
-              >
-                request a custom quote
-              </Link>
-              .
-            </p>
           </div>
         </div>
 

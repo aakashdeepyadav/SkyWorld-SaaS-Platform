@@ -77,7 +77,6 @@ const ComboDetail = () => {
           className="absolute inset-0 opacity-[0.08] dark:opacity-[0.14]"
           style={{ background: gradientCSS }}
         />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-white/30 to-transparent rounded-full -translate-y-1/2 translate-x-1/3 blur-3xl" />
 
         <div className="relative max-w-5xl mx-auto px-6 pt-10 pb-16">
           <Link
@@ -239,42 +238,7 @@ const ComboDetail = () => {
           </div>
         </section>
 
-        {/* ── Why Choose This Combo ── */}
-        <section className="card dark:bg-surface-800 dark:border-surface-700">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">
-            Why choose a combo?
-          </h2>
-          <div className="grid sm:grid-cols-3 gap-5">
-            {[
-              {
-                icon: TagIcon,
-                title: 'Bundled Savings',
-                desc: `Save ${combo.discount}% compared to buying each service individually.`,
-              },
-              {
-                icon: ClockIcon,
-                title: 'Faster Delivery',
-                desc: 'Services are coordinated together for a streamlined timeline.',
-              },
-              {
-                icon: ShieldCheckIcon,
-                title: 'One Point of Contact',
-                desc: 'A single project manager handles everything for you.',
-              },
-            ].map(({ icon: Ic, title, desc }) => (
-              <div key={title} className="text-center p-4">
-                <div
-                  className="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center"
-                  style={{ background: `rgba(${combo.color}, 0.1)` }}
-                >
-                  <Ic className="w-5 h-5" style={{ color: `rgb(${combo.color})` }} />
-                </div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{title}</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+
 
         {/* ── CTA ── */}
         <section className="text-center">
@@ -287,7 +251,7 @@ const ComboDetail = () => {
             <span>&rarr;</span>
           </button>
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-3">
-            You save {formatINR(combo.originalPrice - combo.price)} with this bundle
+            You save {formatINR(combo.originalPrice - combo.price)}
           </p>
         </section>
 

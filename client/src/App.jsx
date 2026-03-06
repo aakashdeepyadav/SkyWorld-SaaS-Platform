@@ -62,6 +62,7 @@ const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const Contact = lazy(() => import('./pages/Contact'));
 const ServiceDetail = lazy(() => import('./pages/services/ServiceDetail'));
+const PlanDetail = lazy(() => import('./pages/services/PlanDetail'));
 const ComboDetail = lazy(() => import('./pages/services/ComboDetail'));
 const AddOns = lazy(() => import('./pages/services/AddOns'));
 const MonthlyPlans = lazy(() => import('./pages/services/MonthlyPlans'));
@@ -227,6 +228,14 @@ function App() {
         element={
           <Suspense fallback={<PageLoader />}>
             <ServiceDetail />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/services/:slug/:planSlug"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <PlanDetail />
           </Suspense>
         }
       />
