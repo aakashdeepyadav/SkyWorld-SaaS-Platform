@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { useAuth } from './context/AuthContext';
+import { ModalProvider } from './context/ModalContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import RoleRoute from './components/common/RoleRoute';
 import Layout from './components/layout/Layout';
@@ -119,378 +120,383 @@ function App() {
   if (loading) return <PageLoader />;
 
   return (
-    <>
-      <ScrollToTop />
-      <Routes>
-      {/* Root */}
-      <Route
-        path="/"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <Home />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/website"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <Home />
-          </Suspense>
-        }
-      />
+    <ModalProvider>
+      <>
+        <ScrollToTop />
+        <Routes>
+          {/* Root */}
+          <Route
+            path="/"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <Home />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/website"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <Home />
+              </Suspense>
+            }
+          />
 
-      {/* Public routes */}
-      <Route
-        path="/login"
-        element={
-          user ? (
-            <Navigate to="/dashboard" />
-          ) : (
-            <Suspense fallback={<PageLoader />}>
-              <Login />
-            </Suspense>
-          )
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          user ? (
-            <Navigate to="/dashboard" />
-          ) : (
-            <Suspense fallback={<PageLoader />}>
-              <Register />
-            </Suspense>
-          )
-        }
-      />
-      <Route
-        path="/auth/google/callback"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <GoogleCallback />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/forgot-password"
-        element={
-          user ? (
-            <Navigate to="/dashboard" />
-          ) : (
-            <Suspense fallback={<PageLoader />}>
-              <ForgotPassword />
-            </Suspense>
-          )
-        }
-      />
-      <Route
-        path="/reset-password"
-        element={
-          user ? (
-            <Navigate to="/dashboard" />
-          ) : (
-            <Suspense fallback={<PageLoader />}>
-              <ResetPassword />
-            </Suspense>
-          )
-        }
-      />
-      <Route
-        path="/privacy"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <PrivacyPolicy />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/terms"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <TermsOfService />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/faq"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <FAQ />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/contact"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <Contact />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/onboarding/client"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <ClientOnboarding />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/onboarding/developer"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <DeveloperOnboarding />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/services/:slug"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <ServiceDetail />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/services/:slug/:planSlug"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <PlanDetail />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/combos/:slug"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <ComboDetail />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/addons"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <AddOns />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/plans/monthly"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <MonthlyPlans />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/plans/monthly/:slug"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <MonthlyPlanDetail />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/checkout/combo/:slug"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <ComboCheckout />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/checkout/monthly/:slug"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <MonthlyCheckout />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/checkout/addons"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <AddOnCheckout />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/book-meeting"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <BookMeeting />
-          </Suspense>
-        }
-      />
+          {/* Public routes */}
+          <Route
+            path="/login"
+            element={
+              user ? (
+                <Navigate to="/dashboard" />
+              ) : (
+                <Suspense fallback={<PageLoader />}>
+                  <Login />
+                </Suspense>
+              )
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              user ? (
+                <Navigate to="/dashboard" />
+              ) : (
+                <Suspense fallback={<PageLoader />}>
+                  <Register />
+                </Suspense>
+              )
+            }
+          />
+          <Route
+            path="/auth/google/callback"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <GoogleCallback />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              user ? (
+                <Navigate to="/dashboard" />
+              ) : (
+                <Suspense fallback={<PageLoader />}>
+                  <ForgotPassword />
+                </Suspense>
+              )
+            }
+          />
+          <Route
+            path="/reset-password"
+            element={
+              user ? (
+                <Navigate to="/dashboard" />
+              ) : (
+                <Suspense fallback={<PageLoader />}>
+                  <ResetPassword />
+                </Suspense>
+              )
+            }
+          />
+          <Route
+            path="/privacy"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <PrivacyPolicy />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/terms"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <TermsOfService />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/faq"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <FAQ />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <Contact />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/onboarding/client"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <ClientOnboarding />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/onboarding/developer"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <DeveloperOnboarding />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/services/:slug"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <ServiceDetail />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/services/:slug/:planSlug"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <PlanDetail />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/combos/:slug"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <ComboDetail />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/addons"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <AddOns />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/plans/monthly"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <MonthlyPlans />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/plans/monthly/:slug"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <MonthlyPlanDetail />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/checkout/combo/:slug"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <ComboCheckout />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/checkout/monthly/:slug"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <MonthlyCheckout />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/checkout/addons"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <AddOnCheckout />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/book-meeting"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <BookMeeting />
+              </Suspense>
+            }
+          />
 
-      {/* Protected routes — Suspense is handled INSIDE Layout around <Outlet> */}
-      <Route
-        element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }
-      >
-        <Route
-          path="/dashboard"
-          element={<Navigate to={`/dashboard/${user?.role || 'client'}`} />}
-        />
+          {/* Protected routes — Suspense is handled INSIDE Layout around <Outlet> */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route
+              path="/dashboard"
+              element={<Navigate to={`/dashboard/${user?.role || 'client'}`} />}
+            />
 
-        <Route
-          path="/dashboard/admin"
-          element={
-            <RoleRoute allowedRoles={['admin']}>
-              <AdminDashboard />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/dashboard/developer"
-          element={
-            <RoleRoute allowedRoles={['developer']}>
-              <DeveloperDashboard />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/dashboard/client"
-          element={
-            <RoleRoute allowedRoles={['client']}>
-              <ClientDashboard />
-            </RoleRoute>
-          }
-        />
+            <Route
+              path="/dashboard/admin"
+              element={
+                <RoleRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/developer"
+              element={
+                <RoleRoute allowedRoles={['developer']}>
+                  <DeveloperDashboard />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/dashboard/client"
+              element={
+                <RoleRoute allowedRoles={['client']}>
+                  <ClientDashboard />
+                </RoleRoute>
+              }
+            />
 
-        {/* Service Requests */}
-        <Route path="/requests" element={<RequestList />} />
-        <Route
-          path="/requests/new"
-          element={
-            <RoleRoute allowedRoles={['admin']}>
-              <NewRequest />
-            </RoleRoute>
-          }
-        />
-        <Route path="/requests/:id" element={<RequestDetail />} />
-        <Route
-          path="/custom-requests"
-          element={
-            <RoleRoute allowedRoles={['client', 'admin']}>
-              <CustomRequestList />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/request"
-          element={
-            <RoleRoute allowedRoles={['client', 'admin']}>
-              <RequestForm />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/request/thanks"
-          element={
-            <RoleRoute allowedRoles={['client', 'admin']}>
-              <CustomRequestThankYou />
-            </RoleRoute>
-          }
-        />
+            {/* Service Requests */}
+            <Route path="/requests" element={<RequestList />} />
+            <Route
+              path="/requests/new"
+              element={
+                <RoleRoute allowedRoles={['admin']}>
+                  <NewRequest />
+                </RoleRoute>
+              }
+            />
+            <Route path="/requests/:id" element={<RequestDetail />} />
+            <Route
+              path="/custom-requests"
+              element={
+                <RoleRoute allowedRoles={['client', 'admin']}>
+                  <CustomRequestList />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/request"
+              element={
+                <RoleRoute allowedRoles={['client', 'admin']}>
+                  <RequestForm />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/request/thanks"
+              element={
+                <RoleRoute allowedRoles={['client', 'admin']}>
+                  <CustomRequestThankYou />
+                </RoleRoute>
+              }
+            />
 
-        {/* Projects */}
-        <Route path="/projects" element={<ProjectList />} />
-        <Route path="/projects/:id" element={<ProjectDetail />} />
+            {/* Projects */}
+            <Route path="/projects" element={<ProjectList />} />
+            <Route path="/projects/:id" element={<ProjectDetail />} />
 
-        {/* Payments */}
-        <Route
-          path="/payments"
-          element={
-            <RoleRoute allowedRoles={['client', 'admin']}>
-              <PaymentList />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/checkout"
-          element={
-            <RoleRoute allowedRoles={['client', 'admin']}>
-              <Checkout />
-            </RoleRoute>
-          }
-        />
+            {/* Payments */}
+            <Route
+              path="/payments"
+              element={
+                <RoleRoute allowedRoles={['client', 'admin']}>
+                  <PaymentList />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <RoleRoute allowedRoles={['client', 'admin']}>
+                  <Checkout />
+                </RoleRoute>
+              }
+            />
 
-        {/* Admin Only */}
-        <Route
-          path="/admin/users"
-          element={
-            <RoleRoute allowedRoles={['admin']}>
-              <UserManagement />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/admin/services"
-          element={
-            <RoleRoute allowedRoles={['admin']}>
-              <ServiceManagement />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/admin/settings"
-          element={
-            <RoleRoute allowedRoles={['admin']}>
-              <AdminSettings />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/admin/meetings"
-          element={
-            <RoleRoute allowedRoles={['admin']}>
-              <AdminMeetings />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/admin/analytics"
-          element={
-            <RoleRoute allowedRoles={['admin']}>
-              <AdminAnalytics />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/admin/documents"
-          element={
-            <RoleRoute allowedRoles={['admin']}>
-              <AdminDocuments />
-            </RoleRoute>
-          }
-        />
+            {/* Admin Only */}
+            <Route
+              path="/admin/users"
+              element={
+                <RoleRoute allowedRoles={['admin']}>
+                  <UserManagement />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/admin/services"
+              element={
+                <RoleRoute allowedRoles={['admin']}>
+                  <ServiceManagement />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/admin/settings"
+              element={
+                <RoleRoute allowedRoles={['admin']}>
+                  <AdminSettings />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/admin/meetings"
+              element={
+                <RoleRoute allowedRoles={['admin']}>
+                  <AdminMeetings />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/admin/analytics"
+              element={
+                <RoleRoute allowedRoles={['admin']}>
+                  <AdminAnalytics />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/admin/documents"
+              element={
+                <RoleRoute allowedRoles={['admin']}>
+                  <AdminDocuments />
+                </RoleRoute>
+              }
+            />
 
-        {/* Profile & Settings */}
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
-        {/* Legacy routes redirect to new paths */}
-        <Route path="/custom-request" element={<Navigate to="/request" replace />} />
-        <Route path="/custom-request/thanks" element={<Navigate to="/request/thanks" replace />} />
-      </Route>
+            {/* Profile & Settings */}
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+            {/* Legacy routes redirect to new paths */}
+            <Route path="/custom-request" element={<Navigate to="/request" replace />} />
+            <Route
+              path="/custom-request/thanks"
+              element={<Navigate to="/request/thanks" replace />}
+            />
+          </Route>
 
-      {/* 404 */}
-      <Route
-        path="*"
-        element={
-          <Suspense fallback={<PageLoader />}>
-            <NotFound />
-          </Suspense>
-        }
-      />
-      </Routes>
-    </>
+          {/* 404 */}
+          <Route
+            path="*"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <NotFound />
+              </Suspense>
+            }
+          />
+        </Routes>
+      </>
+    </ModalProvider>
   );
 }
 

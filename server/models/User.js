@@ -125,6 +125,34 @@ const userSchema = new mongoose.Schema({
   twoFactorBackupCodes: {
     type: [String],
     select: false
+  },
+  // ─── Onboarding Tracking ───────────────────────────────────────────────
+  onboarding: {
+    started: {
+      type: Date,
+      default: null
+    },
+    completed: {
+      type: Boolean,
+      default: false
+    },
+    completedAt: {
+      type: Date,
+      default: null
+    },
+    currentStep: {
+      type: String,
+      enum: ['overview', 'account', 'services', 'workflow', 'projects', 'payments', 'security'],
+      default: 'overview'
+    },
+    completedSteps: {
+      type: [String],
+      default: []
+    },
+    skipCount: {
+      type: Number,
+      default: 0
+    }
   }
 }, {
   timestamps: true
