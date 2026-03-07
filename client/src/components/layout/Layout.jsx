@@ -2,10 +2,7 @@ import { useState, Suspense } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { useModal } from '../../context/ModalContext';
 import NotificationBell from '../common/NotificationBell';
-import MeetingModal from '../modals/MeetingModal';
-import ContactModal from '../modals/ContactModal';
 import {
   HomeIcon,
   UserIcon,
@@ -29,7 +26,6 @@ import {
 const Layout = () => {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
-  const { openModal, activeModal } = useModal();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -74,8 +70,8 @@ const Layout = () => {
 
   const supportNavigation = isClient
     ? [
-        { name: 'Meeting', action: 'meeting', icon: CalendarDaysIcon },
-        { name: 'Contact', action: 'contact', icon: ChatBubbleLeftRightIcon },
+        { name: 'Meeting', href: '/book-meeting', icon: CalendarDaysIcon },
+        { name: 'Contact', href: '/contact', icon: ChatBubbleLeftRightIcon },
       ]
     : [];
 
@@ -96,58 +92,31 @@ const Layout = () => {
         </p>
       )}
       <div className="space-y-0.5">
-        {items.map((item) => {
-          const isItemActive = item.href ? isActive(item.href) : false;
-          const handleClick = () => {
-            setSidebarOpen(false);
-            if (item.action === 'meeting') {
-              openModal('meeting');
-            } else if (item.action === 'contact') {
-              openModal('contact');
-            }
-          };
-
-          return item.action ? (
-            <button
-              key={item.name}
-              onClick={handleClick}
-              className={`w-full text-left flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
-                activeModal === item.action
-                  ? 'bg-primary-500/20 text-primary-400 shadow-glow/20'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+        {items.map((item) => (
+          <Link
+            key={item.name}
+            to={item.href}
+            onClick={() => setSidebarOpen(false)}
+            className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
+              isActive(item.href)
+                ? 'bg-primary-500/20 text-primary-400 shadow-glow/20'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <item.icon
+              className={`w-5 h-5 mr-3 transition-colors ${
+                isActive(item.href) ? 'text-primary-400' : 'text-gray-500 group-hover:text-gray-300'
               }`}
-            >
-              <item.icon
-                className={`w-5 h-5 mr-3 transition-colors ${
-                  activeModal === item.action
-                    ? 'text-primary-400'
-                    : 'text-gray-500 group-hover:text-gray-300'
-                }`}
-              />
-              {item.name}
-              {activeModal === item.action && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-400" />
-              )}
-            </button>
-          ) : (
-            <Link
-              key={item.name}
-              to={item.href}
-              onClick={() => setSidebarOpen(false)}
-              className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
-                isItemActive
-                  ? 'bg-primary-500/20 text-primary-400 shadow-glow/20'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <item.icon
-                className={`w-5 h-5 mr-3 transition-colors ${
-                  isItemActive ? 'text-primary-400' : 'text-gray-500 group-hover:text-gray-300'
-                }`}
-              />
-              {item.name}
-              {isItemActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-400" />}
-            </Link>
+            />
+            {item.name}
+            {isActive(item.href) && (
+              <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-400" />
+            )}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
           );
         })}
       </div>
@@ -299,10 +268,6 @@ const Layout = () => {
           </Suspense>
         </main>
       </div>
-
-      {/* Modal renderers */}
-      {activeModal === 'meeting' && <MeetingModal />}
-      {activeModal === 'contact' && <ContactModal />}
     </div>
   );
 };
