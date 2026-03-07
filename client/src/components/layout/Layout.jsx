@@ -29,6 +29,7 @@ const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const configuredWebsiteUrl = import.meta.env.VITE_WEBSITE_URL?.trim();
   const websiteUrl = (() => {
     if (!configuredWebsiteUrl) return '/';
@@ -178,13 +179,6 @@ const Layout = () => {
             <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center px-3 py-2 text-sm text-red-400 rounded-lg hover:bg-red-500/10 transition-all duration-200"
-        >
-          <ArrowRightOnRectangleIcon className="w-4 h-4 mr-2" />
-          Sign Out
-        </button>
       </div>
     </div>
   );
@@ -235,17 +229,82 @@ const Layout = () => {
                 {isDark ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
               </button>
               <NotificationBell />
-              {user?.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={user?.name || 'User avatar'}
-                  className="w-8 h-8 rounded-lg object-cover"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-400 to-accent-500 flex items-center justify-center text-white font-bold text-xs">
-                  {user?.name?.charAt(0).toUpperCase()}
-                </div>
-              )}
+              
+              {/* Profile Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-surface-700 transition-colors"
+                  aria-label="User menu"
+                >
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user?.name || 'User avatar'}
+                      className="w-8 h-8 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-400 to-accent-500 flex items-center justify-center text-white font-bold text-xs">
+                      {user?.name?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </button>
+
+                {/* Dropdown Menu */}
+                {profileDropdownOpen && (
+                  <>
+                    {/* Backdrop */}
+                    <div
+                      className="fixed inset-0 z-30"
+                      onClick={() => setProfileDropdownOpen(false)}
+                    />
+                    
+                    {/* Dropdown Content */}
+                    <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-surface-800 border border-gray-200 dark:border-surface-700 shadow-lg z-40 overflow-hidden">
+                      {/* User Info Header */}
+                      <div className="px-4 py-3 border-b border-gray-200 dark:border-surface-700 bg-gray-50 dark:bg-surface-700/50">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{user?.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role}</p>
+                      </div>
+
+                      {/* Profile & Settings Links */}
+                      <div className="py-1">
+                        <Link
+                          to="/profile"
+                          className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-surface-700 transition-colors"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <UserIcon className="w-4 h-4 inline mr-2 -mt-0.5" />
+                          Profile
+                        </Link>
+                        <Link
+                          to="/settings"
+                          className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-surface-700 transition-colors"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <Cog6ToothIcon className="w-4 h-4 inline mr-2 -mt-0.5" />
+                          Settings
+                        </Link>
+                      </div>
+
+                      {/* Divider */}
+                      <div className="h-px bg-gray-200 dark:bg-surface-700" />
+
+                      {/* Sign Out Button */}
+                      <button
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          handleLogout();
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                      >
+                        <ArrowRightOnRectangleIcon className="w-4 h-4 inline mr-2 -mt-0.5" />
+                        Sign Out
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </header>
