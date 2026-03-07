@@ -101,7 +101,7 @@ const AdminMeetings = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+      <div className="bg-white dark:bg-surface-800 rounded-xl border border-gray-200 dark:border-surface-700 p-4">
         <div className="flex flex-wrap items-center gap-3">
           <FunnelIcon className="h-4 w-4 text-gray-400 shrink-0" />
           <div>
@@ -112,7 +112,7 @@ const AdminMeetings = () => {
                 setDateFilter(e.target.value);
                 setPage(1);
               }}
-              className="input !py-2 !text-sm w-44"
+              className="px-3 py-2 rounded-lg border border-gray-200 dark:border-surface-600 bg-white dark:bg-surface-700 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 outline-none transition-all w-44"
               placeholder="Filter by date"
             />
           </div>
@@ -122,7 +122,7 @@ const AdminMeetings = () => {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="input !py-2 !text-sm w-40"
+            className="px-3 py-2 rounded-lg border border-gray-200 dark:border-surface-600 bg-white dark:bg-surface-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 outline-none transition-all w-40"
           >
             <option value="">All statuses</option>
             <option value="confirmed">Confirmed</option>

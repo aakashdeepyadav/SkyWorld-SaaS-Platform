@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
@@ -28,6 +28,7 @@ const BookMeeting = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirect') || null;
+  const dateInputRef = useRef(null);
 
   /* ── State ── */
   const [selectedDate, setSelectedDate] = useState('');
@@ -332,15 +333,21 @@ const BookMeeting = () => {
               <CalendarDaysIcon className="w-4 h-4 inline mr-1.5 -mt-0.5" />
               Select a Date
             </h2>
-            <input
-              type="date"
-              value={selectedDate}
-              min={minDate}
-              max={maxDate}
-              onChange={(e) => fetchSlots(e.target.value)}
-              disabled={!meetReady || checkingMeet}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 dark:border-surface-600 bg-white dark:bg-surface-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 outline-none transition-all"
-            />
+            <div
+              className="inline-block w-full sm:w-auto cursor-pointer"
+              onClick={() => dateInputRef.current?.showPicker?.()}
+            >
+              <input
+                ref={dateInputRef}
+                type="date"
+                value={selectedDate}
+                min={minDate}
+                max={maxDate}
+                onChange={(e) => fetchSlots(e.target.value)}
+                disabled={!meetReady || checkingMeet}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 dark:border-surface-600 bg-white dark:bg-surface-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 outline-none transition-all cursor-pointer"
+              />
+            </div>
           </div>
 
           {/* Step 3: Pick a slot */}

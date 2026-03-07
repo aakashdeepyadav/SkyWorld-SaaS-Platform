@@ -46,7 +46,7 @@ const AdminDashboard = () => {
       link: '/payments',
     },
     {
-      name: 'Pending Requests',
+      name: 'Service Requests',
       value: stats?.pendingRequests || 0,
       icon: ClipboardDocumentListIcon,
       bg: 'bg-violet-50 dark:bg-violet-500/10',
@@ -54,7 +54,7 @@ const AdminDashboard = () => {
       link: '/requests',
     },
     {
-      name: 'Pending Requests',
+      name: 'Custom Requests',
       value: stats?.pendingCustomRequests || 0,
       icon: DocumentTextIcon,
       bg: 'bg-sky-50 dark:bg-sky-500/10',
