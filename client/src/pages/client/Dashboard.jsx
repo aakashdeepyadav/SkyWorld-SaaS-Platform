@@ -151,25 +151,13 @@ const ClientDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Welcome back, {user?.name?.split(' ')[0]}
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Your projects and requests at a glance.
-          </p>
-        </div>
-        <div className="flex gap-2 self-start">
-          <Link to="/" className="btn-primary inline-flex items-center">
-            <GlobeAltIcon className="w-4 h-4 mr-1.5" />
-            Browse Services
-          </Link>
-          <Link to="/request" className="btn-secondary inline-flex items-center">
-            <SparklesIcon className="w-4 h-4 mr-1.5" />
-            New Request
-          </Link>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Welcome back, {user?.name?.split(' ')[0]}
+        </h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Your projects and requests at a glance.
+        </p>
       </div>
 
       {/* Stats */}
@@ -195,7 +183,17 @@ const ClientDashboard = () => {
       {/* Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
-          <h2 className="font-semibold text-gray-900 dark:text-white mb-4">My Projects</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-gray-900 dark:text-white">My Projects</h2>
+            {projects?.projects?.length > 0 && (
+              <Link
+                to="/projects"
+                className="text-xs font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+              >
+                View all →
+              </Link>
+            )}
+          </div>
           {projectsLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -216,78 +214,78 @@ const ClientDashboard = () => {
                 const progress = getProjectProgress(project);
                 return (
                   <div
-                  key={project._id}
-                  className="p-3 rounded-xl border border-gray-100 dark:border-surface-700 hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                      {project.title}
-                    </h3>
-                    <span className={`${getStatusBadge(project.status)} capitalize`}>
-                      {project.status}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mt-2">
-                    {project.serviceType && (
-                      <span className="badge-primary">
-                        {serviceLabels[project.serviceType] || project.serviceType}
+                    key={project._id}
+                    className="p-3 rounded-xl border border-gray-100 dark:border-surface-700 hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                        {project.title}
+                      </h3>
+                      <span className={`${getStatusBadge(project.status)} capitalize`}>
+                        {project.status}
                       </span>
-                    )}
-                    {project.plan && (
-                      <span className="badge bg-gray-50 dark:bg-surface-700 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-surface-600 capitalize">
-                        {project.plan}
-                      </span>
-                    )}
-                    {project.paymentStatus && (
-                      <span className={`${getPaymentBadge(project.paymentStatus)} capitalize`}>
-                        {project.paymentStatus}
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-2">
-                    <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-1">
-                      <span>Progress</span>
-                      <span>{progress}%</span>
                     </div>
-                    <div className="h-1 bg-gray-100 dark:bg-surface-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary-500 rounded-full transition-all duration-500"
-                        style={{ width: `${progress}%` }}
-                      />
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mt-2">
+                      {project.serviceType && (
+                        <span className="badge-primary">
+                          {serviceLabels[project.serviceType] || project.serviceType}
+                        </span>
+                      )}
+                      {project.plan && (
+                        <span className="badge bg-gray-50 dark:bg-surface-700 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-surface-600 capitalize">
+                          {project.plan}
+                        </span>
+                      )}
+                      {project.paymentStatus && (
+                        <span className={`${getPaymentBadge(project.paymentStatus)} capitalize`}>
+                          {project.paymentStatus}
+                        </span>
+                      )}
                     </div>
-                  </div>
-
-                  {/* Pay Balance button — shows when advance paid but final pending */}
-                  {project.advancePaid && !project.finalPaid && (
-                    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-surface-700">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <CreditCardIcon className="w-3.5 h-3.5 text-amber-500" />
-                          <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
-                            Balance due:{' '}
-                            {formatINR(
-                              project.totalPlanPrice
-                                ? project.totalPlanPrice - Math.ceil(project.totalPlanPrice / 2)
-                                : 0
-                            )}
-                          </span>
-                        </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handlePayBalance(project);
-                          }}
-                          disabled={payingProjectId === project._id}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] rounded-lg hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <LockClosedIcon className="w-3 h-3" />
-                          {payingProjectId === project._id ? 'Processing...' : 'Pay Balance'}
-                        </button>
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-1">
+                        <span>Progress</span>
+                        <span>{progress}%</span>
+                      </div>
+                      <div className="h-1 bg-gray-100 dark:bg-surface-700 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary-500 rounded-full transition-all duration-500"
+                          style={{ width: `${progress}%` }}
+                        />
                       </div>
                     </div>
-                  )}
+
+                    {/* Pay Balance button — shows when advance paid but final pending */}
+                    {project.advancePaid && !project.finalPaid && (
+                      <div className="mt-3 pt-3 border-t border-gray-100 dark:border-surface-700">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <CreditCardIcon className="w-3.5 h-3.5 text-amber-500" />
+                            <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                              Balance due:{' '}
+                              {formatINR(
+                                project.totalPlanPrice
+                                  ? project.totalPlanPrice - Math.ceil(project.totalPlanPrice / 2)
+                                  : 0
+                              )}
+                            </span>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePayBalance(project);
+                            }}
+                            disabled={payingProjectId === project._id}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] rounded-lg hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <LockClosedIcon className="w-3 h-3" />
+                            {payingProjectId === project._id ? 'Processing...' : 'Pay Balance'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  );
+                );
               })}
             </div>
           )}
@@ -328,27 +326,21 @@ const ClientDashboard = () => {
                 </p>
               </div>
             </Link>
-            <Link
-              to="/custom-requests"
-              className="flex items-center p-3 rounded-xl border border-gray-100 dark:border-surface-700 hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors group"
-            >
-              <div className="w-9 h-9 rounded-lg bg-sky-500/10 flex items-center justify-center mr-3">
-                <DocumentTextIcon className="w-5 h-5 text-sky-500" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">
-                  View Requests
-                </h3>
-                <p className="text-xs text-gray-400 dark:text-gray-500">
-                  Track quotes and pay for approved requests
-                </p>
-              </div>
-            </Link>
           </div>
         </div>
 
         <div className="card">
-          <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Requests</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-gray-900 dark:text-white">Your Requests</h2>
+            {customRequests?.requests?.length > 0 && (
+              <Link
+                to="/custom-requests"
+                className="text-xs font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+              >
+                View all →
+              </Link>
+            )}
+          </div>
           {customRequestsLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -392,4 +384,3 @@ const ClientDashboard = () => {
 };
 
 export default ClientDashboard;
-
