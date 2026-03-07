@@ -229,7 +229,7 @@ const Layout = () => {
                 {isDark ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
               </button>
               <NotificationBell />
-              
+
               {/* Profile Dropdown */}
               <div className="relative">
                 <button
@@ -258,13 +258,17 @@ const Layout = () => {
                       className="fixed inset-0 z-30"
                       onClick={() => setProfileDropdownOpen(false)}
                     />
-                    
+
                     {/* Dropdown Content */}
                     <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-surface-800 border border-gray-200 dark:border-surface-700 shadow-lg z-40 overflow-hidden">
                       {/* User Info Header */}
                       <div className="px-4 py-3 border-b border-gray-200 dark:border-surface-700 bg-gray-50 dark:bg-surface-700/50">
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{user?.name}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role}</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                          {user?.name}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                          {user?.role}
+                        </p>
                       </div>
 
                       {/* Profile & Settings Links */}

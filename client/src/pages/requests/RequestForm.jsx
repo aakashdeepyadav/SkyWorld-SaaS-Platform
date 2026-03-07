@@ -150,7 +150,7 @@ const RequestForm = () => {
     [selectedId, ALL_OPTIONS]
   );
 
-  const isCustom = selectedOption?.type === 'custom' || !selectedOption;
+  const isCustom = selectedId === 'custom';
 
   const [formData, setFormData] = useState({
     serviceType: urlService || 'web-development',
