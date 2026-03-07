@@ -8,6 +8,7 @@ import {
   CheckCircleIcon,
   ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
+import { getProjectProgress } from '../../utils/projectProgress';
 
 const DeveloperDashboard = () => {
   const { user } = useAuth();
@@ -121,43 +122,46 @@ const DeveloperDashboard = () => {
           </div>
         ) : (
           <div className="space-y-2">
-            {projects?.projects?.map((project) => (
-              <div
-                key={project._id}
-                className="p-4 border border-gray-100 dark:border-surface-700 rounded-xl hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 dark:text-white">{project.title}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
-                      {project.description}
-                    </p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                      Client: {project.clientId?.name}
-                    </p>
+            {projects?.projects?.map((project) => {
+              const progress = getProjectProgress(project);
+              return (
+                <div
+                  key={project._id}
+                  className="p-4 border border-gray-100 dark:border-surface-700 rounded-xl hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 dark:text-white">{project.title}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+                        {project.description}
+                      </p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                        Client: {project.clientId?.name}
+                      </p>
+                    </div>
+                    <span
+                      className={`${getStatusBadge(project.status)} capitalize ml-3 whitespace-nowrap`}
+                    >
+                      {project.status}
+                    </span>
                   </div>
-                  <span
-                    className={`${getStatusBadge(project.status)} capitalize ml-3 whitespace-nowrap`}
-                  >
-                    {project.status}
-                  </span>
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-1">
+                      <span>Progress</span>
+                      <span>{progress}%</span>
+                    </div>
+                    <div className="h-1 bg-gray-100 dark:bg-surface-700 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          project.status === 'completed' ? 'bg-emerald-500' : 'bg-primary-500'
+                        }`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-3">
-                  <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-1">
-                    <span>Progress</span>
-                    <span>{project.progress || 0}%</span>
-                  </div>
-                  <div className="h-1 bg-gray-100 dark:bg-surface-700 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        project.status === 'completed' ? 'bg-emerald-500' : 'bg-primary-500'
-                      }`}
-                      style={{ width: `${project.progress || 0}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

@@ -163,11 +163,7 @@ export const validators = {
     body('deliveryStatus')
       .optional()
       .isIn(['pending', 'in-progress', 'completed', 'delivered'])
-      .withMessage('Invalid delivery status'),
-    body('progress')
-      .optional()
-      .isInt({ min: 0, max: 100 })
-      .withMessage('Progress must be between 0 and 100')
+      .withMessage('Invalid delivery status')
   ],
 
   createCustomRequest: [

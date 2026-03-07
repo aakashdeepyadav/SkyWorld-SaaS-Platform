@@ -6,6 +6,7 @@ import {
     RocketLaunchIcon,
     XCircleIcon,
 } from '@heroicons/react/24/outline';
+import { getProjectProgress } from '../../utils/projectProgress';
 
 /**
  * Visual project pipeline tracker — shows the project's journey
@@ -201,7 +202,7 @@ const MilestoneTimeline = ({ milestones }) => {
 const ProjectTracker = ({ project }) => {
     const currentIndex = getStepIndex(project.status);
     const isCancelled = project.status === 'cancelled';
-    const progress = project.progress || 0;
+    const progress = getProjectProgress(project);
 
     // Choose color for the ring based on current step
     const ringColor = isCancelled

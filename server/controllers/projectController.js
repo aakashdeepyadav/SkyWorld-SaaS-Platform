@@ -190,9 +190,9 @@ export const updateProject = async (req, res, next) => {
       });
     }
 
-    // Developers can only update status and progress
+    // Developers can only update status and milestones.
     if (isDeveloper && !isAdmin) {
-      const allowedFields = ['status', 'progress', 'milestones'];
+      const allowedFields = ['status', 'milestones'];
       const updates = {};
       allowedFields.forEach(field => {
         if (req.body[field] !== undefined) {
@@ -203,7 +203,7 @@ export const updateProject = async (req, res, next) => {
     }
 
     // Admin: allowlisted fields only (prevent overwriting _id, clientId, etc.)
-    const adminAllowed = ['status', 'progress', 'milestones', 'description', 'developerIds',
+    const adminAllowed = ['status', 'milestones', 'description', 'developerIds',
       'deliveryStatus', 'startDate', 'endDate', 'title', 'serviceType', 'plan',
       'advancePaid', 'finalPaid', 'totalPlanPrice', 'paymentStatus'];
     const safeUpdates = {};

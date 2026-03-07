@@ -1,6 +1,14 @@
 import mongoose from 'mongoose';
 import { DELIVERY_STATUS, PAYMENT_STATUS, PROJECT_STATUS, SERVICE_CATEGORIES } from '../utils/constants.js';
 
+const PROJECT_PROGRESS_BY_STATUS = Object.freeze({
+  [PROJECT_STATUS.PLANNING]: 25,
+  [PROJECT_STATUS.IN_PROGRESS]: 50,
+  [PROJECT_STATUS.REVIEW]: 75,
+  [PROJECT_STATUS.COMPLETED]: 100,
+  [PROJECT_STATUS.CANCELLED]: 0
+});
+
 const milestoneSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -115,6 +123,36 @@ const projectSchema = new mongoose.Schema({
 projectSchema.pre('validate', function (next) {
   if (this.serviceRequestId == null) this.serviceRequestId = undefined;
   if (this.customRequestId == null) this.customRequestId = undefined;
+  if (Object.prototype.hasOwnProperty.call(PROJECT_PROGRESS_BY_STATUS, this.status)) {
+    this.progress = PROJECT_PROGRESS_BY_STATUS[this.status];
+  }
+  next();
+});
+
+projectSchema.pre('findOneAndUpdate', function (next) {
+  const update = this.getUpdate() || {};
+  const set = update.$set || {};
+  const nextStatus = update.status ?? set.status;
+
+  // Progress is status-derived and should not be manually set.
+  if (update.progress !== undefined) {
+    delete update.progress;
+  }
+  if (set.progress !== undefined) {
+    delete set.progress;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(PROJECT_PROGRESS_BY_STATUS, nextStatus)) {
+    set.progress = PROJECT_PROGRESS_BY_STATUS[nextStatus];
+  }
+
+  if (Object.keys(set).length > 0) {
+    update.$set = set;
+  } else if (update.$set) {
+    delete update.$set;
+  }
+
+  this.setUpdate(update);
   next();
 });
 

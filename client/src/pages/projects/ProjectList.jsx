@@ -3,6 +3,7 @@ import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { FolderIcon } from '@heroicons/react/24/outline';
+import { getProjectProgress } from '../../utils/projectProgress';
 
 const getStatusBadge = (status) => {
   const map = {
@@ -73,63 +74,66 @@ const ProjectList = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data.projects.map((project) => (
-            <Link
-              key={project._id}
-              to={`/projects/${project._id}`}
-              className="card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-200 group"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-primary-600 transition-colors flex-1 mr-2">
-                  {project.title}
-                </h3>
-                <span className={`${getStatusBadge(project.status)} capitalize flex-shrink-0`}>
-                  {project.status}
-                </span>
-              </div>
-              {project.description && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-4">
-                  {project.description}
-                </p>
-              )}
-              <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mb-4">
-                {project.serviceType && (
-                  <span className="badge-primary">
-                    {serviceLabels[project.serviceType] || project.serviceType}
-                  </span>
-                )}
-                {project.plan && (
-                  <span className="badge bg-gray-50 dark:bg-surface-700 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-surface-600 capitalize">
-                    {project.plan}
-                  </span>
-                )}
-                {project.paymentStatus && (
-                  <span className={`${getPaymentBadge(project.paymentStatus)} capitalize`}>
-                    {project.paymentStatus}
-                  </span>
-                )}
-              </div>
-              {/* Progress bar */}
-              <div>
-                <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="text-gray-400 dark:text-gray-500">Progress</span>
-                  <span className="font-medium text-gray-600 dark:text-gray-300">
-                    {project.progress || 0}%
+          {data.projects.map((project) => {
+            const progress = getProjectProgress(project);
+            return (
+              <Link
+                key={project._id}
+                to={`/projects/${project._id}`}
+                className="card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-200 group"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-primary-600 transition-colors flex-1 mr-2">
+                    {project.title}
+                  </h3>
+                  <span className={`${getStatusBadge(project.status)} capitalize flex-shrink-0`}>
+                    {project.status}
                   </span>
                 </div>
-                <div className="h-1.5 bg-gray-100 dark:bg-surface-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-500"
-                    style={{ width: `${project.progress || 0}%` }}
-                  />
+                {project.description && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-4">
+                    {project.description}
+                  </p>
+                )}
+                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mb-4">
+                  {project.serviceType && (
+                    <span className="badge-primary">
+                      {serviceLabels[project.serviceType] || project.serviceType}
+                    </span>
+                  )}
+                  {project.plan && (
+                    <span className="badge bg-gray-50 dark:bg-surface-700 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-surface-600 capitalize">
+                      {project.plan}
+                    </span>
+                  )}
+                  {project.paymentStatus && (
+                    <span className={`${getPaymentBadge(project.paymentStatus)} capitalize`}>
+                      {project.paymentStatus}
+                    </span>
+                  )}
                 </div>
-              </div>
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50 dark:border-surface-700 text-xs text-gray-400 dark:text-gray-500">
-                <span>{project.clientId?.name || 'Client'}</span>
-                <span>{new Date(project.createdAt).toLocaleDateString()}</span>
-              </div>
-            </Link>
-          ))}
+                {/* Progress bar */}
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="text-gray-400 dark:text-gray-500">Progress</span>
+                    <span className="font-medium text-gray-600 dark:text-gray-300">
+                      {progress}%
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 dark:bg-surface-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-500"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50 dark:border-surface-700 text-xs text-gray-400 dark:text-gray-500">
+                  <span>{project.clientId?.name || 'Client'}</span>
+                  <span>{new Date(project.createdAt).toLocaleDateString()}</span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
 

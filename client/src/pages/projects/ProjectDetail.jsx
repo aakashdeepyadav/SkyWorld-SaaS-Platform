@@ -9,6 +9,7 @@ import {
     ChatBubbleLeftRightIcon,
     PaperAirplaneIcon,
     CreditCardIcon,
+    UserIcon,
 } from '@heroicons/react/24/outline';
 import { formatINR } from '../../utils/currency';
 import ProjectTracker from '../../components/common/ProjectTracker';
@@ -34,6 +35,7 @@ const ProjectDetail = () => {
     const [showMessages, setShowMessages] = useState(false);
     const [newMessage, setNewMessage] = useState('');
     const [isPaying, setIsPaying] = useState(false);
+    const [selectedDeveloperId, setSelectedDeveloperId] = useState('');
 
     const isAdmin = user?.role === 'admin';
     const isDev = user?.role === 'developer';
@@ -44,6 +46,15 @@ const ProjectDetail = () => {
             const res = await api.get(`/projects/${id}`);
             return res.data.project;
         }
+    );
+
+    const { data: developers = [] } = useQuery(
+        ['projectDevelopers'],
+        async () => {
+            const res = await api.get('/users?role=developer&isActive=true&limit=100');
+            return res.data.users || [];
+        },
+        { enabled: isAdmin }
     );
 
     const { data: messagesData, isLoading: messagesLoading } = useQuery(
@@ -58,6 +69,16 @@ const ProjectDetail = () => {
     useEffect(() => {
         if (showMessages) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messagesData, showMessages]);
+
+    useEffect(() => {
+        const current = project?.developerIds?.[0];
+        const currentId = current?._id || (typeof current === 'string' ? current : '');
+        if (currentId) {
+            setSelectedDeveloperId(currentId);
+        } else {
+            setSelectedDeveloperId('');
+        }
+    }, [project?._id, project?.developerIds]);
 
     const sendMessageMutation = useMutation(
         async () => {
@@ -76,17 +97,6 @@ const ProjectDetail = () => {
         }
     );
 
-    const updateProgressMutation = useMutation(
-        async (progress) => api.put(`/projects/${id}`, { progress }),
-        {
-            onSuccess: () => {
-                toast.success('Progress updated');
-                queryClient.invalidateQueries(['project', id]);
-            },
-            onError: (err) => toast.error(err.response?.data?.message || 'Failed to update'),
-        }
-    );
-
     const updateStatusMutation = useMutation(
         async (status) => api.put(`/projects/${id}`, { status }),
         {
@@ -95,6 +105,23 @@ const ProjectDetail = () => {
                 queryClient.invalidateQueries(['project', id]);
             },
             onError: (err) => toast.error(err.response?.data?.message || 'Failed to update status'),
+        }
+    );
+
+    const assignDeveloperMutation = useMutation(
+        async () => {
+            if (!selectedDeveloperId) {
+                throw new Error('Select a developer');
+            }
+            return api.put(`/projects/${id}`, { developerIds: [selectedDeveloperId] });
+        },
+        {
+            onSuccess: () => {
+                toast.success('Developer assigned');
+                queryClient.invalidateQueries(['project', id]);
+                queryClient.invalidateQueries(['projects']);
+            },
+            onError: (err) => toast.error(err.response?.data?.message || err.message || 'Failed to assign developer'),
         }
     );
 
@@ -243,6 +270,7 @@ const ProjectDetail = () => {
 
     const showMeetingPrompt = user?.role === 'client' && searchParams.get('meetingPrompt') === '1';
     const meetingRedirect = `/projects/${project?._id || id}`;
+    const hasAssignedDeveloper = (project?.developerIds?.length || 0) > 0;
 
     const dismissMeetingPrompt = () => {
         const next = new URLSearchParams(searchParams);
@@ -362,6 +390,50 @@ const ProjectDetail = () => {
                 )}
 
                 {/* Developers */}
+                {isAdmin && (
+                    <div className="mb-6 p-4 bg-gray-50 dark:bg-surface-700 rounded-xl border border-gray-100 dark:border-surface-600">
+                        <div className="flex items-center justify-between gap-3 flex-wrap">
+                            <div>
+                                <p className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
+                                    <UserIcon className="w-4 h-4 text-primary-500" />
+                                    Developer Assignment
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    {project?.advancePaid
+                                        ? '50% payment confirmed. Assign developer to start execution.'
+                                        : 'Assigning is unlocked after the 50% advance payment is confirmed.'}
+                                </p>
+                            </div>
+                            {project?.advancePaid && (
+                                <span className="badge-primary">Payment Verified</span>
+                            )}
+                        </div>
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <select
+                                value={selectedDeveloperId}
+                                onChange={(e) => setSelectedDeveloperId(e.target.value)}
+                                disabled={!project?.advancePaid || assignDeveloperMutation.isLoading}
+                                className="input-field !py-2 !text-sm min-w-[220px] disabled:opacity-60"
+                            >
+                                <option value="">Select developer...</option>
+                                {developers.map((developer) => (
+                                    <option key={developer._id} value={developer._id}>
+                                        {developer.name} ({developer.email})
+                                    </option>
+                                ))}
+                            </select>
+                            <button
+                                type="button"
+                                onClick={() => assignDeveloperMutation.mutate()}
+                                disabled={!project?.advancePaid || !selectedDeveloperId || assignDeveloperMutation.isLoading}
+                                className="btn-primary !py-2 !px-4 !text-sm disabled:opacity-60"
+                            >
+                                {assignDeveloperMutation.isLoading ? 'Assigning...' : 'Assign Developer'}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {project.developerIds?.length > 0 && (
                     <div>
                         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Team</h3>
@@ -382,33 +454,19 @@ const ProjectDetail = () => {
             {/* ── Visual Project Status Tracker ─────────────────────────── */}
             <ProjectTracker project={project} />
 
-            {/* Admin/Dev: Progress Slider */}
-            {(isDev || isAdmin) && project.status !== 'completed' && project.status !== 'cancelled' && (
-                <div className="card dark:bg-surface-800 dark:border-surface-700">
-                    <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Update Progress</h2>
-                    <div className="flex items-center gap-3">
-                        <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            step="5"
-                            defaultValue={project.progress || 0}
-                            className="flex-1 h-1.5 bg-gray-200 dark:bg-surface-700 rounded-lg accent-primary-500 cursor-pointer"
-                            onMouseUp={(e) => updateProgressMutation.mutate(Number(e.target.value))}
-                            onTouchEnd={(e) => updateProgressMutation.mutate(Number(e.target.value))}
-                        />
-                        <span className="text-sm font-medium text-gray-500 w-10 text-right">{project.progress || 0}%</span>
-                    </div>
-                </div>
-            )}
-
             {/* Status Actions */}
             {(isAdmin || isDev) && project.status !== 'completed' && project.status !== 'cancelled' && (
                 <div className="card dark:bg-surface-800 dark:border-surface-700">
                     <h2 className="font-semibold text-gray-900 dark:text-white mb-3">Update Status</h2>
                     <div className="flex flex-wrap gap-2">
                         {project.status === 'planning' && (
-                            <button onClick={() => updateStatusMutation.mutate('in-progress')} className="btn-primary !text-sm !py-2">Start Development</button>
+                            <button
+                                onClick={() => updateStatusMutation.mutate('in-progress')}
+                                disabled={isAdmin && !hasAssignedDeveloper}
+                                className="btn-primary !text-sm !py-2 disabled:opacity-60"
+                            >
+                                {isAdmin && !hasAssignedDeveloper ? 'Assign Developer First' : 'Start Development'}
+                            </button>
                         )}
                         {project.status === 'in-progress' && (
                             <button onClick={() => updateStatusMutation.mutate('review')} className="btn-primary !text-sm !py-2">Submit for Review</button>

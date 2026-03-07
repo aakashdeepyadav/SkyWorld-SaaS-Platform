@@ -14,6 +14,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
+import { getProjectProgress } from '../../utils/projectProgress';
 
 const ClientDashboard = () => {
   const { user } = useAuth();
@@ -211,8 +212,10 @@ const ClientDashboard = () => {
             </div>
           ) : (
             <div className="space-y-2">
-              {projects?.projects?.slice(0, 5).map((project) => (
-                <div
+              {projects?.projects?.slice(0, 5).map((project) => {
+                const progress = getProjectProgress(project);
+                return (
+                  <div
                   key={project._id}
                   className="p-3 rounded-xl border border-gray-100 dark:border-surface-700 hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors"
                 >
@@ -244,12 +247,12 @@ const ClientDashboard = () => {
                   <div className="mt-2">
                     <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-1">
                       <span>Progress</span>
-                      <span>{project.progress || 0}%</span>
+                      <span>{progress}%</span>
                     </div>
                     <div className="h-1 bg-gray-100 dark:bg-surface-700 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary-500 rounded-full transition-all duration-500"
-                        style={{ width: `${project.progress || 0}%` }}
+                        style={{ width: `${progress}%` }}
                       />
                     </div>
                   </div>
@@ -283,8 +286,9 @@ const ClientDashboard = () => {
                       </div>
                     </div>
                   )}
-                </div>
-              ))}
+                  </div>
+                  );
+              })}
             </div>
           )}
         </div>
@@ -388,3 +392,4 @@ const ClientDashboard = () => {
 };
 
 export default ClientDashboard;
+
