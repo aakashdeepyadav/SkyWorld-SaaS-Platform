@@ -26,11 +26,13 @@ const milestoneSchema = new mongoose.Schema({
 const projectSchema = new mongoose.Schema({
   serviceRequestId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'ServiceRequest'
+    ref: 'ServiceRequest',
+    default: undefined
   },
   customRequestId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'CustomRequest'
+    ref: 'CustomRequest',
+    default: undefined
   },
   title: {
     type: String,
@@ -110,9 +112,21 @@ const projectSchema = new mongoose.Schema({
   timestamps: true
 });
 
+projectSchema.pre('validate', function (next) {
+  if (this.serviceRequestId == null) this.serviceRequestId = undefined;
+  if (this.customRequestId == null) this.customRequestId = undefined;
+  next();
+});
+
 // Indexes
-projectSchema.index({ serviceRequestId: 1 }, { unique: true, sparse: true });
-projectSchema.index({ customRequestId: 1 }, { sparse: true });
+projectSchema.index(
+  { serviceRequestId: 1 },
+  { unique: true, partialFilterExpression: { serviceRequestId: { $type: 'objectId' } } }
+);
+projectSchema.index(
+  { customRequestId: 1 },
+  { partialFilterExpression: { customRequestId: { $type: 'objectId' } } }
+);
 projectSchema.index({ clientId: 1 });
 projectSchema.index({ developerIds: 1 });
 projectSchema.index({ status: 1 });

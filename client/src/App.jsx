@@ -4,6 +4,7 @@ import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import RoleRoute from './components/common/RoleRoute';
 import Layout from './components/layout/Layout';
+import ScrollToTop from './components/common/ScrollToTop';
 
 /* ── Suspense fallback ── */
 const PageLoader = () => (
@@ -117,7 +118,9 @@ function App() {
   if (loading) return <PageLoader />;
 
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       {/* Root */}
       <Route
         path="/"
@@ -477,7 +480,8 @@ function App() {
           </Suspense>
         }
       />
-    </Routes>
+      </Routes>
+    </>
   );
 }
 

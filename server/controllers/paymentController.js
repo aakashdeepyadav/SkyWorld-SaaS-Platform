@@ -28,6 +28,13 @@ const isSignatureValid = (expected, provided) => {
 
 const isMongoObjectId = (value) => typeof value === 'string' && /^[a-fA-F0-9]{24}$/.test(value);
 
+const sanitizeProjectRefs = (payload) => {
+  const sanitized = { ...payload };
+  if (sanitized.serviceRequestId == null) delete sanitized.serviceRequestId;
+  if (sanitized.customRequestId == null) delete sanitized.customRequestId;
+  return sanitized;
+};
+
 /**
  * @route   GET /api/payments
  * @desc    Get payments
@@ -444,7 +451,7 @@ export const verifyRazorpayPayment = async (req, res, next) => {
           if (existingProject) {
             projectIdToAttach = existingProject._id;
           } else {
-            const project = await Project.create({
+            const project = await Project.create(sanitizeProjectRefs({
               serviceRequestId: serviceRequest._id,
               title: serviceRequest.title,
               description: serviceRequest.description,
@@ -458,7 +465,7 @@ export const verifyRazorpayPayment = async (req, res, next) => {
               advancePaid: true,
               finalPaid: !isAdvance,
               budget: payment.totalPlanPrice || payment.amount
-            });
+            }));
             projectIdToAttach = project._id;
           }
         }
@@ -471,7 +478,7 @@ export const verifyRazorpayPayment = async (req, res, next) => {
           if (existingProject) {
             projectIdToAttach = existingProject._id;
           } else {
-            const project = await Project.create({
+            const project = await Project.create(sanitizeProjectRefs({
               customRequestId: customRequest._id,
               title: `${customRequest.serviceType.replace('-', ' ')} custom project`,
               description: customRequest.projectDescription,
@@ -485,7 +492,7 @@ export const verifyRazorpayPayment = async (req, res, next) => {
               advancePaid: true,
               finalPaid: true,
               budget: payment.totalPlanPrice || payment.amount
-            });
+            }));
             projectIdToAttach = project._id;
             await CustomRequest.findByIdAndUpdate(customRequest._id, {
               status: CUSTOM_REQUEST_STATUS.APPROVED,
@@ -499,7 +506,7 @@ export const verifyRazorpayPayment = async (req, res, next) => {
         const planLabel = payment.plan.replace(/-/g, ' ');
         const svcLabel = payment.serviceType.replace(/-/g, ' ');
         const title = `${svcLabel} — ${planLabel} plan`;
-        const project = await Project.create({
+        const project = await Project.create(sanitizeProjectRefs({
           title,
           description: `${planLabel} plan purchase`,
           clientId: payment.clientId,
@@ -512,7 +519,7 @@ export const verifyRazorpayPayment = async (req, res, next) => {
           advancePaid: true,
           finalPaid: !isAdvance,
           budget: payment.totalPlanPrice || payment.amount
-        });
+        }));
         projectIdToAttach = project._id;
       }
 

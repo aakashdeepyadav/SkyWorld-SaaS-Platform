@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { formatINR } from '../../utils/currency';
 
@@ -35,6 +35,7 @@ const CustomRequestList = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -119,16 +120,18 @@ const CustomRequestList = () => {
         order_id: order.id,
         handler: async (response) => {
           try {
-            await api.post('/payments/razorpay/verify', {
+            const verifyRes = await api.post('/payments/razorpay/verify', {
               paymentId: payment._id,
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
             });
+            const projectId = verifyRes?.data?.payment?.projectId;
             toast.success('Payment successful');
             queryClient.invalidateQueries(['custom-requests']);
             queryClient.invalidateQueries(['projects']);
             queryClient.invalidateQueries(['payments']);
+            navigate(projectId ? `/projects/${projectId}?meetingPrompt=1` : '/projects');
           } catch (error) {
             toast.error(error.response?.data?.message || 'Payment verification failed');
           }

@@ -28,7 +28,12 @@ const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const websiteUrl = import.meta.env.VITE_WEBSITE_URL || '/website';
+  const configuredWebsiteUrl = import.meta.env.VITE_WEBSITE_URL?.trim();
+  const websiteUrl = (() => {
+    if (!configuredWebsiteUrl) return '/';
+    const normalized = configuredWebsiteUrl.replace(/\/website\/?$/i, '');
+    return normalized || '/';
+  })();
 
   const handleLogout = async () => {
     await logout();

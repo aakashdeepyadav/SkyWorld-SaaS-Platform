@@ -6,7 +6,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useCatalog } from '../../context/CatalogContext';
 import toast from 'react-hot-toast';
 import { formatINR } from '../../utils/currency';
-import MeetingPopup from '../../components/common/MeetingPopup';
 import {
   ArrowLeftIcon,
   ShieldCheckIcon,
@@ -50,8 +49,6 @@ const Checkout = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isPaying, setIsPaying] = useState(false);
-  const [showMeetingPopup, setShowMeetingPopup] = useState(false);
-  const [meetingAsked, setMeetingAsked] = useState(false);
 
   const serviceSlug = searchParams.get('service');
   const serviceId = searchParams.get('serviceId');
@@ -152,11 +149,6 @@ const Checkout = () => {
   }
 
   const handlePay = async () => {
-    // Show meeting popup once before first payment attempt
-    if (!meetingAsked) {
-      setShowMeetingPopup(true);
-      return;
-    }
     if (planPrice <= 0) {
       toast.error('This plan is not available for checkout');
       return;
@@ -188,14 +180,15 @@ const Checkout = () => {
         order_id: order.id,
         handler: async (response) => {
           try {
-            await api.post('/payments/razorpay/verify', {
+            const verifyRes = await api.post('/payments/razorpay/verify', {
               paymentId: payment._id,
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
             });
+            const projectId = verifyRes?.data?.payment?.projectId;
             toast.success('Payment successful!');
-            navigate('/dashboard');
+            navigate(projectId ? `/projects/${projectId}?meetingPrompt=1` : '/projects');
           } catch (error) {
             toast.error(error.response?.data?.message || 'Payment verification failed');
           }
@@ -421,20 +414,6 @@ const Checkout = () => {
           </div>
         </div>
       </div>
-
-      {/* Meeting popup */}
-      <MeetingPopup
-        show={showMeetingPopup}
-        onClose={() => {
-          setShowMeetingPopup(false);
-          setMeetingAsked(true);
-        }}
-        onProceedToPayment={() => {
-          setShowMeetingPopup(false);
-          setMeetingAsked(true);
-        }}
-        redirectAfterMeeting={window.location.pathname + window.location.search}
-      />
     </div>
   );
 };

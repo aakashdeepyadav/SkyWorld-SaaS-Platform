@@ -1,8 +1,43 @@
-import { useState, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
-import { CameraIcon, EnvelopeIcon, PhoneIcon, BuildingOfficeIcon, CalendarIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import {
+    ArrowUpTrayIcon,
+    BuildingOfficeIcon,
+    CalendarIcon,
+    CameraIcon,
+    CheckBadgeIcon,
+    EnvelopeIcon,
+    PhoneIcon,
+    ShieldCheckIcon,
+    UserCircleIcon,
+} from '@heroicons/react/24/outline';
+
+const ROLE_META = {
+    admin: {
+        label: 'Administrator',
+        subtitle: 'Platform governance and access control.',
+        badgeClass: 'badge-danger',
+    },
+    developer: {
+        label: 'Developer',
+        subtitle: 'Delivery operations and project execution.',
+        badgeClass: 'badge-primary',
+    },
+    client: {
+        label: 'Client',
+        subtitle: 'Business profile used for service delivery.',
+        badgeClass: 'badge-success',
+    },
+};
+
+const getInitialFormData = (user) => ({
+    name: user?.name || '',
+    phone: user?.phone || '',
+    company: user?.company || '',
+});
 
 const Profile = () => {
     const { user, updateUser } = useAuth();
@@ -10,21 +45,60 @@ const Profile = () => {
     const [loading, setLoading] = useState(false);
     const [avatarLoading, setAvatarLoading] = useState(false);
     const fileInputRef = useRef(null);
-    const [formData, setFormData] = useState({
-        name: user?.name || '',
-        phone: user?.phone || '',
-        company: user?.company || '',
-    });
+    const [formData, setFormData] = useState(() => getInitialFormData(user));
+
+    useEffect(() => {
+        setFormData(getInitialFormData(user));
+    }, [user?.name, user?.phone, user?.company]);
+
+    const normalizedFormData = useMemo(
+        () => ({
+            name: formData.name.trim(),
+            phone: formData.phone.trim(),
+            company: formData.company.trim(),
+        }),
+        [formData]
+    );
+
+    const hasChanges = useMemo(
+        () =>
+            normalizedFormData.name !== (user?.name || '') ||
+            normalizedFormData.phone !== (user?.phone || '') ||
+            normalizedFormData.company !== (user?.company || ''),
+        [normalizedFormData, user?.company, user?.name, user?.phone]
+    );
+
+    const roleMeta = ROLE_META[user?.role] || {
+        label: user?.role ? user.role[0].toUpperCase() + user.role.slice(1) : 'User',
+        subtitle: 'Account profile information.',
+        badgeClass: 'badge-primary',
+    };
+
+    const memberSince = user?.createdAt
+        ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+        : 'N/A';
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleEditToggle = () => {
+        if (editing) {
+            setFormData(getInitialFormData(user));
+        }
+        setEditing((prev) => !prev);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!normalizedFormData.name) {
+            toast.error('Full name is required');
+            return;
+        }
+
         setLoading(true);
         try {
-            const response = await api.put('/users/profile/me', formData);
+            const response = await api.put('/users/profile/me', normalizedFormData);
             updateUser(response.data.user);
             setEditing(false);
             toast.success('Profile updated successfully');
@@ -39,13 +113,11 @@ const Profile = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Validate file type
         if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
             toast.error('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
             return;
         }
 
-        // Validate file size (5MB max)
         if (file.size > 5 * 1024 * 1024) {
             toast.error('Image must be smaller than 5MB');
             return;
@@ -53,9 +125,9 @@ const Profile = () => {
 
         setAvatarLoading(true);
         try {
-            const formData = new FormData();
-            formData.append('avatar', file);
-            const response = await api.post('/files/avatar', formData, {
+            const avatarFormData = new FormData();
+            avatarFormData.append('avatar', file);
+            const response = await api.post('/files/avatar', avatarFormData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             updateUser(response.data.user);
@@ -64,175 +136,237 @@ const Profile = () => {
             toast.error(error.response?.data?.message || 'Image upload service unavailable. Please try again later.');
         } finally {
             setAvatarLoading(false);
-            // Reset file input so user can re-select the same file
             if (fileInputRef.current) fileInputRef.current.value = '';
         }
     };
 
-    return (
-        <div className="max-w-4xl mx-auto space-y-6">
-            {/* Profile Header */}
-            <div className="relative">
-                <div className="h-36 bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl" />
-                <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 px-6 -mt-12 relative z-10">
-                    {/* Avatar with upload */}
-                    <div className="relative group">
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/jpeg,image/png,image/gif,image/webp"
-                            onChange={handleAvatarChange}
-                            className="hidden"
-                        />
-                        {user?.avatar ? (
-                            <img
-                                src={user.avatar}
-                                alt={user.name}
-                                className="w-24 h-24 rounded-2xl object-cover shadow-lg border-4 border-white dark:border-surface-800 ring-2 ring-primary-500/20"
-                            />
-                        ) : (
-                            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white text-3xl font-bold shadow-lg border-4 border-white dark:border-surface-800 ring-2 ring-primary-500/20">
-                                {user?.name?.charAt(0).toUpperCase()}
-                            </div>
-                        )}
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={avatarLoading}
-                            className="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all duration-200 cursor-pointer"
-                            title="Change photo"
-                        >
-                            {avatarLoading ? (
-                                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                                <CameraIcon className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                            )}
-                        </button>
-                    </div>
-                    <div className="flex-1 pb-1">
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user?.name}</h1>
-                        <p className="text-gray-500 dark:text-gray-400">{user?.email}</p>
-                    </div>
-                    <button
-                        onClick={() => setEditing(!editing)}
-                        className={editing ? 'btn-secondary' : 'btn-primary'}
-                    >
-                        {editing ? 'Cancel' : 'Edit Profile'}
-                    </button>
-                </div>
-            </div>
+    const inputReadOnlyClasses = 'bg-gray-50 dark:bg-surface-900/50 cursor-not-allowed text-gray-500 dark:text-gray-400';
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                {/* Personal Info */}
-                <div className="lg:col-span-2 card">
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">Personal Information</h2>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">Full Name</label>
+    return (
+        <div className="mx-auto max-w-5xl space-y-6 animate-fade-in">
+            <section className="overflow-hidden rounded-3xl border border-gray-200/80 bg-white shadow-card dark:border-surface-700 dark:bg-surface-800/80">
+                <div className="h-28 bg-gradient-to-r from-surface-900 via-surface-800 to-primary-700" />
+                <div className="px-5 pb-7 sm:px-8">
+                    <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                        <div className="flex items-end gap-4">
+                            <div className="relative">
                                 <input
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    disabled={!editing}
-                                    className={`input-field ${!editing && 'bg-gray-50 dark:bg-surface-900/50 cursor-not-allowed'}`}
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/gif,image/webp"
+                                    onChange={handleAvatarChange}
+                                    className="hidden"
                                 />
+                                {user?.avatar ? (
+                                    <img
+                                        src={user.avatar}
+                                        alt={user?.name || 'Profile avatar'}
+                                        className="h-24 w-24 rounded-2xl object-cover border-4 border-white dark:border-surface-800 shadow-card"
+                                    />
+                                ) : (
+                                    <div className="h-24 w-24 rounded-2xl border-4 border-white dark:border-surface-800 bg-gradient-to-br from-primary-600 to-primary-400 text-white shadow-card flex items-center justify-center text-3xl font-semibold">
+                                        {user?.name?.charAt(0).toUpperCase() || '?'}
+                                    </div>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={avatarLoading}
+                                    className="absolute -right-2 -bottom-2 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-70 dark:border-surface-600 dark:bg-surface-800 dark:text-gray-300 dark:hover:bg-surface-700"
+                                    title="Upload profile photo"
+                                >
+                                    {avatarLoading ? (
+                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
+                                    ) : (
+                                        <CameraIcon className="h-4 w-4" />
+                                    )}
+                                </button>
                             </div>
+                            <div className="pb-0.5">
+                                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                    {user?.name || 'Profile'}
+                                </h1>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
+                                <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{roleMeta.subtitle}</p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                onClick={handleEditToggle}
+                                className={editing ? 'btn-secondary !py-2 !px-4' : 'btn-primary !py-2 !px-4'}
+                            >
+                                {editing ? 'Cancel' : 'Edit Profile'}
+                            </button>
+                            {editing && (
+                                <button
+                                    type="submit"
+                                    form="profile-form"
+                                    disabled={loading || !hasChanges}
+                                    className="btn-primary !py-2 !px-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {loading ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="mt-5 flex flex-wrap items-center gap-2">
+                        <span className={`${roleMeta.badgeClass} !text-[11px]`}>{roleMeta.label}</span>
+                        <span className={`${user?.isActive !== false ? 'badge-success' : 'badge-danger'} !text-[11px]`}>
+                            {user?.isActive !== false ? 'Active Account' : 'Inactive Account'}
+                        </span>
+                        <span className="badge !text-[11px] bg-gray-100 text-gray-700 ring-1 ring-gray-200 dark:bg-surface-700/70 dark:text-gray-300 dark:ring-surface-600">
+                            {user?.authMethod === 'google' ? 'Google Sign-In' : 'Email Sign-In'}
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+                <section className="card !p-0 overflow-hidden">
+                    <div className="border-b border-gray-100 px-6 py-4 dark:border-surface-700">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Profile Information</h2>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Maintain your personal and organization details used across SkyWorld.
+                        </p>
+                    </div>
+
+                    <form id="profile-form" onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">Email</label>
+                                <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Full Name
+                                </label>
                                 <div className="relative">
-                                    <EnvelopeIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                                    <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                                     <input
-                                        value={user?.email || ''}
-                                        disabled
-                                        className="input-field pl-10 bg-gray-50 dark:bg-surface-900/50 cursor-not-allowed"
+                                        id="name"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        disabled={!editing}
+                                        maxLength={50}
+                                        className={`input-field pl-10 ${!editing ? inputReadOnlyClasses : ''}`}
                                     />
                                 </div>
                             </div>
+
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">Phone</label>
+                                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Email
+                                </label>
                                 <div className="relative">
-                                    <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                                    <EnvelopeIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                                     <input
+                                        id="email"
+                                        value={user?.email || ''}
+                                        disabled
+                                        className={`input-field pl-10 ${inputReadOnlyClasses}`}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Phone
+                                </label>
+                                <div className="relative">
+                                    <PhoneIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                                    <input
+                                        id="phone"
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleChange}
                                         disabled={!editing}
-                                        placeholder="Enter phone number"
-                                        className={`input-field pl-10 ${!editing && 'bg-gray-50 dark:bg-surface-900/50 cursor-not-allowed'}`}
+                                        maxLength={20}
+                                        placeholder="+12025550123"
+                                        className={`input-field pl-10 ${!editing ? inputReadOnlyClasses : ''}`}
                                     />
                                 </div>
                             </div>
+
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">Company</label>
+                                <label htmlFor="company" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Company
+                                </label>
                                 <div className="relative">
-                                    <BuildingOfficeIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                                    <BuildingOfficeIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                                     <input
+                                        id="company"
                                         name="company"
                                         value={formData.company}
                                         onChange={handleChange}
                                         disabled={!editing}
-                                        placeholder="Enter company name"
-                                        className={`input-field pl-10 ${!editing && 'bg-gray-50 dark:bg-surface-900/50 cursor-not-allowed'}`}
+                                        maxLength={100}
+                                        placeholder="Your organization"
+                                        className={`input-field pl-10 ${!editing ? inputReadOnlyClasses : ''}`}
                                     />
                                 </div>
                             </div>
                         </div>
-                        {editing && (
-                            <div className="flex justify-end pt-2">
-                                <button type="submit" disabled={loading} className="btn-primary disabled:opacity-50">
-                                    {loading ? 'Saving...' : 'Save Changes'}
-                                </button>
-                            </div>
+
+                        {editing && !hasChanges && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                No changes detected. Update one or more fields to enable saving.
+                            </p>
                         )}
                     </form>
-                </div>
+                </section>
 
-                {/* Account Details */}
-                <div className="card h-fit">
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">Account</h2>
-                    <div className="space-y-3">
-                        <div className="flex items-center p-3 bg-gray-50 dark:bg-surface-900/50 rounded-xl border border-gray-100 dark:border-surface-700/50">
-                            <ShieldCheckIcon className="w-5 h-5 text-primary-500 mr-3 flex-shrink-0" />
-                            <div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Role</p>
-                                <p className="font-semibold text-gray-900 dark:text-white capitalize">{user?.role}</p>
+                <div className="space-y-6">
+                    <section className="card">
+                        <h2 className="text-base font-semibold text-gray-900 dark:text-white">Account Summary</h2>
+                        <div className="mt-4 space-y-3">
+                            <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-surface-700/60 dark:bg-surface-900/40">
+                                <ShieldCheckIcon className="h-5 w-5 text-primary-500" />
+                                <div>
+                                    <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Role</p>
+                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{roleMeta.label}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-surface-700/60 dark:bg-surface-900/40">
+                                <CheckBadgeIcon className={`h-5 w-5 ${user?.isActive !== false ? 'text-emerald-500' : 'text-red-500'}`} />
+                                <div>
+                                    <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</p>
+                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                        {user?.isActive !== false ? 'Active' : 'Inactive'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-surface-700/60 dark:bg-surface-900/40">
+                                <CalendarIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                                <div>
+                                    <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Member Since</p>
+                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{memberSince}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-surface-700/60 dark:bg-surface-900/40">
+                                <ArrowUpTrayIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                                <div>
+                                    <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">2FA</p>
+                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                        {user?.twoFactorEnabled ? 'Enabled' : 'Not Enabled'}
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex items-center p-3 bg-gray-50 dark:bg-surface-900/50 rounded-xl border border-gray-100 dark:border-surface-700/50">
-                            <div className={`w-2.5 h-2.5 rounded-full mr-3 flex-shrink-0 ${user?.isActive !== false ? 'bg-emerald-500' : 'bg-gray-400'}`} />
-                            <div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Status</p>
-                                <p className="font-semibold text-gray-900 dark:text-white capitalize">{user?.isActive !== false ? 'Active' : 'Inactive'}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center p-3 bg-gray-50 dark:bg-surface-900/50 rounded-xl border border-gray-100 dark:border-surface-700/50">
-                            <CalendarIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-3 flex-shrink-0" />
-                            <div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Member Since</p>
-                                <p className="font-semibold text-gray-900 dark:text-white">
-                                    {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A'}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center p-3 bg-gray-50 dark:bg-surface-900/50 rounded-xl border border-gray-100 dark:border-surface-700/50">
-                            <div className="w-5 h-5 mr-3 flex items-center justify-center flex-shrink-0">
-                                {user?.authMethod === 'google' ? (
-                                    <svg className="w-4 h-4" viewBox="0 0 24 24">
-                                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                                    </svg>
-                                ) : (
-                                    <EnvelopeIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                                )}
-                            </div>
-                            <div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Auth Method</p>
-                                <p className="font-semibold text-gray-900 dark:text-white capitalize">{user?.authMethod || 'Email'}</p>
-                            </div>
-                        </div>
-                    </div>
+                    </section>
+
+                    <section className="card border-primary-100 dark:border-primary-500/20">
+                        <h2 className="text-base font-semibold text-gray-900 dark:text-white">Security Controls</h2>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Manage password, notifications, and account safety settings.
+                        </p>
+                        <Link to="/settings?tab=security" className="btn-secondary mt-4 inline-flex items-center gap-2 !px-4 !py-2">
+                            <ShieldCheckIcon className="h-4 w-4" />
+                            Open Settings
+                        </Link>
+                    </section>
                 </div>
             </div>
         </div>

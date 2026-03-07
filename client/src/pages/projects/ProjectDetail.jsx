@@ -1,10 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { ArrowLeftIcon, ChatBubbleLeftRightIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
+import {
+    ArrowLeftIcon,
+    ChatBubbleLeftRightIcon,
+    PaperAirplaneIcon,
+    CreditCardIcon,
+} from '@heroicons/react/24/outline';
 import { formatINR } from '../../utils/currency';
 import ProjectTracker from '../../components/common/ProjectTracker';
 
@@ -22,6 +27,7 @@ const getStatusBadge = (status) => {
 const ProjectDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { user } = useAuth();
     const queryClient = useQueryClient();
     const messagesEndRef = useRef(null);
@@ -93,17 +99,28 @@ const ProjectDetail = () => {
     );
 
     const handlePay = async () => {
-        if (!project?.budget || project.budget <= 0) {
+        const totalPayable = Number(project?.totalPlanPrice || project?.budget || 0);
+        if (!totalPayable || totalPayable <= 0) {
             toast.error('Payment amount unavailable');
             return;
         }
+        if (project?.finalPaid) {
+            toast.success('This project is fully paid');
+            return;
+        }
+
+        const isFinalPayment = Boolean(project?.advancePaid && !project?.finalPaid);
+        const orderEndpoint = isFinalPayment
+            ? '/payments/razorpay/final-order'
+            : '/payments/razorpay/order';
+
         if (!window.Razorpay) {
             toast.error('Payment service not available');
             return;
         }
         setIsPaying(true);
         try {
-            const { data } = await api.post('/payments/razorpay/order', { projectId: id });
+            const { data } = await api.post(orderEndpoint, { projectId: id });
             const { order, keyId, payment } = data;
             const phone = typeof user?.phone === 'string' ? user.phone.trim() : '';
             const prefill = {
@@ -116,19 +133,22 @@ const ProjectDetail = () => {
                 amount: order.amount,
                 currency: order.currency,
                 name: 'SkyWorld',
-                description: project.title,
+                description: `${isFinalPayment ? 'Final' : 'Advance'} payment - ${project.title}`,
                 order_id: order.id,
                 handler: async (response) => {
                     try {
-                        await api.post('/payments/razorpay/verify', {
+                        const verifyRes = await api.post('/payments/razorpay/verify', {
                             paymentId: payment._id,
                             razorpayOrderId: response.razorpay_order_id,
                             razorpayPaymentId: response.razorpay_payment_id,
                             razorpaySignature: response.razorpay_signature
                         });
-                        toast.success('Payment successful');
+                        const redirectProjectId = verifyRes?.data?.payment?.projectId || id;
+                        toast.success(isFinalPayment ? 'Final payment successful' : 'Advance payment successful');
                         queryClient.invalidateQueries(['payments']);
                         queryClient.invalidateQueries(['project', id]);
+                        queryClient.invalidateQueries('clientProjects');
+                        navigate(`/projects/${redirectProjectId}?meetingPrompt=1`);
                     } catch (err) {
                         toast.error(err.response?.data?.message || 'Payment verification failed');
                     }
@@ -173,7 +193,62 @@ const ProjectDetail = () => {
         );
     }
 
-    const canPay = user?.role === 'client' && project?.budget > 0 && project.status !== 'cancelled';
+    const totalPlanPrice = Number(project?.totalPlanPrice || project?.budget || 0);
+    const advanceAmount = totalPlanPrice > 0 ? Math.ceil(totalPlanPrice / 2) : 0;
+    const finalAmount = totalPlanPrice > 0 ? Math.max(totalPlanPrice - advanceAmount, 0) : 0;
+    const nextPaymentAmount = project?.advancePaid ? finalAmount : advanceAmount;
+    const nextPaymentLabel = project?.advancePaid ? 'Pay Final 50%' : 'Pay 50% Advance';
+
+    const paymentStage = (() => {
+        if (!totalPlanPrice || totalPlanPrice <= 0) {
+            return {
+                label: 'No Payment Required',
+                badgeClass: 'badge',
+                description: 'No payable amount is configured for this project.'
+            };
+        }
+        if (project?.finalPaid) {
+            return {
+                label: '100% Paid',
+                badgeClass: 'badge-success',
+                description: 'Advance and final payments are completed for this project.'
+            };
+        }
+        if (project?.advancePaid) {
+            return {
+                label: '50% Advance Paid',
+                badgeClass: 'badge-primary',
+                description: `Half payment is completed. Remaining amount due: ${formatINR(finalAmount)}.`
+            };
+        }
+        if (project?.paymentStatus === 'failed') {
+            return {
+                label: 'Payment Failed',
+                badgeClass: 'badge-danger',
+                description: `Payment attempt failed. Complete the advance payment of ${formatINR(advanceAmount)} to proceed.`
+            };
+        }
+        return {
+            label: 'Advance Pending',
+            badgeClass: 'badge-warning',
+            description: `To start this project, complete advance payment of ${formatINR(advanceAmount)}.`
+        };
+    })();
+
+    const canPay =
+        user?.role === 'client' &&
+        totalPlanPrice > 0 &&
+        project.status !== 'cancelled' &&
+        !project?.finalPaid;
+
+    const showMeetingPrompt = user?.role === 'client' && searchParams.get('meetingPrompt') === '1';
+    const meetingRedirect = `/projects/${project?._id || id}`;
+
+    const dismissMeetingPrompt = () => {
+        const next = new URLSearchParams(searchParams);
+        next.delete('meetingPrompt');
+        setSearchParams(next, { replace: true });
+    };
 
     return (
         <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
@@ -215,20 +290,74 @@ const ProjectDetail = () => {
                     </div>
                 </div>
 
+                <div className="flex items-center justify-between gap-3 p-4 bg-gray-50 dark:bg-surface-700 rounded-xl mb-6 border border-gray-100 dark:border-surface-600">
+                    <div className="min-w-0">
+                        <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">Payment Stage</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{paymentStage.description}</p>
+                    </div>
+                    <div className="flex-shrink-0 inline-flex items-center gap-2">
+                        <CreditCardIcon className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                        <span className={`${paymentStage.badgeClass}`}>{paymentStage.label}</span>
+                    </div>
+                </div>
+
                 {/* Pay CTA */}
                 {canPay && (
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-primary-50 dark:bg-primary-500/10 rounded-xl mb-6">
                         <div>
-                            <p className="text-sm font-semibold text-primary-700 dark:text-primary-400">Pay for this project</p>
-                            <p className="text-xs text-primary-600 dark:text-primary-500 mt-0.5">Amount: {formatINR(project.budget)}</p>
+                            <p className="text-sm font-semibold text-primary-700 dark:text-primary-400">
+                                {project?.advancePaid ? 'Complete final payment' : 'Pay to start this project'}
+                            </p>
+                            <p className="text-xs text-primary-600 dark:text-primary-500 mt-0.5">
+                                Amount: {formatINR(nextPaymentAmount)}
+                            </p>
                         </div>
                         <button
                             onClick={handlePay}
                             disabled={isPaying}
                             className="btn-primary !py-2 !px-4 disabled:opacity-50"
                         >
-                            {isPaying ? 'Processing...' : 'Pay Now'}
+                            {isPaying ? 'Processing...' : `${nextPaymentLabel} (${formatINR(nextPaymentAmount)})`}
                         </button>
+                    </div>
+                )}
+
+                {user?.role === 'client' && (
+                    <div
+                        className={`rounded-xl border p-4 mb-6 ${showMeetingPrompt
+                                ? 'bg-sky-50 dark:bg-sky-500/10 border-sky-200 dark:border-sky-500/30'
+                                : 'bg-gray-50 dark:bg-surface-700 border-gray-100 dark:border-surface-600'
+                            }`}
+                    >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                {showMeetingPrompt ? 'Payment received. Book your kickoff meeting.' : 'Meeting & Contact'}
+                            </p>
+                            {showMeetingPrompt && <span className="badge-primary">Recommended</span>}
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
+                            Schedule a meeting to discuss scope, timeline, and next steps. For urgent help, contact support directly.
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                            <Link
+                                to={`/book-meeting?redirect=${encodeURIComponent(meetingRedirect)}`}
+                                className="btn-primary !py-2 !px-3 !text-sm"
+                            >
+                                Book Meeting
+                            </Link>
+                            <Link to="/contact" className="btn-secondary !py-2 !px-3 !text-sm">
+                                Contact Support
+                            </Link>
+                            {showMeetingPrompt && (
+                                <button
+                                    type="button"
+                                    onClick={dismissMeetingPrompt}
+                                    className="btn-ghost !py-2 !px-3 !text-sm"
+                                >
+                                    Not now
+                                </button>
+                            )}
+                        </div>
                     </div>
                 )}
 

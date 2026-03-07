@@ -5,7 +5,6 @@ import { formatINR } from '../../utils/currency';
 import { useCatalog } from '../../context/CatalogContext';
 import { api } from '../../services/api';
 import toast from 'react-hot-toast';
-import MeetingPopup from '../../components/common/MeetingPopup';
 import {
   ArrowLeftIcon,
   CheckIcon,
@@ -23,8 +22,6 @@ const AddOnCheckout = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isPaying, setIsPaying] = useState(false);
-  const [showMeetingPopup, setShowMeetingPopup] = useState(false);
-  const [meetingAsked, setMeetingAsked] = useState(false);
 
   /* Pre-select add-on from query param (e.g. ?selected=Chatbot+integration) */
   const preSelected = searchParams.get('selected');
@@ -75,10 +72,6 @@ const AddOnCheckout = () => {
   }
 
   const handlePay = async () => {
-    if (!meetingAsked) {
-      setShowMeetingPopup(true);
-      return;
-    }
     if (totalAmount <= 0) {
       toast.error('Select at least one add-on');
       return;
@@ -111,14 +104,15 @@ const AddOnCheckout = () => {
         order_id: order.id,
         handler: async (response) => {
           try {
-            await api.post('/payments/razorpay/verify', {
+            const verifyRes = await api.post('/payments/razorpay/verify', {
               paymentId: payment._id,
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
             });
+            const projectId = verifyRes?.data?.payment?.projectId;
             toast.success('Payment successful!');
-            navigate('/dashboard');
+            navigate(projectId ? `/projects/${projectId}?meetingPrompt=1` : '/projects');
           } catch {
             toast.error('Payment verification failed. Contact support.');
           }
@@ -306,20 +300,6 @@ const AddOnCheckout = () => {
           </div>
         </div>
       </div>
-
-      {/* Meeting popup */}
-      <MeetingPopup
-        show={showMeetingPopup}
-        onClose={() => {
-          setShowMeetingPopup(false);
-          setMeetingAsked(true);
-        }}
-        onProceedToPayment={() => {
-          setShowMeetingPopup(false);
-          setMeetingAsked(true);
-        }}
-        redirectAfterMeeting="/checkout/addons"
-      />
     </div>
   );
 };

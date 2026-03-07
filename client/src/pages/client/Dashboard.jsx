@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
@@ -11,12 +11,14 @@ import {
   GlobeAltIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 
 const ClientDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [payingProjectId, setPayingProjectId] = useState(null);
 
   const { data: projects, isLoading: projectsLoading } = useQuery('clientProjects', async () => {
@@ -59,14 +61,17 @@ const ClientDashboard = () => {
         order_id: order.id,
         handler: async (response) => {
           try {
-            await api.post('/payments/razorpay/verify', {
+            const verifyRes = await api.post('/payments/razorpay/verify', {
               paymentId: payment._id,
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
             });
+            const projectId = verifyRes?.data?.payment?.projectId || project._id;
             toast.success('Final payment successful!');
-            window.location.reload();
+            queryClient.invalidateQueries('clientProjects');
+            queryClient.invalidateQueries(['payments']);
+            navigate(`/projects/${projectId}?meetingPrompt=1`);
           } catch (err) {
             toast.error(err.response?.data?.message || 'Payment verification failed');
           }
