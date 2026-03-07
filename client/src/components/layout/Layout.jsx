@@ -117,11 +117,6 @@ const Layout = () => {
       </div>
     </div>
   );
-          );
-        })}
-      </div>
-    </div>
-  );
 
   // Get the current page title
   const getPageTitle = () => {

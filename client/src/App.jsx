@@ -224,14 +224,6 @@ function App() {
             }
           />
           <Route
-            path="/contact"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <Contact />
-              </Suspense>
-            }
-          />
-          <Route
             path="/onboarding/client"
             element={
               <Suspense fallback={<PageLoader />}>
@@ -316,14 +308,6 @@ function App() {
             element={
               <Suspense fallback={<PageLoader />}>
                 <AddOnCheckout />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/book-meeting"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <BookMeeting />
               </Suspense>
             }
           />
@@ -477,6 +461,11 @@ function App() {
             {/* Profile & Settings */}
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
+
+            {/* Support Pages — rendered within Layout with sidebar visible */}
+            <Route path="/book-meeting" element={<BookMeeting />} />
+            <Route path="/contact" element={<Contact />} />
+
             {/* Legacy routes redirect to new paths */}
             <Route path="/custom-request" element={<Navigate to="/request" replace />} />
             <Route
