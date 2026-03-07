@@ -281,12 +281,13 @@ const BookMeeting = () => {
 
           <div className="mb-6">
             <div
-              className={`rounded-xl border p-3 text-sm ${checkingMeet
-                ? 'bg-gray-50 dark:bg-surface-700 border-gray-200 dark:border-surface-600 text-gray-500 dark:text-gray-400'
-                : meetReady
-                  ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-300'
-                  : 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-300'
-                }`}
+              className={`rounded-xl border p-3 text-sm ${
+                checkingMeet
+                  ? 'bg-gray-50 dark:bg-surface-700 border-gray-200 dark:border-surface-600 text-gray-500 dark:text-gray-400'
+                  : meetReady
+                    ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                    : 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-300'
+              }`}
             >
               {checkingMeet ? 'Checking Google Meet setup...' : meetStatusMessage}
             </div>
@@ -390,9 +391,10 @@ const BookMeeting = () => {
                               key={slot.startTime}
                               onClick={() => setSelectedSlot(slot)}
                               className={`py-2.5 px-3 rounded-xl text-sm font-medium border transition-all
-                                ${selectedSlot?.startTime === slot.startTime
-                                  ? 'bg-sky-500 text-white border-sky-500 shadow-lg shadow-sky-500/25'
-                                  : 'bg-white dark:bg-surface-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-surface-600 hover:border-sky-300 dark:hover:border-sky-500/50'
+                                ${
+                                  selectedSlot?.startTime === slot.startTime
+                                    ? 'bg-sky-500 text-white border-sky-500 shadow-lg shadow-sky-500/25'
+                                    : 'bg-white dark:bg-surface-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-surface-600 hover:border-sky-300 dark:hover:border-sky-500/50'
                                 }`}
                             >
                               {formatTime12(slot.startTime)}
@@ -416,9 +418,10 @@ const BookMeeting = () => {
                               key={slot.startTime}
                               onClick={() => setSelectedSlot(slot)}
                               className={`py-2.5 px-3 rounded-xl text-sm font-medium border transition-all
-                                ${selectedSlot?.startTime === slot.startTime
-                                  ? 'bg-sky-500 text-white border-sky-500 shadow-lg shadow-sky-500/25'
-                                  : 'bg-white dark:bg-surface-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-surface-600 hover:border-sky-300 dark:hover:border-sky-500/50'
+                                ${
+                                  selectedSlot?.startTime === slot.startTime
+                                    ? 'bg-sky-500 text-white border-sky-500 shadow-lg shadow-sky-500/25'
+                                    : 'bg-white dark:bg-surface-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-surface-600 hover:border-sky-300 dark:hover:border-sky-500/50'
                                 }`}
                             >
                               {formatTime12(slot.startTime)}
