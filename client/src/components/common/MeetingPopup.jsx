@@ -46,24 +46,22 @@ const MeetingPopup = ({ show, onClose, onProceedToPayment, redirectAfterMeeting 
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
-          visible ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${visible ? 'opacity-100' : 'opacity-0'
+          }`}
         onClick={handleNo}
       />
 
       {/* Modal */}
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none transition-all duration-300 ${
-          visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
+        className={`fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none transition-all duration-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}
       >
         <div
           className="pointer-events-auto w-full max-w-md bg-white dark:bg-surface-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-surface-700 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="relative px-6 pt-6 pb-4 bg-gradient-to-r from-sky-500 to-indigo-600">
+          <div className="relative px-6 pt-6 pb-4 bg-[#37BBEC]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
             <button
               onClick={handleNo}
@@ -101,7 +99,7 @@ const MeetingPopup = ({ show, onClose, onProceedToPayment, redirectAfterMeeting 
             <div className="flex gap-3">
               <button
                 onClick={handleYes}
-                className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 transition-all duration-200 active:scale-[0.98] text-sm flex items-center justify-center gap-2"
+                className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] transition-all duration-200 active:scale-[0.98] text-sm flex items-center justify-center gap-2"
               >
                 <VideoCameraIcon className="w-4 h-4" />
                 Yes, Book Meeting

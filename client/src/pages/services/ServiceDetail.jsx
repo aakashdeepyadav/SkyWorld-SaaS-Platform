@@ -162,7 +162,7 @@ const ServiceDetail = () => {
               >
                 {plan.popular && (
                   <div
-                    className={`absolute top-0 right-0 bg-gradient-to-l ${catalog.gradient} text-white text-[10px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-bl-xl`}
+                    className={`absolute top-0 right-0 bg-[#37BBEC] text-white text-[10px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-bl-xl`}
                   >
                     Popular
                   </div>
@@ -223,7 +223,7 @@ const ServiceDetail = () => {
                 <Link
                   to={`/services/${slug}/${plan.slug}`}
                   className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 active:scale-[0.98] mt-auto text-center block ${plan.popular
-                    ? `text-white bg-gradient-to-r ${catalog.gradient} hover:shadow-lg hover:shadow-primary-500/25`
+                    ? `text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25`
                     : 'text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-surface-700 hover:bg-gray-200 dark:hover:bg-surface-600'
                     }`}
                 >

@@ -43,10 +43,10 @@ class ErrorBoundary extends Component {
     const headingColor = t('#0f172a', '#f1f5f9');
     const textColor = t('#64748b', '#94a3b8');
     const subtleText = t('#94a3b8', '#64748b');
-    const accentGradient = 'linear-gradient(135deg, #0ea5e9, #6366f1)';
+    const accentColor = '#37BBEC';
     const iconBg = t('#eff6ff', '#1e3a5f');
     const iconStroke = t('#3b82f6', '#60a5fa');
-    const btnPrimaryBg = accentGradient;
+    const btnPrimaryBg = accentColor;
     const btnSecBg = t('#f1f5f9', '#334155');
     const btnSecColor = t('#475569', '#cbd5e1');
     const btnSecBorder = t('#e2e8f0', '#475569');
@@ -79,8 +79,8 @@ class ErrorBoundary extends Component {
             overflow: 'hidden',
           }}
         >
-          {/* Gradient accent bar */}
-          <div style={{ height: 4, background: accentGradient }} />
+          {/* Accent bar */}
+          <div style={{ height: 4, background: accentColor }} />
 
           <div style={{ padding: '40px 36px 36px' }}>
             {/* Icon */}
@@ -181,16 +181,16 @@ class ErrorBoundary extends Component {
                   border: 'none',
                   cursor: 'pointer',
                   transition: 'transform 0.15s, box-shadow 0.15s',
-                  boxShadow: '0 4px 14px -3px rgba(14,165,233,0.4)',
+                  boxShadow: '0 4px 14px -3px rgba(55,187,236,0.4)',
                   letterSpacing: '0.01em',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px -3px rgba(14,165,233,0.5)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px -3px rgba(55,187,236,0.5)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 14px -3px rgba(14,165,233,0.4)';
+                  e.currentTarget.style.boxShadow = '0 4px 14px -3px rgba(55,187,236,0.4)';
                 }}
               >
                 Reload Page

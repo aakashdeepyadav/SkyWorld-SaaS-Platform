@@ -86,8 +86,8 @@ const Contact = () => {
         {status === 'error' && (
           <div className="mb-6 rounded-xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300">
             Something went wrong. Please try again or email us directly at{' '}
-            <a href="mailto:ventures.skyworld@gmail.com" className="underline">
-              ventures.skyworld@gmail.com
+            <a href="mailto:support@skyworld.buzz" className="underline">
+              support@skyworld.buzz
             </a>
           </div>
         )}
@@ -207,10 +207,10 @@ const Contact = () => {
           <div className="mt-10 text-sm text-gray-500 dark:text-gray-400">
             Or email us directly at{' '}
             <a
-              href="mailto:ventures.skyworld@gmail.com"
+              href="mailto:support@skyworld.buzz"
               className="text-primary-500 hover:underline"
             >
-              ventures.skyworld@gmail.com
+              support@skyworld.buzz
             </a>
           </div>
         )}

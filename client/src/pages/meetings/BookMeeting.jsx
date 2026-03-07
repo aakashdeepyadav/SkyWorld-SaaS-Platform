@@ -141,7 +141,7 @@ const BookMeeting = () => {
         <div className="max-w-lg mx-auto">
           <div className="card dark:bg-surface-800 dark:border-surface-700 text-center overflow-hidden">
             {/* Success header */}
-            <div className="-mx-6 -mt-6 px-6 py-8 mb-6 bg-gradient-to-r from-emerald-500 to-teal-500 relative overflow-hidden">
+            <div className="-mx-6 -mt-6 px-6 py-8 mb-6 bg-emerald-500 relative overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
               <div className="relative">
                 <CheckCircleIcon className="w-14 h-14 text-white mx-auto mb-3" />
@@ -197,14 +197,14 @@ const BookMeeting = () => {
               {redirectTo ? (
                 <Link
                   to={redirectTo}
-                  className="flex-1 py-3 px-5 rounded-xl font-semibold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 transition-all text-center text-sm"
+                  className="flex-1 py-3 px-5 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] transition-all text-center text-sm"
                 >
                   Continue to Payment
                 </Link>
               ) : (
                 <Link
                   to="/dashboard"
-                  className="flex-1 py-3 px-5 rounded-xl font-semibold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 transition-all text-center text-sm"
+                  className="flex-1 py-3 px-5 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] transition-all text-center text-sm"
                 >
                   Go to Dashboard
                 </Link>
@@ -265,7 +265,7 @@ const BookMeeting = () => {
 
         <div className="card dark:bg-surface-800 dark:border-surface-700 overflow-hidden">
           {/* Header */}
-          <div className="-mx-6 -mt-6 px-6 py-5 mb-6 bg-gradient-to-r from-sky-500 to-indigo-600 relative overflow-hidden">
+          <div className="-mx-6 -mt-6 px-6 py-5 mb-6 bg-[#37BBEC] relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
             <div className="relative flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
@@ -280,13 +280,12 @@ const BookMeeting = () => {
 
           <div className="mb-6">
             <div
-              className={`rounded-xl border p-3 text-sm ${
-                checkingMeet
-                  ? 'bg-gray-50 dark:bg-surface-700 border-gray-200 dark:border-surface-600 text-gray-500 dark:text-gray-400'
-                  : meetReady
-                    ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-300'
-                    : 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-300'
-              }`}
+              className={`rounded-xl border p-3 text-sm ${checkingMeet
+                ? 'bg-gray-50 dark:bg-surface-700 border-gray-200 dark:border-surface-600 text-gray-500 dark:text-gray-400'
+                : meetReady
+                  ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                  : 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-300'
+                }`}
             >
               {checkingMeet ? 'Checking Google Meet setup...' : meetStatusMessage}
             </div>
@@ -384,10 +383,9 @@ const BookMeeting = () => {
                               key={slot.startTime}
                               onClick={() => setSelectedSlot(slot)}
                               className={`py-2.5 px-3 rounded-xl text-sm font-medium border transition-all
-                                ${
-                                  selectedSlot?.startTime === slot.startTime
-                                    ? 'bg-sky-500 text-white border-sky-500 shadow-lg shadow-sky-500/25'
-                                    : 'bg-white dark:bg-surface-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-surface-600 hover:border-sky-300 dark:hover:border-sky-500/50'
+                                ${selectedSlot?.startTime === slot.startTime
+                                  ? 'bg-sky-500 text-white border-sky-500 shadow-lg shadow-sky-500/25'
+                                  : 'bg-white dark:bg-surface-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-surface-600 hover:border-sky-300 dark:hover:border-sky-500/50'
                                 }`}
                             >
                               {formatTime12(slot.startTime)}
@@ -411,10 +409,9 @@ const BookMeeting = () => {
                               key={slot.startTime}
                               onClick={() => setSelectedSlot(slot)}
                               className={`py-2.5 px-3 rounded-xl text-sm font-medium border transition-all
-                                ${
-                                  selectedSlot?.startTime === slot.startTime
-                                    ? 'bg-sky-500 text-white border-sky-500 shadow-lg shadow-sky-500/25'
-                                    : 'bg-white dark:bg-surface-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-surface-600 hover:border-sky-300 dark:hover:border-sky-500/50'
+                                ${selectedSlot?.startTime === slot.startTime
+                                  ? 'bg-sky-500 text-white border-sky-500 shadow-lg shadow-sky-500/25'
+                                  : 'bg-white dark:bg-surface-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-surface-600 hover:border-sky-300 dark:hover:border-sky-500/50'
                                 }`}
                             >
                               {formatTime12(slot.startTime)}
@@ -452,7 +449,7 @@ const BookMeeting = () => {
               <button
                 onClick={handleBook}
                 disabled={booking || !meetReady || checkingMeet}
-                className="w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <VideoCameraIcon className="w-5 h-5" />
                 {booking ? 'Booking...' : 'Confirm Meeting'}

@@ -108,7 +108,7 @@ const AddOns = () => {
         <section className="text-center">
           <Link
             to={user ? '/checkout/addons' : '/register'}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl text-white font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300 active:scale-[0.98]"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl text-white font-bold bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25 transition-all duration-300 active:scale-[0.98]"
           >
             Checkout Add-Ons
           </Link>

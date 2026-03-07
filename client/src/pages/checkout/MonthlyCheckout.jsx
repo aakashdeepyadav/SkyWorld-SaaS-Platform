@@ -138,7 +138,7 @@ const MonthlyCheckout = () => {
         {/* Main checkout card */}
         <div className="card dark:bg-surface-800 dark:border-surface-700 overflow-hidden">
           {/* Header */}
-          <div className="-mx-6 -mt-6 px-6 py-5 mb-6 bg-gradient-to-r from-sky-500 to-indigo-500 relative overflow-hidden">
+          <div className="-mx-6 -mt-6 px-6 py-5 mb-6 bg-[#37BBEC] relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
             <div className="relative flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
@@ -272,7 +272,7 @@ const MonthlyCheckout = () => {
             <button
               onClick={handlePay}
               disabled={isPaying}
-              className="w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:shadow-lg hover:shadow-sky-500/25 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <LockClosedIcon className="w-4 h-4" />
               {isPaying ? 'Processing...' : `Subscribe — ${formatINR(plan.price)}/month`}

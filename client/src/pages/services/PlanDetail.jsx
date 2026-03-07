@@ -105,7 +105,7 @@ const PlanDetail = () => {
                         <div className="max-w-lg">
                             {plan.popular && (
                                 <span
-                                    className={`inline-block text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-gradient-to-r ${catalog.gradient} text-white mb-3`}
+                                    className={`inline-block text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#37BBEC] text-white mb-3`}
                                 >
                                     Most Popular
                                 </span>
@@ -134,7 +134,7 @@ const PlanDetail = () => {
                             </p>
                             <button
                                 onClick={handleCheckout}
-                                className={`mt-4 px-8 py-3 rounded-xl font-semibold text-white bg-gradient-to-r ${catalog.gradient} hover:shadow-lg transition-all duration-300 active:scale-[0.98]`}
+                                className={`mt-4 px-8 py-3 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg transition-all duration-300 active:scale-[0.98]`}
                             >
                                 Get Started
                             </button>
@@ -277,7 +277,7 @@ const PlanDetail = () => {
                 <div className="text-center mb-16">
                     <button
                         onClick={handleCheckout}
-                        className={`inline-flex items-center gap-2 px-10 py-4 rounded-2xl text-white font-bold text-lg bg-gradient-to-r ${catalog.gradient} transition-all duration-300 hover:shadow-xl active:scale-[0.98]`}
+                        className={`inline-flex items-center gap-2 px-10 py-4 rounded-2xl text-white font-bold text-lg bg-[#37BBEC] hover:bg-[#2ea8d6] transition-all duration-300 hover:shadow-xl active:scale-[0.98]`}
                     >
                         Get Started — {formatINR(plan.price)}
                         <span>&rarr;</span>

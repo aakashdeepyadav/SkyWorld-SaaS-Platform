@@ -270,7 +270,7 @@ const ClientDashboard = () => {
                             handlePayBalance(project);
                           }}
                           disabled={payingProjectId === project._id}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-sky-500 to-blue-600 rounded-lg hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] rounded-lg hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <LockClosedIcon className="w-3 h-3" />
                           {payingProjectId === project._id ? 'Processing...' : 'Pay Balance'}

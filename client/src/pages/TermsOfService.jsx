@@ -9,13 +9,13 @@ const TermsOfService = () => {
                 </Link>
 
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Terms of Service</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">Last updated: February 20, 2026</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">Last updated: March 7, 2026</p>
 
                 <div className="prose prose-gray dark:prose-invert max-w-none space-y-6">
                     <section>
                         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">1. Acceptance of Terms</h2>
                         <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                            By accessing or using the SkyWorld SaaS Platform operated by SkyWorld Ventures ("we", "our", "us"),
+                            By accessing or using the SkyWorld platform operated by SkyWorld Ventures ("we", "our", "us"),
                             you agree to be bound by these Terms of Service. If you do not agree, please do not use our platform.
                         </p>
                     </section>
@@ -23,12 +23,15 @@ const TermsOfService = () => {
                     <section>
                         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">2. Description of Services</h2>
                         <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-3">
-                            SkyWorld provides a platform connecting clients with professional services in:
+                            SkyWorld provides a digital services platform connecting clients with professional services in:
                         </p>
                         <ul className="list-disc pl-6 text-gray-600 dark:text-gray-300 space-y-1">
-                            <li><strong>App Development</strong> — Mobile and desktop application development</li>
-                            <li><strong>Web Development</strong> — Website and web application development</li>
-                            <li><strong>Branding &amp; Creative</strong> — Brand identity, design, and creative services</li>
+                            <li><strong>Web Development</strong> — Launch Pages, Starter Websites, and Growth Websites for businesses of all sizes</li>
+                            <li><strong>App Development</strong> — Progressive Web Apps (PWA) and full-stack applications with dashboards</li>
+                            <li><strong>Branding &amp; Design</strong> — Logo design, brand identity kits, business collateral, and social media assets</li>
+                            <li><strong>Combo Packages</strong> — Bundled service packages (e.g., Restaurant Starter, Medical Growth, Premium Business) at discounted rates</li>
+                            <li><strong>Monthly Maintenance Plans</strong> — Recurring plans for website updates, monitoring, SEO, and ongoing support (Care Plan Lite, Growth Plan, Local Growth Plus)</li>
+                            <li><strong>Add-On Services</strong> — Optional extras such as Google Business Profile setup, local SEO, chatbot integration, WhatsApp API setup, and more</li>
                         </ul>
                     </section>
 
@@ -51,6 +54,7 @@ const TermsOfService = () => {
                             <li>Provide clear and accurate project requirements</li>
                             <li>Respond to communications in a timely manner</li>
                             <li>Make payments as agreed upon for services rendered</li>
+                            <li>Review deliverables and approve project completion</li>
                         </ul>
 
                         <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">Developers</h3>
@@ -66,25 +70,47 @@ const TermsOfService = () => {
                         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">5. Intellectual Property</h2>
                         <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                             Upon full payment, clients receive ownership rights to the deliverables created
-                            specifically for their project. SkyWorld retains ownership of the platform, its
-                            underlying technology, tools, and any pre-existing intellectual property.
-                            Developers retain the right to use general knowledge and non-proprietary techniques
-                            gained during projects.
+                            specifically for their project — including source code, design files, and brand assets.
+                            SkyWorld retains ownership of the platform, its underlying technology, tools, and any
+                            pre-existing intellectual property. Developers retain the right to use general knowledge
+                            and non-proprietary techniques gained during projects.
                         </p>
                     </section>
 
                     <section>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">6. Payments &amp; Refunds</h2>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">6. Pricing &amp; Payment Terms</h2>
                         <ul className="list-disc pl-6 text-gray-600 dark:text-gray-300 space-y-2">
-                            <li>All payments are processed through secure third-party payment providers</li>
-                            <li>Pricing is determined on a per-project basis and agreed upon before work begins</li>
+                            <li><strong>Fixed-Price Plans:</strong> Prices are displayed on the platform. Payment follows a 50/50 model — 50% advance to start the project, and the remaining 50% upon delivery and client approval</li>
+                            <li><strong>Combo Packages:</strong> Bundled at discounted rates (12–18% off). Payment follows the same 50/50 model</li>
+                            <li><strong>Monthly Plans:</strong> Billed monthly starting from the subscription date. You can pause or cancel with 7 days notice. No long-term contracts</li>
+                            <li><strong>Add-On Services:</strong> Charged upfront in full at the time of purchase</li>
+                            <li><strong>Custom Requests:</strong> Pricing is quoted based on scope after review. Payment terms are agreed upon before work begins</li>
+                            <li>All payments are processed securely through Razorpay</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">7. Refunds</h2>
+                        <ul className="list-disc pl-6 text-gray-600 dark:text-gray-300 space-y-2">
                             <li>Refund requests are evaluated on a case-by-case basis</li>
+                            <li>Advance payments may be partially refundable if significant work has not yet been started</li>
+                            <li>Monthly plan payments for the current billing cycle are non-refundable</li>
                             <li>We reserve the right to suspend services for overdue payments</li>
                         </ul>
                     </section>
 
                     <section>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">7. Prohibited Activities</h2>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">8. Revisions &amp; Delivery</h2>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                            All fixed-price plans include unlimited revisions until you are satisfied. Delivery
+                            timelines are estimates and may vary based on project complexity, feedback turnaround,
+                            and scope changes. We commit to regular progress updates throughout the project lifecycle.
+                            Source code and all deliverables are handed over upon project completion and full payment.
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">9. Prohibited Activities</h2>
                         <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-3">You agree not to:</p>
                         <ul className="list-disc pl-6 text-gray-600 dark:text-gray-300 space-y-1">
                             <li>Use the platform for any unlawful purpose</li>
@@ -98,17 +124,7 @@ const TermsOfService = () => {
                     </section>
 
                     <section>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">8. File Uploads</h2>
-                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                            Files uploaded to the platform are stored securely via Cloudinary. You are responsible
-                            for ensuring you have the rights to upload any content. We reserve the right to remove
-                            content that violates these terms. Maximum file sizes and supported formats are
-                            enforced by the platform.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">9. Limitation of Liability</h2>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">10. Limitation of Liability</h2>
                         <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                             SkyWorld Ventures is provided "as is" without warranties of any kind. We shall not be
                             liable for any indirect, incidental, special, or consequential damages arising from
@@ -118,17 +134,18 @@ const TermsOfService = () => {
                     </section>
 
                     <section>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">10. Termination</h2>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">11. Termination</h2>
                         <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                             We may suspend or terminate your account at any time for violation of these terms
                             or for any reason with reasonable notice. You may delete your account at any time.
                             Upon termination, your right to use the platform ceases immediately, though we may
-                            retain certain data as required by law.
+                            retain certain data as required by law. Active monthly subscriptions will be cancelled
+                            upon account termination.
                         </p>
                     </section>
 
                     <section>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">11. Changes to Terms</h2>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">12. Changes to Terms</h2>
                         <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                             We reserve the right to modify these terms at any time. Material changes will be
                             communicated via email or platform notification. Continued use of the platform after
@@ -137,11 +154,11 @@ const TermsOfService = () => {
                     </section>
 
                     <section>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">12. Contact Us</h2>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">13. Contact Us</h2>
                         <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                             For questions about these Terms of Service, contact us at{' '}
-                            <a href="mailto:ventures.skyworld@gmail.com" className="text-primary-500 hover:underline">
-                                ventures.skyworld@gmail.com
+                            <a href="mailto:support@skyworld.buzz" className="text-primary-500 hover:underline">
+                                support@skyworld.buzz
                             </a>
                         </p>
                     </section>

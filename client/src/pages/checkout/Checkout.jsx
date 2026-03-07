@@ -230,7 +230,7 @@ const Checkout = () => {
         <div className="card dark:bg-surface-800 dark:border-surface-700 overflow-hidden">
           {/* Gradient header strip */}
           <div
-            className={`-mx-6 -mt-6 px-6 py-5 mb-6 bg-gradient-to-r ${meta.gradient} relative overflow-hidden`}
+            className={`-mx-6 -mt-6 px-6 py-5 mb-6 bg-[#37BBEC] relative overflow-hidden`}
           >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
             <div className="relative flex items-center gap-4">
@@ -392,7 +392,7 @@ const Checkout = () => {
             <button
               onClick={handlePay}
               disabled={isPaying || advanceAmount <= 0}
-              className={`w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-gradient-to-r ${meta.gradient} hover:shadow-lg hover:shadow-primary-500/25 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
+              className={`w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
             >
               <LockClosedIcon className="w-4 h-4" />
               {isPaying ? 'Processing...' : `Pay Advance ${formatINR(advanceAmount)}`}

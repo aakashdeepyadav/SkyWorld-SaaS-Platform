@@ -85,7 +85,7 @@ const MonthlyPlanDetail = () => {
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-lg">
               {plan.popular && (
-                <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-gradient-to-r from-sky-500 to-indigo-500 text-white mb-3">
+                <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#37BBEC] text-white mb-3">
                   Most Popular
                 </span>
               )}
@@ -107,7 +107,7 @@ const MonthlyPlanDetail = () => {
               </div>
               <button
                 onClick={handleGetStarted}
-                className="mt-4 px-8 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:shadow-lg hover:shadow-sky-500/25 transition-all duration-300 active:scale-[0.98]"
+                className="mt-4 px-8 py-3 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25 transition-all duration-300 active:scale-[0.98]"
               >
                 Get Started
               </button>

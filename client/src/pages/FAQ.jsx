@@ -2,52 +2,56 @@ import { Link } from 'react-router-dom';
 
 const FAQ_ITEMS = [
   {
+    q: 'What services does SkyWorld offer?',
+    a: 'We offer Web Development (Launch Page, Starter Website, Growth Website), Branding & Design (Starter Branding Kit, Branding Plus), App Development (Mini App / PWA, App Lite + Dashboard), Combo Packages (Restaurant Starter, Medical Growth, Premium Business), Monthly Maintenance Plans, and Add-On Services like Google Business Profile setup, SEO, and Chatbot integration.'
+  },
+  {
     q: 'How does SkyWorld pricing work?',
-    a: 'Starter plan prices come from the active service pricing in the admin panel. Custom work is quoted separately based on scope and timeline.'
+    a: 'Each service has transparent fixed-price plans starting from ₹2,499. Combo packages offer bundled discounts of 12–18%. Monthly maintenance plans start at ₹1,499/month. Custom work is quoted separately based on your scope and timeline.'
   },
   {
-    q: 'Why can the amount in checkout change?',
-    a: 'If admin updates a service price, new checkout sessions use the latest active price. Existing already-created payment orders keep their original amount.'
+    q: 'How does the payment process work?',
+    a: 'For fixed-price plans, you pay 50% advance to start and the remaining 50% after project delivery and your approval. Monthly plans are billed monthly with no long-term contracts. Add-ons are charged upfront in full. All payments are processed securely through Razorpay.'
   },
   {
-    q: 'What payment methods are supported?',
-    a: 'Payments are processed through Razorpay. Available payment methods depend on Razorpay support for your region and account setup.'
+    q: 'What are Combo Packages?',
+    a: 'Combos bundle multiple services at a discounted price. For example, the Restaurant Starter (₹10,099) includes a Starter Website, Starter Branding Kit, and Google Business Profile setup — saving you 12% compared to buying separately.'
+  },
+  {
+    q: 'What are Monthly Maintenance Plans?',
+    a: 'Optional recurring plans for ongoing website updates, monitoring, and support. We offer Care Plan Lite (₹1,499/month), Growth Plan (₹3,499/month), and Local Growth Plus (₹6,999/month). You can pause or cancel anytime with 7 days notice.'
+  },
+  {
+    q: 'What Add-On Services are available?',
+    a: 'You can add extras to any plan: Google Business Profile setup, extra pages, extra revision rounds, product upload support, basic local SEO, priority 48-hour updates, chatbot integration, WhatsApp Business API setup, and social media starter kits.'
+  },
+  {
+    q: 'Do I get unlimited revisions?',
+    a: 'Yes, all our fixed-price plans include unlimited revisions until you are satisfied with the result. We work with you until the deliverables meet your expectations.'
+  },
+  {
+    q: 'Can I book a meeting before paying?',
+    a: 'Yes! Before checkout, you will be offered to book a free 30-minute Google Meet call with our team to discuss your requirements, scope, and timeline before committing to payment.'
   },
   {
     q: 'Do I need to be signed in to pay?',
-    a: 'Yes. You must be signed in to start checkout so your payment can be linked to your request and dashboard records.'
+    a: 'Yes. You must be signed in to start checkout so your payment can be linked to your request, project records, and dashboard.'
   },
   {
-    q: 'Can I submit a custom request instead of a starter plan?',
-    a: 'Yes. Use the Custom Request flow for projects that need tailored scope, advanced features, or phased delivery.'
+    q: 'Can I submit a custom request instead of a fixed plan?',
+    a: 'Absolutely. Use the Custom Request flow for projects that need tailored scope, advanced features, or phased delivery. We will review your requirements and provide a personalized quote.'
   },
   {
-    q: 'How is my payment verified?',
-    a: 'After payment, the platform verifies Razorpay signature and marks payment as completed only when verification succeeds.'
-  },
-  {
-    q: 'Will my project appear automatically after payment?',
-    a: 'Yes. Successful payment is linked to your request and project records, then visible in your dashboard.'
-  },
-  {
-    q: 'Can I change my role?',
-    a: 'Normal users cannot change their own role. Role updates are controlled by admin permissions.'
-  },
-  {
-    q: 'Why is my profile image not updating everywhere?',
-    a: 'Usually this is temporary cache delay. Refresh your session and ensure Cloudinary environment variables are correctly configured in backend.'
-  },
-  {
-    q: 'What does "Refused to get unsafe header" mean in browser console?',
-    a: 'That warning is typically from third-party scripts in checkout and does not usually block your app logic. Focus on API response codes for real errors.'
+    q: 'What happens after I pay?',
+    a: 'Your project is automatically created and visible in your dashboard. You can track progress, milestones, and communicate with the assigned developer directly through the platform.'
   },
   {
     q: 'How do I contact support?',
-    a: 'Email ventures.skyworld@gmail.com and include your account email, request ID, and a short issue summary.'
+    a: 'Email support@skyworld.buzz and include your account email, request ID, and a short issue summary. For urgent matters, you can also reach us through live chat on the platform.'
   },
   {
     q: 'Where can I read legal policies?',
-    a: 'You can review Privacy Policy at /privacy and Terms of Service at /terms.'
+    a: 'You can review our Privacy Policy at /privacy and Terms of Service at /terms.'
   }
 ];
 
@@ -60,7 +64,7 @@ const FAQ = () => {
         </Link>
 
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Frequently Asked Questions</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">Last updated: February 22, 2026</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">Last updated: March 7, 2026</p>
 
         <div className="space-y-3">
           {FAQ_ITEMS.map((item) => (
@@ -76,7 +80,7 @@ const FAQ = () => {
 
         <div className="mt-10 text-sm text-gray-500 dark:text-gray-400">
           Still need help?{' '}
-          <a href="mailto:ventures.skyworld@gmail.com" className="text-primary-500 hover:underline">
+          <a href="mailto:support@skyworld.buzz" className="text-primary-500 hover:underline">
             Contact support
           </a>
         </div>

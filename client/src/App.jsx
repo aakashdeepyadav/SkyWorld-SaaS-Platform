@@ -61,6 +61,8 @@ const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const Contact = lazy(() => import('./pages/Contact'));
+const ClientOnboarding = lazy(() => import('./pages/onboarding/ClientOnboarding'));
+const DeveloperOnboarding = lazy(() => import('./pages/onboarding/DeveloperOnboarding'));
 const ServiceDetail = lazy(() => import('./pages/services/ServiceDetail'));
 const PlanDetail = lazy(() => import('./pages/services/PlanDetail'));
 const ComboDetail = lazy(() => import('./pages/services/ComboDetail'));
@@ -220,6 +222,22 @@ function App() {
         element={
           <Suspense fallback={<PageLoader />}>
             <Contact />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/onboarding/client"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <ClientOnboarding />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/onboarding/developer"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <DeveloperOnboarding />
           </Suspense>
         }
       />

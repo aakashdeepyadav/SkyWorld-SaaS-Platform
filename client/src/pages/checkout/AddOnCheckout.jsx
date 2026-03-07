@@ -154,7 +154,7 @@ const AddOnCheckout = () => {
 
         <div className="card dark:bg-surface-800 dark:border-surface-700 overflow-hidden">
           {/* Header */}
-          <div className="-mx-6 -mt-6 px-6 py-5 mb-6 bg-gradient-to-r from-amber-500 to-orange-500 relative overflow-hidden">
+          <div className="-mx-6 -mt-6 px-6 py-5 mb-6 bg-[#37BBEC] relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
             <div className="relative flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
@@ -180,16 +180,14 @@ const AddOnCheckout = () => {
                     key={addon.label}
                     type="button"
                     onClick={() => toggleAddOn(addon.label)}
-                    className={`w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all duration-200 ${
-                      isSelected
-                        ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30'
-                        : 'bg-gray-50 dark:bg-surface-700 border-gray-100 dark:border-surface-600 hover:border-gray-200 dark:hover:border-surface-500'
-                    }`}
+                    className={`w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all duration-200 ${isSelected
+                      ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30'
+                      : 'bg-gray-50 dark:bg-surface-700 border-gray-100 dark:border-surface-600 hover:border-gray-200 dark:hover:border-surface-500'
+                      }`}
                   >
                     <div
-                      className={`w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center transition-colors ${
-                        isSelected ? 'bg-amber-500 text-white' : 'bg-gray-200 dark:bg-surface-600'
-                      }`}
+                      className={`w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center transition-colors ${isSelected ? 'bg-amber-500 text-white' : 'bg-gray-200 dark:bg-surface-600'
+                        }`}
                     >
                       {isSelected ? (
                         <CheckIcon className="w-3.5 h-3.5" strokeWidth={3} />
@@ -199,11 +197,10 @@ const AddOnCheckout = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm font-medium ${
-                          isSelected
-                            ? 'text-gray-900 dark:text-white'
-                            : 'text-gray-700 dark:text-gray-300'
-                        }`}
+                        className={`text-sm font-medium ${isSelected
+                          ? 'text-gray-900 dark:text-white'
+                          : 'text-gray-700 dark:text-gray-300'
+                          }`}
                       >
                         {addon.label}
                       </p>
@@ -214,11 +211,10 @@ const AddOnCheckout = () => {
                       )}
                     </div>
                     <span
-                      className={`text-sm font-bold flex-shrink-0 ${
-                        isSelected
-                          ? 'text-amber-600 dark:text-amber-400'
-                          : 'text-gray-500 dark:text-gray-400'
-                      }`}
+                      className={`text-sm font-bold flex-shrink-0 ${isSelected
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : 'text-gray-500 dark:text-gray-400'
+                        }`}
                     >
                       {formatINR(addon.price)}
                       {addon.unit && (
@@ -276,7 +272,7 @@ const AddOnCheckout = () => {
                 <button
                   onClick={handlePay}
                   disabled={isPaying}
-                  className="w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <LockClosedIcon className="w-4 h-4" />
                   {isPaying ? 'Processing...' : `Pay ${formatINR(totalAmount)}`}

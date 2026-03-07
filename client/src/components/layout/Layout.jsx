@@ -42,9 +42,9 @@ const Layout = () => {
     { name: 'Dashboard', href: `/dashboard/${user?.role}`, icon: HomeIcon },
     ...(isAdmin
       ? [
-          { name: 'Requests', href: '/requests', icon: ClipboardDocumentListIcon },
-          { name: 'Custom Requests', href: '/custom-requests', icon: DocumentTextIcon },
-        ]
+        { name: 'Requests', href: '/requests', icon: ClipboardDocumentListIcon },
+        { name: 'Custom Requests', href: '/custom-requests', icon: DocumentTextIcon },
+      ]
       : isDeveloper
         ? [{ name: 'Requests', href: '/requests', icon: ClipboardDocumentListIcon }]
         : [{ name: 'My Requests', href: '/custom-requests', icon: DocumentTextIcon }]),
@@ -82,16 +82,14 @@ const Layout = () => {
             key={item.name}
             to={item.href}
             onClick={() => setSidebarOpen(false)}
-            className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
-              isActive(item.href)
+            className={`flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${isActive(item.href)
                 ? 'bg-primary-500/20 text-primary-400 shadow-glow/20'
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
-            }`}
+              }`}
           >
             <item.icon
-              className={`w-5 h-5 mr-3 transition-colors ${
-                isActive(item.href) ? 'text-primary-400' : 'text-gray-500 group-hover:text-gray-300'
-              }`}
+              className={`w-5 h-5 mr-3 transition-colors ${isActive(item.href) ? 'text-primary-400' : 'text-gray-500 group-hover:text-gray-300'
+                }`}
             />
             {item.name}
             {isActive(item.href) && (
@@ -180,9 +178,8 @@ const Layout = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 w-64 bg-sidebar-gradient z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 w-64 bg-sidebar-gradient z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <SidebarContent />
       </aside>
