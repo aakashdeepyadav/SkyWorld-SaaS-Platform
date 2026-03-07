@@ -9,6 +9,7 @@ import Project from '../models/Project.js';
 import User from '../models/User.js';
 import DailySnapshot from '../models/DailySnapshot.js';
 import IntegrationCredential from '../models/IntegrationCredential.js';
+import DocumentEmailLog from '../models/DocumentEmailLog.js';
 import { PAYMENT_STATUS } from '../utils/constants.js';
 
 const TIMEZONE = 'Asia/Kolkata';
@@ -20,6 +21,10 @@ const todayIST = () =>
 
 const startOfDayUTC = (dateStr) => new Date(`${dateStr}T00:00:00+05:30`);
 const endOfDayUTC = (dateStr) => new Date(`${dateStr}T23:59:59.999+05:30`);
+const startOfMonthUTC = (dateStr) => {
+  const [year, month] = String(dateStr).split('-');
+  return new Date(`${year}-${month}-01T00:00:00+05:30`);
+};
 
 // ─── Health Checks ───────────────────────────────────────────────────────────
 
@@ -103,6 +108,51 @@ const getResendQuota = async () => {
   }
 };
 
+const getMailerSendQuota = async () => {
+  const monthlyLimit = Math.max(parseInt(process.env.MAILERSEND_MONTHLY_LIMIT, 10) || 500, 1);
+  try {
+    const todayStr = todayIST();
+    const start = startOfDayUTC(todayStr);
+    const end = endOfDayUTC(todayStr);
+    const monthStart = startOfMonthUTC(todayStr);
+    const monthEnd = new Date();
+
+    const [sentToday, monthlyUsed] = await Promise.all([
+      DocumentEmailLog.countDocuments({
+        provider: 'mailersend',
+        status: 'sent',
+        createdAt: { $gte: start, $lte: end },
+      }),
+      DocumentEmailLog.countDocuments({
+        provider: 'mailersend',
+        status: 'sent',
+        createdAt: { $gte: monthStart, $lte: monthEnd },
+      }),
+    ]);
+
+    const monthlyRemaining = Math.max(monthlyLimit - monthlyUsed, 0);
+
+    return {
+      sent: sentToday,
+      limit: monthlyLimit,
+      remaining: monthlyRemaining,
+      monthlyUsed,
+      monthlyLimit,
+      monthlyRemaining,
+    };
+  } catch (err) {
+    logger.warn('MailerSend usage check failed:', err.message);
+    return {
+      sent: 0,
+      limit: monthlyLimit,
+      remaining: monthlyLimit,
+      monthlyUsed: 0,
+      monthlyLimit,
+      monthlyRemaining: monthlyLimit,
+    };
+  }
+};
+
 // ─── Collect Live Metrics ────────────────────────────────────────────────────
 
 export const collectDailyMetrics = async () => {
@@ -124,6 +174,7 @@ export const collectDailyMetrics = async () => {
     newUsersToday,
     brevoQuota,
     resendQuota,
+    mailerSendQuota,
     backendStatus,
     frontendStatus,
     googleOAuthStatus,
@@ -147,6 +198,7 @@ export const collectDailyMetrics = async () => {
     // Email quotas
     getBrevoQuota(),
     getResendQuota(),
+    getMailerSendQuota(),
     // Health
     pingUrl(`${process.env.BACKEND_URL || 'https://skyworld-backend.onrender.com'}/health`),
     pingUrl(`${process.env.FRONTEND_URL || 'https://skyworld.buzz'}`),
@@ -197,7 +249,7 @@ export const collectDailyMetrics = async () => {
     date: dateStr,
     meetings: meetingStats,
     payments: paymentStats,
-    emails: { brevo: brevoQuota, resend: resendQuota },
+    emails: { brevo: brevoQuota, resend: resendQuota, mailersend: mailerSendQuota },
     health: {
       backend: backendStatus,
       frontend: frontendStatus,
@@ -216,6 +268,10 @@ export const collectDailyMetrics = async () => {
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 let _snapshotCache = { data: null, date: null, refreshedAt: 0 };
+
+export const invalidateDashboardSnapshotCache = () => {
+  _snapshotCache = { data: null, date: null, refreshedAt: 0 };
+};
 
 export const refreshTodaySnapshot = async ({ force = false } = {}) => {
   const dateStr = todayIST();
@@ -291,12 +347,12 @@ export const flushSnapshotToSheet = async (snapshot) => {
     try {
       const existing = await sheets.spreadsheets.values.get({
         spreadsheetId,
-        range: `${SHEET_NAME}!A1:V1`,
+        range: `${SHEET_NAME}!A1:Y1`,
       });
       if (!existing.data.values || existing.data.values.length === 0) {
         await sheets.spreadsheets.values.update({
           spreadsheetId,
-          range: `${SHEET_NAME}!A1:V1`,
+          range: `${SHEET_NAME}!A1:Y1`,
           valueInputOption: 'RAW',
           requestBody: {
             values: [[
@@ -304,6 +360,7 @@ export const flushSnapshotToSheet = async (snapshot) => {
               'Meetings Total', 'Meetings Confirmed', 'Meetings Cancelled', 'Meetings Completed',
               'Payments Total', 'Payments Completed', 'Payments Failed', 'Payments Pending', 'Revenue (₹)',
               'Brevo Sent', 'Brevo Remaining', 'Resend Sent', 'Resend Remaining',
+              'MailerSend Sent (Today)', 'MailerSend Used (Month)', 'MailerSend Remaining (Month)',
               'Backend', 'Frontend', 'Database', 'Google OAuth',
               'Service Requests', 'Custom Requests', 'Projects Active', 'New Users',
             ]],
@@ -321,7 +378,7 @@ export const flushSnapshotToSheet = async (snapshot) => {
         });
         await sheets.spreadsheets.values.update({
           spreadsheetId,
-          range: `${SHEET_NAME}!A1:V1`,
+          range: `${SHEET_NAME}!A1:Y1`,
           valueInputOption: 'RAW',
           requestBody: {
             values: [[
@@ -329,6 +386,7 @@ export const flushSnapshotToSheet = async (snapshot) => {
               'Meetings Total', 'Meetings Confirmed', 'Meetings Cancelled', 'Meetings Completed',
               'Payments Total', 'Payments Completed', 'Payments Failed', 'Payments Pending', 'Revenue (₹)',
               'Brevo Sent', 'Brevo Remaining', 'Resend Sent', 'Resend Remaining',
+              'MailerSend Sent (Today)', 'MailerSend Used (Month)', 'MailerSend Remaining (Month)',
               'Backend', 'Frontend', 'Database', 'Google OAuth',
               'Service Requests', 'Custom Requests', 'Projects Active', 'New Users',
             ]],
@@ -342,11 +400,12 @@ export const flushSnapshotToSheet = async (snapshot) => {
     const p = snapshot.payments || {};
     const eb = snapshot.emails?.brevo || {};
     const er = snapshot.emails?.resend || {};
+    const em = snapshot.emails?.mailersend || {};
     const h = snapshot.health || {};
 
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: `${SHEET_NAME}!A:V`,
+      range: `${SHEET_NAME}!A:Y`,
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [[
@@ -354,6 +413,7 @@ export const flushSnapshotToSheet = async (snapshot) => {
           m.total, m.confirmed, m.cancelled, m.completed,
           p.total, p.completed, p.failed, p.pending, p.revenue,
           eb.sent, eb.remaining, er.sent, er.remaining,
+          em.sent, em.monthlyUsed, em.monthlyRemaining,
           h.backend, h.frontend, h.database, h.googleOAuth,
           snapshot.serviceRequests?.total || 0,
           snapshot.customRequests?.total || 0,
@@ -424,3 +484,4 @@ export const getSnapshotHistory = async (startDate, endDate, { page = 1, limit =
     return { rows: [], total: 0, page: 1, totalPages: 0 };
   }
 };
+

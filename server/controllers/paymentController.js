@@ -35,6 +35,13 @@ const sanitizeProjectRefs = (payload) => {
   return sanitized;
 };
 
+const isServiceRequestDuplicateError = (error) => {
+  if (!error || error.code !== 11000) return false;
+  if (error?.keyPattern?.serviceRequestId) return true;
+  if (Object.prototype.hasOwnProperty.call(error?.keyValue ?? {}, 'serviceRequestId')) return true;
+  return /serviceRequestId/i.test(error?.message || '');
+};
+
 /**
  * @route   GET /api/payments
  * @desc    Get payments
@@ -451,22 +458,34 @@ export const verifyRazorpayPayment = async (req, res, next) => {
           if (existingProject) {
             projectIdToAttach = existingProject._id;
           } else {
-            const project = await Project.create(sanitizeProjectRefs({
-              serviceRequestId: serviceRequest._id,
-              title: serviceRequest.title,
-              description: serviceRequest.description,
-              clientId: serviceRequest.clientId,
-              status: PROJECT_STATUS.PLANNING,
-              deliveryStatus: DELIVERY_STATUS.PENDING,
-              paymentStatus: isAdvance ? PAYMENT_STATUS.PROCESSING : PAYMENT_STATUS.COMPLETED,
-              serviceType: payment.serviceType,
-              plan: payment.plan,
-              totalPlanPrice: payment.totalPlanPrice || payment.amount,
-              advancePaid: true,
-              finalPaid: !isAdvance,
-              budget: payment.totalPlanPrice || payment.amount
-            }));
-            projectIdToAttach = project._id;
+            try {
+              const project = await Project.create(sanitizeProjectRefs({
+                serviceRequestId: serviceRequest._id,
+                title: serviceRequest.title,
+                description: serviceRequest.description,
+                clientId: serviceRequest.clientId,
+                status: PROJECT_STATUS.PLANNING,
+                deliveryStatus: DELIVERY_STATUS.PENDING,
+                paymentStatus: isAdvance ? PAYMENT_STATUS.PROCESSING : PAYMENT_STATUS.COMPLETED,
+                serviceType: payment.serviceType,
+                plan: payment.plan,
+                totalPlanPrice: payment.totalPlanPrice || payment.amount,
+                advancePaid: true,
+                finalPaid: !isAdvance,
+                budget: payment.totalPlanPrice || payment.amount
+              }));
+              projectIdToAttach = project._id;
+            } catch (projectCreateError) {
+              // Concurrent verification calls can race on unique serviceRequestId index.
+              if (!isServiceRequestDuplicateError(projectCreateError)) {
+                throw projectCreateError;
+              }
+              const duplicateProject = await Project.findOne({ serviceRequestId: serviceRequest._id });
+              if (!duplicateProject) {
+                throw projectCreateError;
+              }
+              projectIdToAttach = duplicateProject._id;
+            }
           }
         }
       }

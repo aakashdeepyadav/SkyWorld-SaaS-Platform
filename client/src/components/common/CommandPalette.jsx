@@ -54,6 +54,7 @@ const CommandPalette = () => {
           ? [
               { name: 'User Management', path: '/admin/users', section: 'Admin' },
               { name: 'Service Management', path: '/admin/services', section: 'Admin' },
+              { name: 'Document Dispatch', path: '/admin/documents', section: 'Admin' },
             ]
           : []),
       ].filter((c) => !c.hidden),

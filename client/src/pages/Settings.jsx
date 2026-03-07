@@ -24,6 +24,95 @@ const Settings = () => {
         marketing: user?.notificationPreferences?.marketing ?? false,
     });
     const [notifLoading, setNotifLoading] = useState(false);
+    const [twoFactorLoading, setTwoFactorLoading] = useState(false);
+    const [disable2FAPassword, setDisable2FAPassword] = useState('');
+    const [twoFactorSetup, setTwoFactorSetup] = useState({
+        qrCode: '',
+        secret: '',
+        token: '',
+        backupCodes: [],
+    });
+
+    const resetTwoFactorSetupState = () => {
+        setTwoFactorSetup({ qrCode: '', secret: '', token: '', backupCodes: [] });
+    };
+
+    const startTwoFactorSetup = async () => {
+        setTwoFactorLoading(true);
+        try {
+            const response = await api.post('/auth/2fa/setup');
+            setTwoFactorSetup({
+                qrCode: response.data?.data?.qrCode || '',
+                secret: response.data?.data?.secret || '',
+                token: '',
+                backupCodes: [],
+            });
+            toast.success('Scan the QR code and verify with your authenticator app');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to start 2FA setup');
+        } finally {
+            setTwoFactorLoading(false);
+        }
+    };
+
+    const verifyTwoFactorSetup = async (e) => {
+        e.preventDefault();
+        if (!twoFactorSetup.token.trim()) {
+            toast.error('Enter the 6-digit authenticator code');
+            return;
+        }
+        setTwoFactorLoading(true);
+        try {
+            const response = await api.post('/auth/2fa/verify-setup', {
+                token: twoFactorSetup.token.trim(),
+            });
+            const backupCodes = response.data?.data?.backupCodes || [];
+            setTwoFactorSetup((prev) => ({
+                ...prev,
+                token: '',
+                backupCodes,
+            }));
+            if (user) {
+                updateUser({ ...user, twoFactorEnabled: true });
+            }
+            toast.success('Two-factor authentication enabled');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to verify 2FA setup');
+        } finally {
+            setTwoFactorLoading(false);
+        }
+    };
+
+    const copyBackupCodes = async () => {
+        if (!twoFactorSetup.backupCodes.length) return;
+        try {
+            await navigator.clipboard.writeText(twoFactorSetup.backupCodes.join('\n'));
+            toast.success('Backup codes copied');
+        } catch {
+            toast.error('Failed to copy backup codes');
+        }
+    };
+
+    const handleDisableTwoFactor = async () => {
+        if (!disable2FAPassword.trim()) {
+            toast.error('Password is required to disable 2FA');
+            return;
+        }
+        setTwoFactorLoading(true);
+        try {
+            await api.post('/auth/2fa/disable', { password: disable2FAPassword.trim() });
+            if (user) {
+                updateUser({ ...user, twoFactorEnabled: false });
+            }
+            setDisable2FAPassword('');
+            resetTwoFactorSetupState();
+            toast.success('Two-factor authentication disabled');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to disable 2FA');
+        } finally {
+            setTwoFactorLoading(false);
+        }
+    };
 
     const handlePasswordChange = async (e) => {
         e.preventDefault();
@@ -208,6 +297,155 @@ const Settings = () => {
                                     </div>
                                 </form>
                             )}
+
+                            <div className="mt-8 pt-6 border-t border-gray-100 dark:border-surface-700">
+                                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Two-factor authentication</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    Add an authenticator app code for an extra layer of account security.
+                                </p>
+
+                                {user?.authMethod === 'google' ? (
+                                    <div className="mt-4 p-4 bg-gray-50 dark:bg-surface-800 rounded-xl border border-gray-100 dark:border-surface-700">
+                                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                                            2FA setup is currently available for email-password login accounts.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="mt-4 p-4 bg-gray-50 dark:bg-surface-800 rounded-xl border border-gray-100 dark:border-surface-700">
+                                            <div className="flex items-center justify-between gap-4">
+                                                <div>
+                                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                                        Status: {user?.twoFactorEnabled ? 'Enabled' : 'Disabled'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                        {user?.twoFactorEnabled
+                                                            ? 'Your login requires a 2FA verification code.'
+                                                            : 'Enable 2FA to protect your account from unauthorized access.'}
+                                                    </p>
+                                                </div>
+                                                {!user?.twoFactorEnabled && !twoFactorSetup.qrCode && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={startTwoFactorSetup}
+                                                        disabled={twoFactorLoading}
+                                                        className="btn-primary !py-2 !px-4 disabled:opacity-50"
+                                                    >
+                                                        {twoFactorLoading ? 'Starting...' : 'Enable 2FA'}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {!user?.twoFactorEnabled && twoFactorSetup.qrCode && (
+                                            <div className="mt-4 p-4 border border-gray-200 dark:border-surface-700 rounded-xl bg-white dark:bg-surface-800">
+                                                <p className="text-sm font-medium text-gray-900 dark:text-white">Step 1: Scan QR code</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    Use Google Authenticator, Microsoft Authenticator, or Authy.
+                                                </p>
+                                                <div className="mt-3 flex flex-col sm:flex-row gap-4 items-start">
+                                                    <img
+                                                        src={twoFactorSetup.qrCode}
+                                                        alt="2FA setup QR code"
+                                                        className="w-40 h-40 rounded-lg border border-gray-200 dark:border-surface-700 bg-white p-2"
+                                                    />
+                                                    <div className="text-xs text-gray-600 dark:text-gray-300">
+                                                        <p className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Manual setup key</p>
+                                                        <code className="block px-3 py-2 rounded bg-gray-100 dark:bg-surface-900 break-all">
+                                                            {twoFactorSetup.secret}
+                                                        </code>
+                                                    </div>
+                                                </div>
+
+                                                <form onSubmit={verifyTwoFactorSetup} className="mt-4 flex flex-col sm:flex-row gap-3">
+                                                    <input
+                                                        type="text"
+                                                        inputMode="numeric"
+                                                        maxLength={6}
+                                                        className="input-field sm:max-w-[220px] tracking-[0.25em] text-center"
+                                                        placeholder="000000"
+                                                        value={twoFactorSetup.token}
+                                                        onChange={(e) =>
+                                                            setTwoFactorSetup((prev) => ({
+                                                                ...prev,
+                                                                token: e.target.value.replace(/\D/g, ''),
+                                                            }))
+                                                        }
+                                                        required
+                                                    />
+                                                    <button
+                                                        type="submit"
+                                                        disabled={twoFactorLoading}
+                                                        className="btn-primary !py-2.5 !px-4 disabled:opacity-50"
+                                                    >
+                                                        {twoFactorLoading ? 'Verifying...' : 'Verify and enable'}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={resetTwoFactorSetupState}
+                                                        className="btn-secondary !py-2.5 !px-4"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        )}
+
+                                        {user?.twoFactorEnabled && (
+                                            <div className="mt-4 p-4 border border-gray-200 dark:border-surface-700 rounded-xl bg-white dark:bg-surface-800">
+                                                <p className="text-sm font-medium text-gray-900 dark:text-white">Disable 2FA</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    Confirm your current account password to disable two-factor authentication.
+                                                </p>
+                                                <div className="mt-3 flex flex-col sm:flex-row gap-3">
+                                                    <input
+                                                        type="password"
+                                                        className="input-field sm:max-w-[280px]"
+                                                        placeholder="Current password"
+                                                        value={disable2FAPassword}
+                                                        onChange={(e) => setDisable2FAPassword(e.target.value)}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleDisableTwoFactor}
+                                                        disabled={twoFactorLoading}
+                                                        className="btn-danger !py-2.5 !px-4 disabled:opacity-50"
+                                                    >
+                                                        {twoFactorLoading ? 'Disabling...' : 'Disable 2FA'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {twoFactorSetup.backupCodes.length > 0 && (
+                                            <div className="mt-4 p-4 border border-amber-200 dark:border-amber-500/30 rounded-xl bg-amber-50/80 dark:bg-amber-500/10">
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">
+                                                        Save these backup codes now
+                                                    </p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={copyBackupCodes}
+                                                        className="btn-secondary !py-1.5 !px-3 !text-xs"
+                                                    >
+                                                        Copy codes
+                                                    </button>
+                                                </div>
+                                                <p className="text-xs text-amber-800/80 dark:text-amber-300/80 mt-1">
+                                                    Each code can be used once if you lose access to your authenticator app.
+                                                </p>
+                                                <div className="mt-3 grid grid-cols-2 gap-2">
+                                                    {twoFactorSetup.backupCodes.map((code) => (
+                                                        <code key={code} className="px-3 py-2 rounded bg-white/80 dark:bg-surface-900 text-xs font-semibold text-gray-800 dark:text-gray-200">
+                                                            {code}
+                                                        </code>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
                         </div>
                     )}
 

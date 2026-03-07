@@ -51,12 +51,33 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(async (email, password) => {
     try {
       const response = await api.post('/auth/login', { email, password });
+      if (response.data?.twoFactorRequired) {
+        toast.success(response.data.message || 'Two-factor authentication required');
+        return response.data;
+      }
       setUser(response.data.user);
       localStorage.setItem('hasSession', 'true');
       toast.success('Login successful');
       return response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed');
+      throw error;
+    }
+  }, []);
+
+  const verifyTwoFactor = useCallback(async (tempToken, { token, backupCode } = {}) => {
+    try {
+      const response = await api.post('/auth/2fa/verify', {
+        tempToken,
+        ...(token ? { token: String(token).trim() } : {}),
+        ...(backupCode ? { backupCode: String(backupCode).trim() } : {}),
+      });
+      setUser(response.data.user);
+      localStorage.setItem('hasSession', 'true');
+      toast.success(response.data.message || 'Login successful');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || '2FA verification failed');
       throw error;
     }
   }, []);
@@ -139,6 +160,7 @@ export const AuthProvider = ({ children }) => {
       register,
       verifyOtp,
       resendOtp,
+      verifyTwoFactor,
       googleLogin,
       logout,
       updateUser,
@@ -151,6 +173,7 @@ export const AuthProvider = ({ children }) => {
       register,
       verifyOtp,
       resendOtp,
+      verifyTwoFactor,
       googleLogin,
       logout,
       updateUser,

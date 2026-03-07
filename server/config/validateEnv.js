@@ -76,6 +76,10 @@ export const validateEnv = () => {
         process.env.SMTP_USER &&
         process.env.SMTP_PASS
     );
+    const hasMailerSend = Boolean(
+        process.env.MAILERSEND_API_TOKEN &&
+        (process.env.MAILERSEND_FROM_EMAIL || process.env.FROM_EMAIL)
+    );
 
     if (isProduction && !hasBrevo && !hasGenericSmtp) {
         logger.error('FATAL: Configure BREVO_SMTP_* or SMTP_* variables for OTP and password reset emails');
@@ -84,6 +88,10 @@ export const validateEnv = () => {
 
     if (!isProduction && !hasBrevo && !hasGenericSmtp && !(process.env.ETHEREAL_USER && process.env.ETHEREAL_PASS)) {
         logger.warn('Warning: No email provider configured. OTP/password reset emails will fail.');
+    }
+
+    if (!hasMailerSend) {
+        logger.warn('Warning: MAILERSEND_API_TOKEN + MAILERSEND_FROM_EMAIL not configured. Admin document emails via MailerSend will be unavailable.');
     }
 
     const smtpHost = cleanEnvValue(process.env.BREVO_SMTP_HOST || process.env.SMTP_HOST || '');

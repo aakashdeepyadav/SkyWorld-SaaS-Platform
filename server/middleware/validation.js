@@ -1,5 +1,6 @@
 import { body, param, query, validationResult } from 'express-validator';
 import { PASSWORD_POLICY } from '../utils/constants.js';
+import { ADMIN_DOCUMENT_TYPE_VALUES } from '../utils/documentEmail.js';
 
 /**
  * Handle validation errors
@@ -243,5 +244,26 @@ export const validators = {
       .optional()
       .isInt({ min: 1, max: 100 })
       .withMessage('Limit must be between 1 and 100')
+  ],
+
+  sendAdminDocuments: [
+    body('userId')
+      .isMongoId()
+      .withMessage('Valid userId is required'),
+    body('documents')
+      .isArray({ min: 1, max: 10 })
+      .withMessage('At least one document is required'),
+    body('documents.*')
+      .isString()
+      .trim()
+      .toLowerCase()
+      .isIn(ADMIN_DOCUMENT_TYPE_VALUES)
+      .withMessage('Invalid document type selected'),
+    body('customMessage')
+      .optional({ nullable: true })
+      .isString()
+      .trim()
+      .isLength({ max: 1000 })
+      .withMessage('Custom message cannot exceed 1000 characters')
   ]
 };

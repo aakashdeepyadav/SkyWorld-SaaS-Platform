@@ -86,7 +86,15 @@ const HealthRow = ({ icon: Icon, label, status }) => {
   );
 };
 
-const QuotaBar = ({ label, sent, limit, remaining, color = 'sky' }) => {
+const QuotaBar = ({
+  label,
+  sent,
+  limit,
+  remaining,
+  color = 'sky',
+  sentCaption = 'sent today',
+  remainingCaption = 'remaining',
+}) => {
   const p = pct(sent, limit);
   const bar = p > 85 ? 'bg-red-500' : p > 60 ? 'bg-amber-500' : (QUOTA_BG[color] || 'bg-sky-500');
   const valClr = p > 85 ? 'text-red-600 dark:text-red-400' : p > 60 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300';
@@ -104,8 +112,8 @@ const QuotaBar = ({ label, sent, limit, remaining, color = 'sky' }) => {
           style={{ width: `${Math.max(Math.min(p, 100), p > 0 ? 2 : 0)}%` }} />
       </div>
       <div className="flex justify-between text-[11px] text-slate-400">
-        <span>{sent} sent today</span>
-        <span className="font-medium">{remaining} remaining</span>
+        <span>{sent} {sentCaption}</span>
+        <span className="font-medium">{remaining} {remainingCaption}</span>
       </div>
     </div>
   );
@@ -212,19 +220,23 @@ const AdminAnalytics = () => {
   const p  = d.payments || {};
   const eb = d.emails?.brevo || {};
   const er = d.emails?.resend || {};
+  const em = d.emails?.mailersend || {};
   const hl = d.health || {};
   const sr = d.serviceRequests || {};
   const cr = d.customRequests || {};
   const pj = d.projects || {};
   const us = d.users || {};
 
-  const totalEmails  = (eb.sent || 0) + (er.sent || 0);
+  const totalEmails  = (eb.sent || 0) + (er.sent || 0) + (em.sent || 0);
   const totalReqs    = (sr.total || 0) + (cr.total || 0);
   const healthArr    = [hl.backend, hl.frontend, hl.database, hl.googleOAuth];
   const healthUp     = healthArr.filter((s) => s === 'up' || s === 'connected').length;
   const healthPct    = pct(healthUp, healthArr.length);
-  const emailCap     = pct((eb.remaining || 0) + (er.remaining || 0), (eb.limit || 300) + (er.limit || 100));
-  const overallUsage = pct((eb.sent || 0) + (er.sent || 0), (eb.limit || 300) + (er.limit || 100));
+  const mailerLimit = em.monthlyLimit || em.limit || 500;
+  const mailerUsed = em.monthlyUsed ?? em.sent ?? 0;
+  const mailerRemaining = em.monthlyRemaining ?? em.remaining ?? Math.max(mailerLimit - mailerUsed, 0);
+  const emailCap = pct(mailerRemaining, mailerLimit);
+  const overallUsage = pct(mailerUsed, mailerLimit);
 
   const payPie = useMemo(() => [
     { name: 'Completed', value: p.completed || 0 },
@@ -293,7 +305,7 @@ const AdminAnalytics = () => {
                 <StatCard icon={CreditCardIcon} label="Today's Revenue" value={fmtINR(p.revenue)}
                   sub={`${p.total || 0} txns · ${p.completed || 0} completed`} accent="green" />
                 <StatCard icon={EnvelopeIcon} label="Emails Sent" value={totalEmails}
-                  sub={`Brevo ${eb.sent || 0} · Resend ${er.sent || 0}`} accent="violet" />
+                  sub={`Brevo ${eb.sent || 0} · Resend ${er.sent || 0} · MailerSend ${em.sent || 0}`} accent="violet" />
                 <StatCard icon={ClipboardDocumentListIcon} label="Requests" value={totalReqs}
                   sub={`${sr.pending || 0} service · ${cr.pending || 0} custom pending`} accent="amber" />
                 <StatCard icon={UserGroupIcon} label="Total Users" value={us.total || 0}
@@ -319,15 +331,24 @@ const AdminAnalytics = () => {
                 </Card>
 
                 <Card icon={EnvelopeIcon} title="Email Quotas" className="lg:col-span-8"
-                  right={<span className="text-[11px] text-slate-400">Resets at midnight</span>}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  right={<span className="text-[11px] text-slate-400">Brevo/Resend daily · MailerSend monthly</span>}>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <QuotaBar label="Brevo (SMTP)" sent={eb.sent || 0} limit={eb.limit || 300} remaining={eb.remaining ?? 300} color="sky" />
                     <QuotaBar label="Resend (Meetings)" sent={er.sent || 0} limit={er.limit || 100} remaining={er.remaining ?? 100} color="violet" />
+                    <QuotaBar
+                      label="MailerSend (Docs)"
+                      sent={mailerUsed}
+                      limit={mailerLimit}
+                      remaining={mailerRemaining}
+                      sentCaption="used this month"
+                      remainingCaption="monthly remaining"
+                      color="amber"
+                    />
                   </div>
                   <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-700/40 grid grid-cols-4 gap-4">
                     <MiniStat label="Total Sent" value={totalEmails} color="text-violet-600 dark:text-violet-400" />
-                    <MiniStat label="Brevo Cap" value={eb.limit || 300} />
-                    <MiniStat label="Resend Cap" value={er.limit || 100} />
+                    <MiniStat label="MailerSend Used" value={mailerUsed} />
+                    <MiniStat label="MailerSend Cap" value={mailerLimit} />
                     <MiniStat label="Usage" value={`${overallUsage}%`}
                       color={overallUsage > 80 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'} />
                   </div>
@@ -425,7 +446,7 @@ const AdminAnalytics = () => {
                       { l: 'Meeting Fill Rate', v: m.total > 0 ? `${pct(m.confirmed || 0, m.total)}%` : '—', d: 'Confirmed vs total bookings', I: CalendarDaysIcon, c: 'text-sky-600 dark:text-sky-400' },
                       { l: 'Payment Success', v: p.total > 0 ? `${pct(p.completed || 0, p.total)}%` : '—', d: 'Completed vs total payments', I: CreditCardIcon, c: 'text-emerald-600 dark:text-emerald-400' },
                       { l: 'Request Approval', v: totalReqs > 0 ? `${pct(sr.approved || 0, totalReqs)}%` : '—', d: 'Approved service requests', I: ClipboardDocumentListIcon, c: 'text-amber-600 dark:text-amber-400' },
-                      { l: 'Email Capacity', v: `${emailCap}%`, d: 'Remaining email quota', I: EnvelopeIcon, c: 'text-violet-600 dark:text-violet-400' },
+                      { l: 'Email Capacity', v: `${emailCap}%`, d: 'MailerSend monthly remaining', I: EnvelopeIcon, c: 'text-violet-600 dark:text-violet-400' },
                     ].map((ins) => (
                       <div key={ins.l} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
                         <div className="shrink-0 p-1.5 rounded-lg bg-slate-50 dark:bg-slate-700/50">
@@ -531,7 +552,7 @@ const AdminAnalytics = () => {
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-700/40">
                       {rows.map((s) => {
                         const sm = s.meetings || {}, sp = s.payments || {}, se = s.emails || {}, sh = s.health || {};
-                        const te = (se.brevo?.sent || 0) + (se.resend?.sent || 0);
+                        const te = (se.brevo?.sent || 0) + (se.resend?.sent || 0) + (se.mailersend?.sent || 0);
                         return (
                           <tr key={s.date} className="hover:bg-slate-50/60 dark:hover:bg-slate-700/20 transition-colors">
                             <td className="py-3 px-4 font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap text-xs">

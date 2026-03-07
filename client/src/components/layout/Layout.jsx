@@ -20,6 +20,7 @@ import {
   CalendarDaysIcon,
   AdjustmentsHorizontalIcon,
   ChartBarSquareIcon,
+  ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline';
 
 const Layout = () => {
@@ -42,6 +43,7 @@ const Layout = () => {
 
   const isAdmin = user?.role === 'admin';
   const isDeveloper = user?.role === 'developer';
+  const isClient = user?.role === 'client';
 
   const mainNavigation = [
     { name: 'Dashboard', href: `/dashboard/${user?.role}`, icon: HomeIcon },
@@ -62,8 +64,16 @@ const Layout = () => {
     { name: 'Users', href: '/admin/users', icon: UsersIcon },
     { name: 'Services', href: '/admin/services', icon: WrenchScrewdriverIcon },
     { name: 'Meetings', href: '/admin/meetings', icon: CalendarDaysIcon },
+    { name: 'Documents', href: '/admin/documents', icon: DocumentTextIcon },
     { name: 'Integrations', href: '/admin/settings', icon: AdjustmentsHorizontalIcon },
   ];
+
+  const supportNavigation = isClient
+    ? [
+        { name: 'Meeting', href: '/book-meeting', icon: CalendarDaysIcon },
+        { name: 'Contact', href: '/contact', icon: ChatBubbleLeftRightIcon },
+      ]
+    : [];
 
   const accountNavigation = [
     { name: 'Profile', href: '/profile', icon: UserIcon },
@@ -108,7 +118,7 @@ const Layout = () => {
 
   // Get the current page title
   const getPageTitle = () => {
-    const allItems = [...mainNavigation, ...adminNavigation, ...accountNavigation];
+    const allItems = [...mainNavigation, ...adminNavigation, ...supportNavigation, ...accountNavigation];
     const active = allItems.find((n) => isActive(n.href));
     if (active) return active.name;
 
@@ -135,6 +145,7 @@ const Layout = () => {
       <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
         <NavSection items={mainNavigation} />
         {isAdmin && <NavSection label="Admin" items={adminNavigation} />}
+        {supportNavigation.length > 0 && <NavSection label="Support" items={supportNavigation} />}
         <NavSection label="Account" items={accountNavigation} />
       </nav>
 

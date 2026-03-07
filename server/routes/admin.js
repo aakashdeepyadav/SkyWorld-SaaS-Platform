@@ -3,6 +3,8 @@ import { authenticate } from '../middleware/auth.js';
 import { adminOnly } from '../middleware/rbac.js';
 import { apiRateLimiter } from '../middleware/rateLimiter.js';
 import { getAnalytics } from '../controllers/analyticsController.js';
+import { getDocumentRecipients, sendDocumentsToUser } from '../controllers/documentController.js';
+import { validators, handleValidationErrors } from '../middleware/validation.js';
 
 const router = Router();
 
@@ -12,5 +14,7 @@ router.use(apiRateLimiter);
 
 // GET /api/v1/admin/analytics?period=30d
 router.get('/analytics', getAnalytics);
+router.get('/documents/recipients', validators.pagination, handleValidationErrors, getDocumentRecipients);
+router.post('/documents/send', validators.sendAdminDocuments, handleValidationErrors, sendDocumentsToUser);
 
 export default router;

@@ -295,15 +295,15 @@ export const setupSpreadsheetDashboard = async () => {
 
   // ── 3. Dashboard values & formulas ─────────────────────────────────────────
 
-  const emailsLast = `=IFERROR(INDEX(${DA}!K:K,${LR})+INDEX(${DA}!M:M,${LR}),"")`;
-  const reqsLast = `=IFERROR(INDEX(${DA}!S:S,${LR})+INDEX(${DA}!T:T,${LR}),"")`;
-  const emailsMth = `=SUMPRODUCT((LEFT(${DA}!A$2:A$9999,7)=TEXT(TODAY(),"YYYY-MM"))*(${DA}!K$2:K$9999+${DA}!M$2:M$9999))`;
-  const reqsMth = `=SUMPRODUCT((LEFT(${DA}!A$2:A$9999,7)=TEXT(TODAY(),"YYYY-MM"))*(${DA}!S$2:S$9999+${DA}!T$2:T$9999))`;
+  const emailsLast = `=IFERROR(INDEX(${DA}!K:K,${LR})+INDEX(${DA}!M:M,${LR})+INDEX(${DA}!O:O,${LR}),"")`;
+  const reqsLast = `=IFERROR(INDEX(${DA}!V:V,${LR})+INDEX(${DA}!W:W,${LR}),"")`;
+  const emailsMth = `=SUMPRODUCT((LEFT(${DA}!A$2:A$9999,7)=TEXT(TODAY(),"YYYY-MM"))*(${DA}!K$2:K$9999+${DA}!M$2:M$9999+${DA}!O$2:O$9999))`;
+  const reqsMth = `=SUMPRODUCT((LEFT(${DA}!A$2:A$9999,7)=TEXT(TODAY(),"YYYY-MM"))*(${DA}!V$2:V$9999+${DA}!W$2:W$9999))`;
   const daysMth = `=COUNTIF(ARRAYFORMULA(LEFT(${DA}!A$2:A$9999,7)),TEXT(TODAY(),"YYYY-MM"))`;
-  const emailsAll = `=SUM(${DA}!K$2:K)+SUM(${DA}!M$2:M)`;
-  const reqsAll = `=SUM(${DA}!S$2:S)+SUM(${DA}!T$2:T)`;
+  const emailsAll = `=SUM(${DA}!K$2:K)+SUM(${DA}!M$2:M)+SUM(${DA}!O$2:O)`;
+  const reqsAll = `=SUM(${DA}!V$2:V)+SUM(${DA}!W$2:W)`;
   const daysAll = `=COUNTA(${DA}!A$2:A)`;
-  const uptime = `=IFERROR(IF(INDEX(${DA}!O:O,${LR})="up","✓ ","✗ ")&INDEX(${DA}!O:O,${LR})&"  ·  "&IF(INDEX(${DA}!P:P,${LR})="up","✓ ","✗ ")&INDEX(${DA}!P:P,${LR}),"—")`;
+  const uptime = `=IFERROR(IF(INDEX(${DA}!R:R,${LR})="up","✓ ","✗ ")&INDEX(${DA}!R:R,${LR})&"  ·  "&IF(INDEX(${DA}!S:S,${LR})="up","✓ ","✗ ")&INDEX(${DA}!S:S,${LR}),"—")`;
 
   const dashValues = [
     /* 1  */ ['SKYWORLD VENTURES'],
@@ -312,19 +312,19 @@ export const setupSpreadsheetDashboard = async () => {
     /* 4  */ [],
     /* 5  */ ['  LATEST SNAPSHOT'],
     /* 6  */ ['Meetings', 'Payments', 'Revenue (₹)', 'Emails Sent', 'Requests', 'New Users', 'Active Projects', 'System Status'],
-    /* 7  */ [last('B'), last('F'), last('J'), emailsLast, reqsLast, last('V'), last('U'), uptime],
+    /* 7  */ [last('B'), last('F'), last('J'), emailsLast, reqsLast, last('Y'), last('X'), uptime],
     /* 8  */ [],
     /* 9  */ ['  THIS MONTH'],
     /* 10 */ ['Meetings', 'Payments', 'Revenue (₹)', 'Emails Sent', 'Requests', 'New Users', 'Days Tracked', ''],
-    /* 11 */ [mthSum('B'), mthSum('F'), mthSum('J'), emailsMth, reqsMth, mthSum('V'), daysMth, ''],
+    /* 11 */ [mthSum('B'), mthSum('F'), mthSum('J'), emailsMth, reqsMth, mthSum('Y'), daysMth, ''],
     /* 12 */ [],
     /* 13 */ ['  ALL TIME'],
     /* 14 */ ['Total Meetings', 'Total Payments', 'Total Revenue', 'Total Emails', 'Total Requests', 'Total New Users', 'Days Tracked', ''],
-    /* 15 */ [allSum('B'), allSum('F'), allSum('J'), emailsAll, reqsAll, allSum('V'), daysAll, ''],
+    /* 15 */ [allSum('B'), allSum('F'), allSum('J'), emailsAll, reqsAll, allSum('Y'), daysAll, ''],
     /* 16 */ [],
     /* 17 */ ['  SYSTEM HEALTH (Latest)'],
     /* 18 */ ['Backend', 'Frontend', 'Database', 'Google OAuth'],
-    /* 19 */ [last('O'), last('P'), last('Q'), last('R')],
+    /* 19 */ [last('R'), last('S'), last('T'), last('U')],
     /* 20 */ [],
     /* 21 */ ['  DAILY TRENDS'],
   ];
@@ -350,9 +350,9 @@ export const setupSpreadsheetDashboard = async () => {
       `=SUMPRODUCT((LEFT(${DA}!$A$2:$A$9999,7)=$A${r})*${DA}!$B$2:$B$9999)`,
       `=SUMPRODUCT((LEFT(${DA}!$A$2:$A$9999,7)=$A${r})*${DA}!$F$2:$F$9999)`,
       `=SUMPRODUCT((LEFT(${DA}!$A$2:$A$9999,7)=$A${r})*${DA}!$J$2:$J$9999)`,
-      `=SUMPRODUCT((LEFT(${DA}!$A$2:$A$9999,7)=$A${r})*(${DA}!$K$2:$K$9999+${DA}!$M$2:$M$9999))`,
-      `=SUMPRODUCT((LEFT(${DA}!$A$2:$A$9999,7)=$A${r})*(${DA}!$S$2:$S$9999+${DA}!$T$2:$T$9999))`,
-      `=SUMPRODUCT((LEFT(${DA}!$A$2:$A$9999,7)=$A${r})*${DA}!$V$2:$V$9999)`,
+      `=SUMPRODUCT((LEFT(${DA}!$A$2:$A$9999,7)=$A${r})*(${DA}!$K$2:$K$9999+${DA}!$M$2:$M$9999+${DA}!$O$2:$O$9999))`,
+      `=SUMPRODUCT((LEFT(${DA}!$A$2:$A$9999,7)=$A${r})*(${DA}!$V$2:$V$9999+${DA}!$W$2:$W$9999))`,
+      `=SUMPRODUCT((LEFT(${DA}!$A$2:$A$9999,7)=$A${r})*${DA}!$Y$2:$Y$9999)`,
       `=COUNTIF(ARRAYFORMULA(LEFT(${DA}!$A$2:$A$9999,7)),$A${r})`,
       `=IF(H${r}>0,D${r}/H${r},0)`,
     ]);
@@ -578,3 +578,4 @@ export const setupSpreadsheetDashboard = async () => {
   logger.info('Spreadsheet dashboard setup complete ✓');
   return { success: true, message: 'Sheet dashboard created with Dashboard, Monthly Summary, charts & filters' };
 };
+

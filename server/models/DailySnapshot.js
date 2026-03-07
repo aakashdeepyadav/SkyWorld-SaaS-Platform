@@ -37,6 +37,14 @@ const dailySnapshotSchema = new mongoose.Schema({
   emails: {
     brevo:  { sent: { type: Number, default: 0 }, limit: { type: Number, default: 300 }, remaining: { type: Number, default: 300 } },
     resend: { sent: { type: Number, default: 0 }, limit: { type: Number, default: 100 }, remaining: { type: Number, default: 100 } },
+    mailersend: {
+      sent: { type: Number, default: 0 },
+      limit: { type: Number, default: 500 },
+      remaining: { type: Number, default: 500 },
+      monthlyUsed: { type: Number, default: 0 },
+      monthlyLimit: { type: Number, default: 500 },
+      monthlyRemaining: { type: Number, default: 500 },
+    },
   },
 
   // ── System Health ───────────────────────────────────────────────────────────

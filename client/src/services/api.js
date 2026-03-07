@@ -82,7 +82,8 @@ const AUTH_ENDPOINTS = [
   '/auth/register',
   '/auth/google',
   '/auth/verify-otp',
-  '/auth/resend-otp'
+  '/auth/resend-otp',
+  '/auth/2fa/verify'
 ];
 
 // Request interceptor
