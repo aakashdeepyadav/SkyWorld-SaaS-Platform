@@ -122,6 +122,20 @@ router.post('/book', authenticate, sensitiveRateLimiter, async (req, res, next) 
       });
     }
 
+    // ── Two-bookings-per-day limit ─────────────────────────────────────
+    const dailyBookingCount = await Booking.countDocuments({
+      date,
+      userId: req.user?._id,
+      status: { $ne: 'cancelled' },
+    });
+
+    if (dailyBookingCount >= 2) {
+      return res.status(429).json({
+        success: false,
+        message: 'You can only book up to 2 meetings per day. Please choose a different date.',
+      });
+    }
+
     const booking = await bookMeeting({
       clientName: clientName.trim(),
       clientEmail: clientEmail.trim().toLowerCase(),
