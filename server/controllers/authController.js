@@ -18,6 +18,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { logger } from '../utils/logger.js';
 import User from '../models/User.js';
 import { ROLES } from '../utils/constants.js';
+import emailService from '../services/emailService.js';
 
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
@@ -89,6 +90,14 @@ export const login = async (req, res, next) => {
         success: false,
         message: 'Email not verified. Complete signup OTP verification first.'
       });
+    }
+
+    // ── Grace-period auto-restore ────────────────────────────────────────
+    if (!user.isActive && user.scheduledDeletionAt && user.scheduledDeletionAt > new Date()) {
+      user.isActive = true;
+      user.scheduledDeletionAt = null;
+      await user.save({ validateBeforeSave: false });
+      await createAuditLog(req, 'account_restored', 'user', user._id, { method: 'auto_login' });
     }
 
     // ── 2FA Challenge ────────────────────────────────────────────────────
@@ -409,7 +418,7 @@ export const resetUserPassword = async (req, res, next) => {
 
 /**
  * @route   DELETE /api/auth/account
- * @desc    Soft-delete user account (deactivate)
+ * @desc    Schedule account for deletion (7-day grace period)
  * @access  Private
  */
 export const deleteAccount = async (req, res, next) => {
@@ -419,17 +428,62 @@ export const deleteAccount = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    // Soft-delete: deactivate instead of removing to preserve data integrity
-    user.isActive = false;
-    await user.save();
+    // Schedule deletion 7 days from now
+    const deletionDate = new Date();
+    deletionDate.setDate(deletionDate.getDate() + 7);
 
-    await createAuditLog(req, 'account_deleted', 'user', user._id, { email: user.email });
+    user.isActive = false;
+    user.scheduledDeletionAt = deletionDate;
+    await user.save({ validateBeforeSave: false });
+
+    await createAuditLog(req, 'account_deletion_scheduled', 'user', user._id, {
+      email: user.email,
+      scheduledDeletionAt: deletionDate
+    });
 
     clearTokenCookies(res);
 
-    res.json({ success: true, message: 'Account deleted successfully' });
+    // Send deletion notification email (fire-and-forget)
+    emailService.sendAccountDeletionEmail(user, deletionDate).catch((err) =>
+      logger.error('Failed to send account deletion email:', err.message)
+    );
+
+    res.json({
+      success: true,
+      message: 'Account scheduled for deletion. You have 7 days to log in and restore it.',
+      scheduledDeletionAt: deletionDate
+    });
   } catch (error) {
     logger.error('Delete account error:', error);
+    next(error);
+  }
+};
+
+/**
+ * @route   POST /api/auth/restore-account
+ * @desc    Cancel scheduled deletion and restore account
+ * @access  Private
+ */
+export const restoreAccount = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.isActive && !user.scheduledDeletionAt) {
+      return res.json({ success: true, message: 'Account is already active' });
+    }
+
+    user.isActive = true;
+    user.scheduledDeletionAt = null;
+    await user.save({ validateBeforeSave: false });
+
+    await createAuditLog(req, 'account_restored', 'user', user._id, { email: user.email });
+
+    res.json({ success: true, message: 'Account restored successfully' });
+  } catch (error) {
+    logger.error('Restore account error:', error);
     next(error);
   }
 };

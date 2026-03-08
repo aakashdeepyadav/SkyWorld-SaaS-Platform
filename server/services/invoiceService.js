@@ -2,10 +2,55 @@ import PDFDocument from 'pdfkit';
 import path from 'path';
 import fs from 'fs';
 
+/* ═══════════════════════════════════════════════════════════════════
+   Brand Tokens
+   ═══════════════════════════════════════════════════════════════════ */
+const brandColor = '#37bbec';
+const brandDeep = '#249fce';
+const darkColor = '#0f172a';
+const grayColor = '#64748b';
+const lightGray = '#f8fafc';
+const lightBrand = '#ebf8ff';
+const borderColor = '#e2e8f0';
+const paidGreen = '#059669';
+const white = '#ffffff';
+
+const COMPANY_NAME = 'SkyWorld Ventures';
+const COMPANY_EMAIL = 'hello@skyworld.dev';
+const COMPANY_URL = 'skyworld.dev';
+
+/* ═══════════════════════════════════════════════════════════════════
+   Helpers
+   ═══════════════════════════════════════════════════════════════════ */
+const getLogoPath = () => {
+    const names = ['wordmark_logo_white_.png', 'wordmark_logo_all_white_fullname.png'];
+    for (const name of names) {
+        const p = path.resolve('..', 'client', 'public', name);
+        if (fs.existsSync(p)) return p;
+    }
+    return null;
+};
+
+const fmt = (amount) => {
+    const n = Number(amount || 0);
+    return `₹${n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};
+
+const fmtDate = (value) =>
+    new Date(value || Date.now()).toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+    });
+
 /**
- * Generate a branded PDF invoice from a payment record.
+ * Generate a professionally branded PDF invoice.
  *
- * @param {object} payment  — Payment document (populated with client & project)
+ * Supports the 2-step payment model (50% advance + 50% final).
+ * When payment is an advance, shows "Balance Due".
+ * When payment is the final, shows the full project breakdown.
+ *
+ * @param {object} payment  — Payment document (populated with clientId & projectId)
  * @param {object} [opts]   — Optional overrides
  * @returns {Promise<Buffer>} — PDF as a Buffer
  */
@@ -19,166 +64,144 @@ export async function generateInvoicePDF(payment, opts = {}) {
             doc.on('end', () => resolve(Buffer.concat(buffers)));
             doc.on('error', reject);
 
-            const brandColor = '#0ea5e9';
-            const darkColor = '#0f172a';
-            const grayColor = '#64748b';
-            const lightGray = '#f1f5f9';
-
-            // ── Header ──────────────────────────────────────────────────────
-            // Try to embed the actual logo image
-            const logoPath = path.resolve('..', 'client', 'public', 'wordmark_logo_black_fullname.png');
-            if (fs.existsSync(logoPath)) {
-                doc.image(logoPath, 50, 35, { height: 50 });
-            } else {
-                // Fallback to text if logo file not found
-                doc
-                    .fontSize(24)
-                    .fillColor(brandColor)
-                    .text('SkyWorld', 50, 45, { continued: false })
-                    .fontSize(9)
-                    .fillColor(grayColor)
-                    .text('V E N T U R E S', 50, 72);
-            }
-
-            // Invoice tag (right-aligned)
-            doc
-                .fontSize(28)
-                .fillColor(darkColor)
-                .text('INVOICE', 350, 45, { align: 'right' })
-                .fontSize(10)
-                .fillColor(grayColor)
-                .text(`#${(payment.razorpayPaymentId || payment._id).toString().slice(-8).toUpperCase()}`, 350, 78, { align: 'right' });
-
-            // Divider
-            doc
-                .moveTo(50, 100)
-                .lineTo(545, 100)
-                .strokeColor(brandColor)
-                .lineWidth(2)
-                .stroke();
-
-            // ── Billing Details ─────────────────────────────────────────────
             const clientName = payment.clientId?.name || opts.clientName || 'Client';
             const clientEmail = payment.clientId?.email || opts.clientEmail || '';
             const projectTitle = payment.projectId?.title || opts.projectTitle || 'Service';
-
-            // From
-            doc
-                .fontSize(9)
-                .fillColor(grayColor)
-                .text('FROM', 50, 120)
-                .fontSize(11)
-                .fillColor(darkColor)
-                .text('SkyWorld Ventures', 50, 134)
-                .fontSize(9)
-                .fillColor(grayColor)
-                .text('hello@skyworld.dev', 50, 148);
-
-            // To
-            doc
-                .fontSize(9)
-                .fillColor(grayColor)
-                .text('BILL TO', 300, 120)
-                .fontSize(11)
-                .fillColor(darkColor)
-                .text(clientName, 300, 134)
-                .fontSize(9)
-                .fillColor(grayColor)
-                .text(clientEmail, 300, 148);
-
-            // ── Invoice Meta ────────────────────────────────────────────────
-            const issueDate = new Date(payment.createdAt || Date.now()).toLocaleDateString('en-IN', {
-                year: 'numeric', month: 'long', day: 'numeric',
-            });
-            const status = payment.status === 'completed' ? 'PAID' : payment.status.toUpperCase();
-
-            doc
-                .fontSize(9)
-                .fillColor(grayColor)
-                .text('DATE', 50, 185)
-                .fillColor(darkColor)
-                .text(issueDate, 50, 198)
-                .fillColor(grayColor)
-                .text('STATUS', 300, 185)
-                .fillColor(status === 'PAID' ? '#059669' : '#dc2626')
-                .text(status, 300, 198);
-
-            // ── Line Items Table ────────────────────────────────────────────
-            const tableTop = 240;
-
-            // Header row
-            doc
-                .rect(50, tableTop, 495, 28)
-                .fillColor(darkColor)
-                .fill();
-
-            doc
-                .fontSize(9)
-                .fillColor('#ffffff')
-                .text('DESCRIPTION', 60, tableTop + 9)
-                .text('QTY', 340, tableTop + 9, { width: 50, align: 'center' })
-                .text('RATE', 400, tableTop + 9, { width: 60, align: 'right' })
-                .text('AMOUNT', 470, tableTop + 9, { width: 70, align: 'right' });
-
-            // Data row
-            const rowY = tableTop + 32;
             const amount = payment.amount || 0;
-            const currency = (payment.currency || 'INR').toUpperCase();
-            const symbol = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency;
+            const totalProject = payment.totalPlanPrice || amount;
+            const phase = payment.paymentPhase || 'advance';
+            const isAdvance = phase !== 'final';
+            const isPaid = payment.status === 'completed';
+            const invoiceId = payment.invoiceNumber
+                || `INV-${(payment.razorpayPaymentId || payment._id || '').toString().slice(-8).toUpperCase()}`;
 
-            doc
-                .rect(50, rowY, 495, 32)
-                .fillColor(lightGray)
-                .fill();
+            /* ── Header Banner ─────────────────────────────────────────── */
+            doc.rect(0, 0, 612, 82).fillColor(brandColor).fill();
+            doc.rect(0, 82, 612, 3).fillColor(brandDeep).fill();
 
-            doc
-                .fontSize(10)
-                .fillColor(darkColor)
-                .text(projectTitle, 60, rowY + 10, { width: 270 })
-                .text('1', 340, rowY + 10, { width: 50, align: 'center' })
-                .text(`${symbol}${amount.toLocaleString('en-IN')}`, 400, rowY + 10, { width: 60, align: 'right' })
-                .text(`${symbol}${amount.toLocaleString('en-IN')}`, 470, rowY + 10, { width: 70, align: 'right' });
-
-            // ── Total ───────────────────────────────────────────────────────
-            const totalY = rowY + 50;
-
-            doc
-                .moveTo(350, totalY)
-                .lineTo(545, totalY)
-                .strokeColor('#e2e8f0')
-                .lineWidth(1)
-                .stroke();
-
-            doc
-                .fontSize(10)
-                .fillColor(grayColor)
-                .text('Subtotal', 350, totalY + 10)
-                .fillColor(darkColor)
-                .text(`${symbol}${amount.toLocaleString('en-IN')}`, 470, totalY + 10, { width: 70, align: 'right' });
-
-            doc
-                .fontSize(13)
-                .fillColor(darkColor)
-                .text('Total', 350, totalY + 35)
-                .fontSize(14)
-                .fillColor(brandColor)
-                .text(`${symbol}${amount.toLocaleString('en-IN')}`, 440, totalY + 35, { width: 100, align: 'right' });
-
-            // ── Payment Info ────────────────────────────────────────────────
-            if (payment.razorpayPaymentId) {
-                doc
-                    .fontSize(8)
-                    .fillColor(grayColor)
-                    .text(`Payment ID: ${payment.razorpayPaymentId}`, 50, totalY + 80)
-                    .text(`Order ID: ${payment.razorpayOrderId || 'N/A'}`, 50, totalY + 94);
+            // Logo (left)
+            const logoPath = getLogoPath();
+            if (logoPath) {
+                doc.image(logoPath, 50, 16, { height: 48 });
+            } else {
+                doc.fontSize(22).fillColor(white).font('Helvetica-Bold').text('SkyWorld', 50, 22);
+                doc.fontSize(7).fillColor('rgba(255,255,255,0.8)').font('Helvetica').text('VENTURES', 50, 48);
             }
 
-            // ── Footer ──────────────────────────────────────────────────────
-            doc
-                .fontSize(8)
-                .fillColor(grayColor)
-                .text('Thank you for your business!', 50, 720, { align: 'center', width: 495 })
-                .text('skyworld.dev • hello@skyworld.dev', 50, 733, { align: 'center', width: 495 });
+            // INVOICE title (right)
+            doc.fontSize(22).fillColor(white).font('Helvetica-Bold')
+                .text('INVOICE', 350, 20, { align: 'right', width: 212 });
+            doc.fontSize(10).fillColor('rgba(255,255,255,0.8)').font('Helvetica')
+                .text(invoiceId, 350, 48, { align: 'right', width: 212 });
+
+            /* ── From / To ─────────────────────────────────────────────── */
+            doc.y = 105;
+
+            // From box
+            doc.fontSize(8).fillColor(grayColor).font('Helvetica-Bold').text('FROM', 50, 105);
+            doc.fontSize(11).fillColor(darkColor).font('Helvetica').text(COMPANY_NAME, 50, 118);
+            doc.fontSize(9).fillColor(grayColor).text(COMPANY_EMAIL, 50, 132);
+            doc.text(COMPANY_URL, 50, 144);
+
+            // To box
+            doc.fontSize(8).fillColor(grayColor).font('Helvetica-Bold').text('BILL TO', 350, 105);
+            doc.fontSize(11).fillColor(darkColor).font('Helvetica').text(clientName, 350, 118);
+            doc.fontSize(9).fillColor(grayColor).text(clientEmail, 350, 132);
+
+            /* ── Invoice Meta ──────────────────────────────────────────── */
+            const metaY = 170;
+            doc.moveTo(50, metaY).lineTo(562, metaY).strokeColor(borderColor).lineWidth(0.5).stroke();
+
+            // Date
+            doc.fontSize(8).fillColor(grayColor).font('Helvetica-Bold').text('DATE', 50, metaY + 10);
+            doc.fontSize(10).fillColor(darkColor).font('Helvetica').text(fmtDate(payment.paidAt || payment.createdAt), 50, metaY + 22);
+
+            // Payment Phase
+            doc.fontSize(8).fillColor(grayColor).font('Helvetica-Bold').text('PAYMENT PHASE', 200, metaY + 10);
+            doc.fontSize(10).fillColor(darkColor).font('Helvetica')
+                .text(isAdvance ? 'Advance (50%)' : 'Final (50%)', 200, metaY + 22);
+
+            // Status
+            doc.fontSize(8).fillColor(grayColor).font('Helvetica-Bold').text('STATUS', 400, metaY + 10);
+            const statusLabel = isPaid ? 'PAID' : (payment.status || 'PENDING').toUpperCase();
+            doc.fontSize(10).fillColor(isPaid ? paidGreen : '#dc2626').font('Helvetica-Bold')
+                .text(statusLabel, 400, metaY + 22);
+            doc.font('Helvetica');
+
+            /* ── Line Items Table ──────────────────────────────────────── */
+            const tableTop = metaY + 55;
+
+            // Table header
+            doc.rect(50, tableTop, 512, 30).fillColor(darkColor).fill();
+            doc.fontSize(9).fillColor(white).font('Helvetica-Bold');
+            doc.text('DESCRIPTION', 62, tableTop + 10);
+            doc.text('AMOUNT', 462, tableTop + 10, { width: 90, align: 'right' });
+            doc.font('Helvetica');
+
+            // Row: This payment
+            const r1 = tableTop + 30;
+            doc.rect(50, r1, 512, 32).fillColor(lightGray).fill();
+            const phaseDesc = isAdvance
+                ? `${projectTitle} — Advance Payment (50%)`
+                : `${projectTitle} — Final Payment (50%)`;
+            doc.fontSize(10).fillColor(darkColor).text(phaseDesc, 62, r1 + 10, { width: 380 });
+            doc.fontSize(10).fillColor(darkColor).text(fmt(amount), 462, r1 + 10, { width: 90, align: 'right' });
+
+            /* ── Summary ───────────────────────────────────────────────── */
+            const sumY = r1 + 52;
+            doc.moveTo(350, sumY).lineTo(562, sumY).strokeColor(borderColor).lineWidth(0.5).stroke();
+
+            // This payment
+            doc.fontSize(10).fillColor(grayColor).text('This Invoice', 350, sumY + 12);
+            doc.fontSize(10).fillColor(darkColor).text(fmt(amount), 462, sumY + 12, { width: 90, align: 'right' });
+
+            // Total project value
+            doc.fontSize(10).fillColor(grayColor).text('Total Project Value', 350, sumY + 32);
+            doc.fontSize(10).fillColor(darkColor).text(fmt(totalProject), 462, sumY + 32, { width: 90, align: 'right' });
+
+            // Divider
+            doc.moveTo(350, sumY + 52).lineTo(562, sumY + 52).strokeColor(borderColor).lineWidth(0.5).stroke();
+
+            // Balance or Fully Paid
+            if (isAdvance) {
+                const balance = totalProject - amount;
+                doc.fontSize(11).fillColor(grayColor).font('Helvetica-Bold').text('Balance Due', 350, sumY + 62);
+                doc.fontSize(13).fillColor('#dc2626').text(fmt(balance), 440, sumY + 60, { width: 112, align: 'right' });
+            } else {
+                doc.fontSize(11).fillColor(grayColor).font('Helvetica-Bold').text('Balance Due', 350, sumY + 62);
+                doc.fontSize(13).fillColor(paidGreen).text(fmt(0), 440, sumY + 60, { width: 112, align: 'right' });
+                // Fully paid badge
+                doc.roundedRect(350, sumY + 85, 202, 24, 4).fillColor('#ecfdf5').fill();
+                doc.fontSize(10).fillColor(paidGreen).font('Helvetica-Bold')
+                    .text('✓  Project Fully Paid', 350, sumY + 91, { width: 202, align: 'center' });
+            }
+            doc.font('Helvetica');
+
+            /* ── Payment Info ──────────────────────────────────────────── */
+            if (payment.razorpayPaymentId || payment.transactionId) {
+                const infoY = sumY + 125;
+                doc.moveTo(50, infoY).lineTo(562, infoY).strokeColor(borderColor).lineWidth(0.5).stroke();
+                doc.fontSize(8).fillColor(grayColor).font('Helvetica-Bold').text('PAYMENT DETAILS', 50, infoY + 10);
+                doc.font('Helvetica');
+
+                const payInfo = [
+                    ['Payment ID', payment.razorpayPaymentId || payment.transactionId || 'N/A'],
+                    ['Order ID', payment.razorpayOrderId || 'N/A'],
+                    ['Method', (payment.paymentMethod || 'Online').replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase())],
+                ];
+                payInfo.forEach(([label, val], i) => {
+                    const x = 50 + i * 175;
+                    doc.fontSize(8).fillColor(grayColor).text(label, x, infoY + 26);
+                    doc.fontSize(9).fillColor(darkColor).text(val, x, infoY + 38);
+                });
+            }
+
+            /* ── Footer ────────────────────────────────────────────────── */
+            doc.moveTo(50, 720).lineTo(562, 720).strokeColor(borderColor).lineWidth(0.5).stroke();
+            doc.fontSize(9).fillColor(darkColor)
+                .text('Thank you for your business!', 50, 730, { align: 'center', width: 512 });
+            doc.fontSize(8).fillColor(grayColor)
+                .text(`${COMPANY_NAME}  •  ${COMPANY_URL}  •  ${COMPANY_EMAIL}`, 50, 744, { align: 'center', width: 512 });
 
             doc.end();
         } catch (error) {

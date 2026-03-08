@@ -3,14 +3,27 @@ import path from 'path';
 import fs from 'fs';
 import { ADMIN_DOCUMENT_LABELS } from '../utils/documentEmail.js';
 
-const brandColor = '#0ea5e9';
+/* ═══════════════════════════════════════════════════════════════════
+   Brand Tokens
+   ═══════════════════════════════════════════════════════════════════ */
+const brandColor = '#37bbec';
+const brandDeep = '#249fce';
 const darkColor = '#0f172a';
-const accentColor = '#10b981';
-const warningColor = '#f59e0b';
+const accentColor = '#059669';
+const warningColor = '#d97706';
 const grayColor = '#64748b';
-const lightGray = '#f1f5f9';
+const lightGray = '#f8fafc';
+const lightBrand = '#ebf8ff';
 const borderColor = '#e2e8f0';
+const white = '#ffffff';
 
+const COMPANY_NAME = 'SkyWorld Ventures';
+const COMPANY_EMAIL = 'hello@skyworld.dev';
+const COMPANY_URL = 'skyworld.dev';
+
+/* ═══════════════════════════════════════════════════════════════════
+   Formatters
+   ═══════════════════════════════════════════════════════════════════ */
 const formatDate = (value) =>
   new Date(value || Date.now()).toLocaleDateString('en-IN', {
     day: '2-digit',
@@ -27,7 +40,7 @@ const formatCurrency = (amount, currency = 'INR') => {
       maximumFractionDigits: 2,
     }).format(Number(amount || 0));
   } catch {
-    return `${normalized} ${Number(amount || 0).toLocaleString('en-IN')}`;
+    return `₹${Number(amount || 0).toLocaleString('en-IN')}`;
   }
 };
 
@@ -39,6 +52,9 @@ const escapeHtml = (value) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
+/* ═══════════════════════════════════════════════════════════════════
+   Shared PDF helpers
+   ═══════════════════════════════════════════════════════════════════ */
 const createPdfBuffer = (render) =>
   new Promise((resolve, reject) => {
     try {
@@ -54,370 +70,370 @@ const createPdfBuffer = (render) =>
     }
   });
 
-// Add professional header with logo
-const addProfessionalHeader = (doc, title, accentColorOverride = brandColor) => {
-  // Top banner with brand color
-  doc.rect(0, 0, 612, 80).fillColor(accentColorOverride).fill();
-  
-  // Company Logo/Name
-  const logoPath = path.resolve('..', 'client', 'public', 'wordmark_logo_white_.png');
-  if (fs.existsSync(logoPath)) {
-    doc.image(logoPath, 48, 15, { height: 50 });
-  } else {
-    doc.fontSize(26).fillColor('#ffffff').text('SkyWorld', 48, 20);
-    doc.fontSize(8).fillColor('#ffffff').text('VENTURES', 48, 50);
+const getLogoPath = (variant = 'white') => {
+  const names = variant === 'white'
+    ? ['wordmark_logo_white_.png', 'wordmark_logo_all_white_fullname.png']
+    : ['wordmark_logo_black_fullname.png', 'wordmark_logo_coloured_fullname.png'];
+  for (const name of names) {
+    const p = path.resolve('..', 'client', 'public', name);
+    if (fs.existsSync(p)) return p;
   }
-  
-  // Document title (right-aligned)
-  doc
-    .fontSize(20)
-    .fillColor('#ffffff')
-    .text(title, 320, 25, { align: 'right', width: 244 })
-    .fontSize(9)
-    .fillColor('rgba(255,255,255,0.7)')
-    .text(`Issued ${formatDate(new Date())}`, 320, 55, { align: 'right', width: 244 });
+  return null;
 };
 
-const addSectionHeader = (doc, title, y = null) => {
-  if (y !== null) doc.y = y;
-  doc.moveDown(0.6);
+/**
+ * Professional header with branded banner, logo, and document title.
+ */
+const addHeader = (doc, title, accent = brandColor) => {
+  // Full-width banner
+  doc.rect(0, 0, 612, 82).fillColor(accent).fill();
+
+  // Subtle bottom accent strip
+  doc.rect(0, 82, 612, 3).fillColor(brandDeep).fill();
+
+  // Logo (left)
+  const logoPath = getLogoPath('white');
+  if (logoPath) {
+    doc.image(logoPath, 48, 16, { height: 48 });
+  } else {
+    doc.fontSize(22).fillColor(white).font('Helvetica-Bold').text('SkyWorld', 48, 22);
+    doc.fontSize(7).fillColor('rgba(255,255,255,0.8)').font('Helvetica').text('VENTURES', 48, 48);
+  }
+
+  // Document title (right)
+  doc
+    .fontSize(18)
+    .fillColor(white)
+    .font('Helvetica-Bold')
+    .text(title, 300, 22, { align: 'right', width: 264 });
+  doc
+    .fontSize(9)
+    .fillColor('rgba(255,255,255,0.75)')
+    .font('Helvetica')
+    .text(`Issued: ${formatDate(new Date())}`, 300, 50, { align: 'right', width: 264 });
+
+  doc.y = 105;
+};
+
+/**
+ * Section heading with left accent bar.
+ */
+const addSection = (doc, title) => {
+  doc.moveDown(0.8);
+  const y = doc.y;
+  // Accent bar
+  doc.rect(48, y, 3, 16).fillColor(brandColor).fill();
   doc
     .fontSize(12)
     .fillColor(darkColor)
     .font('Helvetica-Bold')
-    .text(title);
-  doc
-    .moveTo(48, doc.y + 4)
-    .lineTo(564, doc.y + 4)
-    .strokeColor(brandColor)
-    .lineWidth(2)
-    .stroke();
-  doc.moveDown(0.4);
+    .text(title, 58, y + 1);
   doc.font('Helvetica');
+  doc.moveDown(0.5);
 };
 
-const addInfoBox = (doc, label, value, boxColor = lightGray) => {
-  const yBefore = doc.y;
+/**
+ * Key-value info row.
+ */
+const addField = (doc, label, value) => {
   doc
-    .rect(48, yBefore, 516, 45)
-    .fillColor(boxColor)
-    .fill();
-  
-  doc
-    .fontSize(9)
+    .fontSize(8)
     .fillColor(grayColor)
     .font('Helvetica-Bold')
-    .text(label, 58, yBefore + 8)
-    .font('Helvetica')
-    .fontSize(12)
+    .text(label.toUpperCase(), 48, doc.y);
+  doc
+    .fontSize(11)
     .fillColor(darkColor)
-    .text(value, 58, yBefore + 22);
-  doc.moveDown();
+    .font('Helvetica')
+    .text(String(value || 'N/A'));
+  doc.moveDown(0.4);
 };
 
-const writeSectionTitle = (doc, title) => {
-  doc.moveDown(0.4);
-  doc.fontSize(12).fillColor('#0f172a').text(title, { underline: true });
-  doc.moveDown(0.2);
+/**
+ * Highlighted value box.
+ */
+const addValueBox = (doc, label, value, boxColor = lightBrand) => {
+  const y = doc.y;
+  doc.rect(48, y, 516, 48).fillColor(boxColor).fill();
+  doc
+    .fontSize(8)
+    .fillColor(grayColor)
+    .font('Helvetica-Bold')
+    .text(label.toUpperCase(), 60, y + 8);
+  doc
+    .fontSize(16)
+    .fillColor(darkColor)
+    .font('Helvetica-Bold')
+    .text(String(value), 60, y + 24);
+  doc.font('Helvetica');
+  doc.y = y + 56;
+};
+
+/**
+ * Professional footer at page bottom.
+ */
+const addFooter = (doc, note = '') => {
+  const y = doc.y < 700 ? 720 : doc.y + 20;
+  doc
+    .moveTo(48, y)
+    .lineTo(564, y)
+    .strokeColor(borderColor)
+    .lineWidth(0.5)
+    .stroke();
+  doc.moveDown(0.3);
+  if (note) {
+    doc.fontSize(9).fillColor(darkColor).text(note, 48, y + 8, { align: 'center', width: 516 });
+  }
+  doc
+    .fontSize(8)
+    .fillColor(grayColor)
+    .text(`${COMPANY_NAME}  •  ${COMPANY_URL}  •  ${COMPANY_EMAIL}`, 48, note ? y + 24 : y + 8, {
+      align: 'center',
+      width: 516,
+    });
 };
 
 const getProjectStageLabel = (project) => {
-  const paymentDone = Boolean(project?.finalPaid);
-  if (paymentDone) return 'Final payment completed';
+  if (project?.finalPaid) return 'Final payment completed';
   if (project?.advancePaid) return 'Advance payment received';
   if (project?.paymentStatus === 'completed') return 'Payment complete';
   return 'Awaiting payment';
 };
 
+/* ═══════════════════════════════════════════════════════════════════
+   1. SERVICE AGREEMENT
+   ═══════════════════════════════════════════════════════════════════ */
 export const generateServiceAgreementPDF = async ({ user, project, payment }) =>
   createPdfBuffer((doc) => {
-    // Professional header
-    addProfessionalHeader(doc, 'Service Agreement', brandColor);
-    doc.moveDown(2);
+    addHeader(doc, 'Service Agreement');
 
-    // Client Information
-    addSectionHeader(doc, 'Client Information');
-    addInfoBox(doc, 'CLIENT NAME', user?.name || 'Client');
-    addInfoBox(doc, 'EMAIL ADDRESS', user?.email || 'N/A');
-    doc.moveDown(0.4);
+    // Client info
+    addSection(doc, 'Client Information');
+    addField(doc, 'Client Name', user?.name || 'Client');
+    addField(doc, 'Email', user?.email || 'N/A');
+    if (user?.company) addField(doc, 'Company', user.company);
 
-    // Project Scope
-    addSectionHeader(doc, 'Project Scope');
-    addInfoBox(doc, 'PROJECT TITLE', project?.title || 'Service engagement');
-    addInfoBox(doc, 'SERVICE CATEGORY', project?.serviceType || 'General service', lightGray);
-    addInfoBox(doc, 'PLAN TYPE', project?.plan || 'Custom');
+    // Project scope
+    addSection(doc, 'Project Scope');
+    addField(doc, 'Project Title', project?.title || 'Service engagement');
+    addField(doc, 'Service Category', project?.serviceType || 'General');
+    addField(doc, 'Plan', project?.plan || 'Custom');
     if (project?.description) {
-      doc.moveDown(0.2);
-      doc
-        .fontSize(10)
-        .fillColor(darkColor)
-        .text('Description:', { underline: true });
       doc.fontSize(10).fillColor(grayColor).text(project.description);
-      doc.moveDown(0.4);
+      doc.moveDown(0.3);
     }
 
-    // Commercial Terms
-    addSectionHeader(doc, 'Commercial Terms');
+    // Commercial terms
+    addSection(doc, 'Commercial Terms');
     const total = payment?.totalPlanPrice || project?.totalPlanPrice || payment?.amount || project?.budget || 0;
     const currency = payment?.currency || 'INR';
-    
-    doc
-      .fontSize(11)
-      .fillColor(darkColor)
-      .text('Total Project Value: ', { continued: true })
-      .fillColor(brandColor)
-      .fontSize(12)
-      .font('Helvetica-Bold')
-      .text(formatCurrency(total, currency));
-    
-    doc.moveDown(0.4);
-    doc
-      .fontSize(10)
-      .fillColor(darkColor)
-      .font('Helvetica')
-      .text('Payment Structure: 50% advance + 50% on final delivery');
-    
-    doc.moveDown(0.3);
-    doc
-      .fontSize(10)
-      .fillColor(grayColor)
-      .text('Additional scope changes may require updated estimates and timeline adjustments.');
-    
-    doc.moveDown(0.8);
 
-    // Standard Terms
-    addSectionHeader(doc, 'Terms & Conditions');
-    const terms = [
-      { num: 1, text: 'Work commences after initial confirmation and first payment clearance' },
-      { num: 2, text: 'Client responsible for providing timely feedback and required assets' },
-      { num: 3, text: 'Delivery dates are estimates subject to scope changes' },
-      { num: 4, text: 'Support and revisions follow selected package guidelines' },
-      { num: 5, text: 'Final handover upon completion of agreed deliverables' },
-    ];
+    addValueBox(doc, 'Total Project Value', formatCurrency(total, currency));
+    doc.moveDown(0.2);
 
-    terms.forEach(({ num, text }) => {
-      doc
-        .fontSize(10)
-        .fillColor(darkColor)
-        .font('Helvetica-Bold')
-        .text(`${num}.`, { continued: true })
-        .font('Helvetica')
-        .fillColor(grayColor)
-        .text(` ${text}`);
-      doc.moveDown(0.3);
-    });
+    // Payment breakdown
+    const advance = Math.round(total * 0.5);
+    const final = total - advance;
 
-    doc.moveDown(1);
+    doc.fontSize(10).fillColor(darkColor);
+    doc.text('Payment Structure:', { underline: false });
+    doc.moveDown(0.2);
 
-    // Footer
-    doc
-      .moveTo(48, doc.y)
-      .lineTo(564, doc.y)
-      .strokeColor(borderColor)
-      .lineWidth(1)
-      .stroke();
-    
-    doc.moveDown(0.5);
-    doc
-      .fontSize(9)
-      .fillColor(grayColor)
-      .text('This agreement is between SkyWorld and the client mentioned above.', { align: 'center' })
-      .text('For questions, contact: hello@skyworld.dev', { align: 'center' });
-  });
-
-export const generatePaymentReceiptPDF = async ({ user, payment }) =>
-  createPdfBuffer((doc) => {
-    // Professional header
-    addProfessionalHeader(doc, 'Payment Receipt', accentColor);
-    doc.moveDown(2);
-
-    // Payment Status Badge
-    const statusColor = payment?.status === 'completed' ? accentColor : warningColor;
-    const statusText = (payment?.status || 'completed').toUpperCase();
-    doc
-      .rect(48, doc.y, 150, 35)
-      .fillColor(statusColor)
-      .fill();
-    doc
-      .fontSize(12)
-      .fillColor('#ffffff')
-      .font('Helvetica-Bold')
-      .text(statusText, 48, doc.y + 10, { width: 150, align: 'center' });
-    doc.moveDown(2);
+    // Payment table
+    const tableY = doc.y;
+    doc.rect(48, tableY, 516, 24).fillColor(darkColor).fill();
+    doc.fontSize(9).fillColor(white).font('Helvetica-Bold');
+    doc.text('Phase', 60, tableY + 7);
+    doc.text('Amount', 350, tableY + 7, { width: 200, align: 'right' });
     doc.font('Helvetica');
 
-    // Recipient Information
-    addSectionHeader(doc, 'Recipient Information');
-    addInfoBox(doc, 'RECIPIENT NAME', user?.name || 'Client');
-    addInfoBox(doc, 'EMAIL ADDRESS', user?.email || 'N/A', lightGray);
-    doc.moveDown(0.4);
+    // Row 1: Advance
+    const r1 = tableY + 24;
+    doc.rect(48, r1, 516, 26).fillColor(lightGray).fill();
+    doc.fontSize(10).fillColor(darkColor).text('50% Advance (before work begins)', 60, r1 + 7);
+    doc.text(formatCurrency(advance, currency), 350, r1 + 7, { width: 200, align: 'right' });
 
-    // Payment Details
-    addSectionHeader(doc, 'Payment Details');
-    const amount = payment?.amount || 0;
-    const currency = payment?.currency || 'INR';
-    
-    // Amount highlight box
-    doc
-      .rect(48, doc.y, 516, 50)
-      .fillColor('#f0f9ff')
-      .fill();
-    doc
-      .fontSize(10)
-      .fillColor(grayColor)
-      .font('Helvetica-Bold')
-      .text('AMOUNT PAID', 58, doc.y + 8)
-      .font('Helvetica')
-      .fontSize(18)
-      .fillColor(accentColor)
-      .text(formatCurrency(amount, currency), 58, doc.y + 22);
-    doc.moveDown(3.2);
+    // Row 2: Final
+    const r2 = r1 + 26;
+    doc.rect(48, r2, 516, 26).fillColor(white).fill();
+    doc.rect(48, r2, 516, 26).strokeColor(borderColor).lineWidth(0.5).stroke();
+    doc.fontSize(10).fillColor(darkColor).text('50% Final (on delivery)', 60, r2 + 7);
+    doc.text(formatCurrency(final, currency), 350, r2 + 7, { width: 200, align: 'right' });
 
-    // Transaction Details Grid
-    const col1X = 48;
-    const col2X = 310;
-    const lineHeight = 24;
-    let y = doc.y;
+    doc.y = r2 + 34;
+    doc.moveDown(0.3);
+    doc.fontSize(9).fillColor(grayColor)
+      .text('Additional scope changes may require updated estimates and timeline adjustments.');
 
-    const details = [
-      { label: 'Payment Date', value: formatDate(payment?.paidAt || payment?.createdAt) },
-      { label: 'Transaction ID', value: payment?.razorpayPaymentId || payment?.transactionId || payment?._id || 'N/A' },
-      { label: 'Order ID', value: payment?.razorpayOrderId || 'N/A' },
-      { label: 'Project', value: payment?.projectId?.title || 'General payment' },
+    // Terms
+    addSection(doc, 'Terms & Conditions');
+    const terms = [
+      'Work commences after initial confirmation and advance payment clearance.',
+      'Client is responsible for providing timely feedback and required assets.',
+      'Delivery dates are estimates subject to scope changes.',
+      'Support and revisions follow the selected package guidelines.',
+      'Final handover and source code delivery upon completion of all agreed deliverables and final payment.',
     ];
-
-    details.forEach(({ label, value }, idx) => {
-      if (idx % 2 === 0) y = doc.y;
-      doc
-        .fontSize(9)
-        .fillColor(grayColor)
-        .font('Helvetica-Bold')
-        .text(label, idx % 2 === 0 ? col1X : col2X, y);
+    terms.forEach((text, i) => {
       doc
         .fontSize(10)
         .fillColor(darkColor)
+        .font('Helvetica-Bold')
+        .text(`${i + 1}. `, { continued: true })
         .font('Helvetica')
-        .text(value, idx % 2 === 0 ? col1X : col2X, doc.y);
-      
+        .fillColor(grayColor)
+        .text(text);
+      doc.moveDown(0.25);
+    });
+
+    addFooter(doc, 'This agreement is between SkyWorld Ventures and the above-mentioned client.');
+  });
+
+/* ═══════════════════════════════════════════════════════════════════
+   2. PAYMENT RECEIPT
+   ═══════════════════════════════════════════════════════════════════ */
+export const generatePaymentReceiptPDF = async ({ user, payment }) =>
+  createPdfBuffer((doc) => {
+    addHeader(doc, 'Payment Receipt', accentColor);
+
+    // Status badge
+    const isPaid = payment?.status === 'completed';
+    const badgeColor = isPaid ? accentColor : warningColor;
+    const badgeText = isPaid ? 'PAID' : (payment?.status || 'PENDING').toUpperCase();
+
+    const badgeY = doc.y;
+    doc.roundedRect(48, badgeY, 120, 28, 4).fillColor(badgeColor).fill();
+    doc.fontSize(11).fillColor(white).font('Helvetica-Bold')
+      .text(badgeText, 48, badgeY + 8, { width: 120, align: 'center' });
+    doc.font('Helvetica');
+
+    // Payment phase tag
+    const phase = payment?.paymentPhase || 'advance';
+    const phaseLabel = phase === 'final' ? 'Final Payment' : 'Advance Payment';
+    doc.roundedRect(178, badgeY, 130, 28, 4).strokeColor(brandColor).lineWidth(1).stroke();
+    doc.fontSize(10).fillColor(brandColor).font('Helvetica-Bold')
+      .text(phaseLabel, 178, badgeY + 8, { width: 130, align: 'center' });
+    doc.font('Helvetica');
+    doc.y = badgeY + 40;
+
+    // Recipient
+    addSection(doc, 'Recipient');
+    addField(doc, 'Name', user?.name || 'Client');
+    addField(doc, 'Email', user?.email || 'N/A');
+
+    // Amount
+    addSection(doc, 'Payment Details');
+    const amount = payment?.amount || 0;
+    const currency = payment?.currency || 'INR';
+    addValueBox(doc, 'Amount Paid', formatCurrency(amount, currency));
+
+    // Transaction grid
+    doc.moveDown(0.3);
+    const details = [
+      ['Payment Date', formatDate(payment?.paidAt || payment?.createdAt)],
+      ['Payment Phase', phaseLabel],
+      ['Transaction ID', payment?.razorpayPaymentId || payment?.transactionId || payment?._id || 'N/A'],
+      ['Order ID', payment?.razorpayOrderId || 'N/A'],
+      ['Project', payment?.projectId?.title || 'General payment'],
+      ['Invoice No.', payment?.invoiceNumber || 'N/A'],
+    ];
+
+    const col1 = 48;
+    const col2 = 310;
+    details.forEach(([label, value], idx) => {
+      const x = idx % 2 === 0 ? col1 : col2;
+      if (idx % 2 === 0) doc.y = idx === 0 ? doc.y : doc.y;
+      const yPos = doc.y;
+      doc.fontSize(8).fillColor(grayColor).font('Helvetica-Bold').text(label.toUpperCase(), x, yPos);
+      doc.fontSize(10).fillColor(darkColor).font('Helvetica').text(String(value), x);
       if (idx % 2 === 1) doc.moveDown(0.5);
     });
 
-    doc.moveDown(1);
+    // Total project context
+    if (payment?.totalPlanPrice) {
+      doc.moveDown(0.5);
+      doc.moveTo(48, doc.y).lineTo(564, doc.y).strokeColor(borderColor).lineWidth(0.5).stroke();
+      doc.moveDown(0.4);
+      doc.fontSize(9).fillColor(grayColor).text('TOTAL PROJECT VALUE', 48);
+      doc.fontSize(12).fillColor(darkColor).font('Helvetica-Bold')
+        .text(formatCurrency(payment.totalPlanPrice, currency));
+      doc.font('Helvetica');
+      if (phase === 'advance') {
+        doc.fontSize(9).fillColor(warningColor)
+          .text(`Balance due on delivery: ${formatCurrency(payment.totalPlanPrice - amount, currency)}`);
+      } else {
+        doc.fontSize(9).fillColor(accentColor).text('Project fully paid — thank you!');
+      }
+    }
 
-    // Footer
-    doc
-      .moveTo(48, doc.y)
-      .lineTo(564, doc.y)
-      .strokeColor(borderColor)
-      .lineWidth(1)
-      .stroke();
-    
-    doc.moveDown(0.5);
-    doc
-      .fontSize(10)
-      .fillColor(darkColor)
-      .text('Receipt Confirmation', { align: 'center', underline: true })
-      .moveDown(0.3);
-    doc
-      .fontSize(9)
-      .fillColor(grayColor)
-      .text('This receipt confirms payment acknowledgement to SkyWorld Ventures.', { align: 'center' })
-      .text('Your payment has been processed successfully.', { align: 'center' });
+    addFooter(doc, 'This receipt confirms payment to SkyWorld Ventures.');
   });
 
+/* ═══════════════════════════════════════════════════════════════════
+   3. PROJECT STAGE REPORT
+   ═══════════════════════════════════════════════════════════════════ */
 export const generateProjectStagePDF = async ({ user, projects = [] }) =>
   createPdfBuffer((doc) => {
-    // Professional header
-    addProfessionalHeader(doc, 'Project Stage Report', brandColor);
-    doc.moveDown(2);
+    addHeader(doc, 'Project Stage Report');
 
-    // Client Information
-    addSectionHeader(doc, 'Client Information');
-    addInfoBox(doc, 'CLIENT NAME', user?.name || 'Client');
-    addInfoBox(doc, 'EMAIL ADDRESS', user?.email || 'N/A', lightGray);
-    doc.moveDown(0.4);
+    addSection(doc, 'Client');
+    addField(doc, 'Name', user?.name || 'Client');
+    addField(doc, 'Email', user?.email || 'N/A');
 
-    // Projects Section
-    addSectionHeader(doc, 'Current Project Status');
-    
+    addSection(doc, 'Project Status');
+
     if (!projects.length) {
-      doc
-        .rect(48, doc.y, 516, 60)
-        .fillColor(lightGray)
-        .fill();
-      doc
-        .fontSize(11)
-        .fillColor(grayColor)
-        .text('No active projects yet', 58, doc.y + 15)
+      doc.rect(48, doc.y, 516, 50).fillColor(lightGray).fill();
+      doc.fontSize(11).fillColor(grayColor)
+        .text('No active projects yet.', 60, doc.y + 10)
         .fontSize(10)
-        .text('Your projects will appear here once work is initiated.', 58, doc.y);
-      doc.moveDown(4);
+        .text('Projects will appear here once work is initiated.', 60);
+      doc.moveDown(3);
     } else {
       projects.slice(0, 6).forEach((project, index) => {
-        // Project card
-        doc
-          .rect(48, doc.y, 516, 100)
-          .strokeColor(borderColor)
-          .lineWidth(1)
-          .stroke();
-        
-        // Project header
-        doc
-          .fontSize(12)
-          .fillColor(darkColor)
-          .font('Helvetica-Bold')
-          .text(`${index + 1}. ${project.title || 'Project'}`, 58, doc.y + 8)
-          .font('Helvetica');
-        
-        // Project details grid
-        const details = [
-          { label: 'Status', value: (project.status || 'planning').charAt(0).toUpperCase() + (project.status || 'planning').slice(1) },
-          { label: 'Progress', value: `${Number(project.progress || 0)}%` },
-          { label: 'Payment Stage', value: getProjectStageLabel(project) },
-          { label: 'Delivery', value: (project.deliveryStatus || 'pending').charAt(0).toUpperCase() + (project.deliveryStatus || 'pending').slice(1) },
+        const cardY = doc.y;
+
+        // Card border
+        doc.rect(48, cardY, 516, 90).strokeColor(borderColor).lineWidth(0.5).stroke();
+        // Left accent
+        doc.rect(48, cardY, 4, 90).fillColor(brandColor).fill();
+
+        // Title
+        doc.fontSize(12).fillColor(darkColor).font('Helvetica-Bold')
+          .text(`${index + 1}. ${project.title || 'Untitled Project'}`, 62, cardY + 10, { width: 490 });
+        doc.font('Helvetica');
+
+        // Progress bar
+        const progress = Number(project.progress || 0);
+        const barY = cardY + 30;
+        doc.rect(62, barY, 200, 8).fillColor('#e2e8f0').fill();
+        if (progress > 0) {
+          doc.rect(62, barY, Math.max(4, progress * 2), 8).fillColor(brandColor).fill();
+        }
+        doc.fontSize(8).fillColor(grayColor).text(`${progress}%`, 270, barY - 1);
+
+        // Details grid
+        const dets = [
+          ['Status', (project.status || 'planning').replace(/^\w/, c => c.toUpperCase())],
+          ['Delivery', (project.deliveryStatus || 'pending').replace(/^\w/, c => c.toUpperCase())],
+          ['Payment', getProjectStageLabel(project)],
         ];
-        
-        // 2x2 grid of details
-        details.forEach(({ label, value }, idx) => {
-          const row = Math.floor(idx / 2);
-          const col = idx % 2;
-          const x = col === 0 ? 58 : 300;
-          const y = doc.y + 28 + (row * 18);
-          
-          doc
-            .fontSize(8)
-            .fillColor(grayColor)
-            .font('Helvetica-Bold')
-            .text(label, x, y);
-          doc
-            .fontSize(10)
-            .fillColor(darkColor)
-            .font('Helvetica')
-            .text(value, x, y + 12);
+        dets.forEach(([label, val], i) => {
+          const x = 62 + i * 170;
+          doc.fontSize(7).fillColor(grayColor).font('Helvetica-Bold').text(label.toUpperCase(), x, cardY + 48);
+          doc.fontSize(10).fillColor(darkColor).font('Helvetica').text(val, x, cardY + 60, { width: 160 });
         });
-        
-        doc.moveDown(5.5);
+
+        doc.y = cardY + 98;
       });
     }
 
-    doc.moveDown(1);
-
-    // Footer
-    doc
-      .moveTo(48, doc.y)
-      .lineTo(564, doc.y)
-      .strokeColor(borderColor)
-      .lineWidth(1)
-      .stroke();
-    
-    doc.moveDown(0.5);
-    doc
-      .fontSize(9)
-      .fillColor(grayColor)
-      .text('This is an automated report from SkyWorld.', { align: 'center' })
-      .text('Contact hello@skyworld.dev for project inquiries', { align: 'center' });
+    addFooter(doc, 'Automated project report from SkyWorld.');
   });
 
+/* ═══════════════════════════════════════════════════════════════════
+   Attachment + Email helpers
+   ═══════════════════════════════════════════════════════════════════ */
 export const toMailerSendAttachment = (filename, buffer) => ({
   filename,
   content: buffer.toString('base64'),
@@ -433,26 +449,35 @@ export const buildDocumentDispatchEmail = ({
     .map((type) => ADMIN_DOCUMENT_LABELS[type] || type)
     .filter(Boolean);
 
-  const listHtml = docs.map((doc) => `<li>${escapeHtml(doc)}</li>`).join('');
+  const listHtml = docs.map((d) => `<li style="margin:4px 0;color:#1e293b;">${escapeHtml(d)}</li>`).join('');
   const customBlock = customMessage
-    ? `<p style="margin:12px 0;color:#334155;">${escapeHtml(customMessage)}</p>`
+    ? `<p style="margin:14px 0;color:#334155;line-height:1.6;">${escapeHtml(customMessage)}</p>`
     : '';
 
   const html = `
-    <div style="font-family:Arial,sans-serif;background:#f8fafc;padding:24px;">
-      <div style="max-width:680px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
-        <div style="background:#0ea5e9;color:#fff;padding:18px 20px;">
-          <h2 style="margin:0;font-size:20px;">SkyWorld Documents</h2>
-          <p style="margin:6px 0 0;font-size:13px;opacity:.9;">Your requested project documents are attached.</p>
+    <div style="font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;padding:32px 16px;">
+      <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);">
+
+        <!-- Header -->
+        <div style="background:#37bbec;padding:24px 28px;">
+          <h2 style="margin:0;font-size:20px;color:#ffffff;font-weight:700;">SkyWorld Ventures</h2>
+          <p style="margin:6px 0 0;font-size:13px;color:rgba(255,255,255,.85);">Your project documents are attached below.</p>
         </div>
-        <div style="padding:20px;">
-          <p style="margin:0 0 10px;color:#0f172a;">Hi ${safeName},</p>
-          <p style="margin:0 0 10px;color:#334155;">Please find the following documents attached:</p>
-          <ul style="margin:8px 0 14px 18px;color:#1e293b;">${listHtml}</ul>
+
+        <!-- Body -->
+        <div style="padding:28px;">
+          <p style="margin:0 0 12px;color:#0f172a;font-size:15px;">Hi ${safeName},</p>
+          <p style="margin:0 0 14px;color:#334155;font-size:14px;line-height:1.6;">Please find the following documents attached to this email:</p>
+          <ul style="margin:8px 0 16px 20px;padding:0;font-size:14px;">${listHtml}</ul>
           ${customBlock}
-          <p style="margin:14px 0 0;color:#334155;">For any clarification, reply to this email or contact SkyWorld support.</p>
-          <p style="margin:16px 0 0;color:#64748b;font-size:12px;">This email was sent by a SkyWorld administrator.</p>
+          <p style="margin:16px 0 0;color:#334155;font-size:14px;line-height:1.6;">For any questions, simply reply to this email or reach us at <a href="mailto:hello@skyworld.dev" style="color:#37bbec;text-decoration:none;">hello@skyworld.dev</a>.</p>
         </div>
+
+        <!-- Footer -->
+        <div style="border-top:1px solid #e2e8f0;padding:16px 28px;text-align:center;">
+          <p style="margin:0;font-size:11px;color:#94a3b8;">SkyWorld Ventures &bull; skyworld.dev &bull; hello@skyworld.dev</p>
+        </div>
+
       </div>
     </div>
   `;
@@ -461,10 +486,12 @@ export const buildDocumentDispatchEmail = ({
     `Hi ${safeName},`,
     '',
     'Please find the following SkyWorld documents attached:',
-    ...docs.map((doc) => `- ${doc}`),
-    customMessage ? `\nAdmin message: ${customMessage}` : '',
+    ...docs.map((d) => `- ${d}`),
+    customMessage ? `\nMessage: ${customMessage}` : '',
     '',
-    'For any clarification, contact SkyWorld support.',
+    'For any questions, contact hello@skyworld.dev',
+    '',
+    `${COMPANY_NAME} • ${COMPANY_URL}`,
   ]
     .filter(Boolean)
     .join('\n');

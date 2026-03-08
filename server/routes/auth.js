@@ -10,6 +10,7 @@ import {
   forgotPassword,
   resetUserPassword,
   deleteAccount,
+  restoreAccount,
   verifyAuthOtp,
   resendAuthOtp
 } from '../controllers/authController.js';
@@ -63,6 +64,7 @@ router.post('/logout', authenticate, logout);
 router.get('/me', authenticate, getMe);
 router.post('/change-password', authenticate, sensitiveRateLimiter, validators.changePassword, handleValidationErrors, changeUserPassword);
 router.delete('/account', authenticate, sensitiveRateLimiter, deleteAccount);
+router.post('/restore-account', authenticate, restoreAccount);
 
 // 2FA — authenticated (setup/manage)
 router.post('/2fa/setup', authenticate, sensitiveRateLimiter, setup2FA);

@@ -37,6 +37,7 @@ import dashboardRoutes from './routes/dashboard.js';
 import { initSentry } from './config/sentry.js';
 import cron from 'node-cron';
 import { nightlyFlushAndReset } from './services/dashboardAnalyticsService.js';
+import { purgeExpiredAccounts } from './services/accountPurgeService.js';
 
 dotenv.config();
 
@@ -222,6 +223,15 @@ const startServer = async () => {
       );
     }, { timezone: 'Asia/Kolkata' });
     logger.info('Cron job scheduled: nightly analytics flush at 11:59 PM IST');
+
+    // ── Cron: Purge expired deleted accounts at 2:00 AM IST ─────────────
+    cron.schedule('0 2 * * *', () => {
+      logger.info('[CRON] Triggering expired account purge (2:00 AM IST)');
+      purgeExpiredAccounts().catch((err) =>
+        logger.error('[CRON] Account purge error:', err.message)
+      );
+    }, { timezone: 'Asia/Kolkata' });
+    logger.info('Cron job scheduled: account purge at 2:00 AM IST');
   } catch (error) {
     logger.error('Failed to start server:', error);
     process.exit(1);

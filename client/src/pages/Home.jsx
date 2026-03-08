@@ -235,7 +235,7 @@ const Home = () => {
         <div className="hp-hero__glow" />
 
         <div className="hp-hero__content">
-          <h1 className="hp-hero__h1" style={{ marginTop: 100 }}>
+          <h1 className="hp-hero__h1">
             <span className="hp-hero__ln" style={{ animationDelay: '.2s' }}>
               We design &amp; build
             </span>
@@ -572,22 +572,9 @@ const Home = () => {
 
                   {/* Highlight badges */}
                   {plan.highlights?.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, margin: '8px 0 4px' }}>
+                    <div className="hp-mplan__highlights">
                       {plan.highlights.map((h) => (
-                        <span
-                          key={h}
-                          style={{
-                            fontSize: 9,
-                            fontWeight: 700,
-                            letterSpacing: '.04em',
-                            textTransform: 'uppercase',
-                            color: '#0ea5e9',
-                            background: 'rgba(14,165,233,.08)',
-                            padding: '2px 7px',
-                            borderRadius: 4,
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
+                        <span key={h} className="hp-mplan__hl">
                           {h}
                         </span>
                       ))}
@@ -713,9 +700,9 @@ const Home = () => {
       <style>{`
 /* ── Tokens ── */
 .hp {
-  --sky: #0ea5e9;
-  --sky-deep: #0284c7;
-  --sky-glow: rgba(14,165,233,.16);
+  --sky: #37bbec;
+  --sky-deep: #249fce;
+  --sky-glow: rgba(55,187,236,.16);
   --indigo: #6366f1;
   --dark: #0f172a;
   --dark-2: #1e293b;
@@ -780,12 +767,6 @@ const Home = () => {
   text-decoration: none; transition: background .2s, transform .15s, box-shadow .2s;
   position: relative; overflow: hidden;
 }
-.hp-nav__cta::after {
-  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
-  transition: left .5s ease;
-}
-.hp-nav__cta:hover::after { left: 100%; }
 .hp-nav__cta:hover { background: var(--sky-deep); transform: translateY(-1px); box-shadow: 0 4px 16px var(--sky-glow); }
 
 /* ══════════════════════════════════════════
@@ -797,12 +778,6 @@ const Home = () => {
   text-decoration: none; cursor: pointer; border: none; transition: all .2s;
 }
 .hp-btn--primary { color: #fff; background: var(--sky); position: relative; overflow: hidden; }
-.hp-btn--primary::after {
-  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
-  transition: left .5s ease;
-}
-.hp-btn--primary:hover::after { left: 100%; }
 .hp-btn--primary:hover {
   background: var(--sky-deep); transform: translateY(-1px);
   box-shadow: 0 4px 20px var(--sky-glow);
@@ -836,7 +811,7 @@ const Home = () => {
 .hp-hero {
   position: relative; background: var(--dark);
   min-height: 100vh; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  align-items: center;
   padding: 80px 24px 0; overflow: hidden;
 }
 
@@ -853,7 +828,7 @@ const Home = () => {
 .hp-hero__glow {
   position: absolute; width: 700px; height: 700px;
   top: 50%; left: 50%; transform: translate(-50%, -55%);
-  background: radial-gradient(circle, rgba(14,165,233,.06) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(55,187,236,.06) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -862,13 +837,14 @@ const Home = () => {
   position: relative; z-index: 1;
   display: flex; flex-direction: column; align-items: center;
   text-align: center; max-width: 900px;
+  margin-top: auto;
 }
 
 /* Pill badge */
 .hp-hero__pill {
   display: inline-block;
   font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--sky); border: 1px solid rgba(14,165,233,.25);
+  color: var(--sky); border: 1px solid rgba(55,187,236,.25);
   padding: 6px 20px; border-radius: 50px; margin: 0 0 32px;
   animation: _heroIn .6s cubic-bezier(.25,.46,.45,.94) both;
 }
@@ -909,7 +885,7 @@ const Home = () => {
 .hp-hero__stats {
   position: relative; z-index: 1;
   display: flex; width: min(85%, 840px);
-  margin-top: auto; padding: 40px 0 48px;
+  margin-top: 56px; margin-bottom: 48px; padding: 40px 0 0;
   border-top: 1px solid rgba(148,163,184,.08);
   animation: _heroIn .6s cubic-bezier(.25,.46,.45,.94) both;
 }
@@ -937,8 +913,8 @@ const Home = () => {
 .hp-svc::before {
   content: ''; position: absolute; inset: 0;
   background-image:
-    linear-gradient(rgba(14,165,233,.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14,165,233,.025) 1px, transparent 1px);
+    linear-gradient(rgba(55,187,236,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(55,187,236,.025) 1px, transparent 1px);
   background-size: 72px 72px;
   mask-image: linear-gradient(180deg, transparent 5%, rgba(0,0,0,.5) 40%, rgba(0,0,0,.5) 60%, transparent 95%);
   -webkit-mask-image: linear-gradient(180deg, transparent 5%, rgba(0,0,0,.5) 40%, rgba(0,0,0,.5) 60%, transparent 95%);
@@ -1009,17 +985,17 @@ const Home = () => {
 .hp-proc::after {
   content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
   width: min(80%, 900px); height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(14,165,233,.2), var(--sky), rgba(14,165,233,.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(55,187,236,.2), var(--sky), rgba(55,187,236,.2), transparent);
 }
 .hp-proc .hp-sect-h { margin-bottom: 48px; }
 .hp-proc__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; position: relative; }
 .hp-proc__item { display: flex; gap: 16px; position: relative; }
 .hp-proc__num {
   font-size: 52px; font-weight: 800; letter-spacing: -.05em; line-height: 1;
-  color: rgba(14,165,233,.1); flex-shrink: 0; font-variant-numeric: tabular-nums;
+  color: rgba(55,187,236,.1); flex-shrink: 0; font-variant-numeric: tabular-nums;
   transition: color .4s;
 }
-.hp-proc__item:hover .hp-proc__num { color: rgba(14,165,233,.2); }
+.hp-proc__item:hover .hp-proc__num { color: rgba(55,187,236,.2); }
 .hp-proc__title {
   font-size: 16px; font-weight: 650; color: var(--dark);
   margin-bottom: 6px; padding-top: 6px;
@@ -1032,19 +1008,7 @@ const Home = () => {
 .hp-pricing {
   padding: 120px 0; background: var(--bg-off); position: relative; overflow: hidden;
 }
-.hp-pricing::before {
-  content: ''; position: absolute; inset: 0;
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 80px,
-    rgba(14,165,233,.018) 80px,
-    rgba(14,165,233,.018) 81px
-  );
-  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 0%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 0%, transparent 75%);
-  pointer-events: none;
-}
+
 .hp-pricing .hp-sect-sub { margin-bottom: 0; }
 
 .hp-tabs {
@@ -1147,12 +1111,6 @@ const Home = () => {
 }
 .hp-plan__cta:hover { border-color: rgba(var(--c),.35); color: rgb(var(--c)); }
 .hp-plan__cta--pop { background: var(--g); color: #fff; border: none; position: relative; overflow: hidden; }
-.hp-plan__cta--pop::after {
-  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
-  transition: left .5s ease;
-}
-.hp-plan__cta--pop:hover::after { left: 100%; }
 .hp-plan__cta--pop:hover {
   box-shadow: 0 4px 18px rgba(var(--c),.25); transform: translateY(-1px);
 }
@@ -1168,17 +1126,9 @@ const Home = () => {
 .hp-combos > .hp-wrap::before {
   content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
   width: min(80%, 900px); height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(14,165,233,.2), var(--sky), rgba(14,165,233,.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(55,187,236,.2), var(--sky), rgba(55,187,236,.2), transparent);
 }
-.hp-combos::before {
-  content: ''; position: absolute; inset: 0;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(14,165,233,.015) 60px, rgba(14,165,233,.015) 61px),
-    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(14,165,233,.015) 60px, rgba(14,165,233,.015) 61px);
-  mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, black 0%, transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, black 0%, transparent 70%);
-  pointer-events: none;
-}
+
 .hp-combos .hp-sect-sub { margin-bottom: 0; }
 .hp-combos__grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px;
@@ -1240,12 +1190,6 @@ const Home = () => {
   transition: all .25s cubic-bezier(.25,.46,.45,.94); border: none;
   position: relative; overflow: hidden;
 }
-.hp-combo__cta::after {
-  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
-  transition: left .5s ease;
-}
-.hp-combo__cta:hover::after { left: 100%; }
 .hp-combo__cta:hover {
   background: var(--dark-2); transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(0,0,0,.12);
@@ -1259,7 +1203,7 @@ const Home = () => {
 }
 .hp-monthly::before {
   content: ''; position: absolute; inset: 0;
-  background-image: radial-gradient(rgba(14,165,233,.045) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(55,187,236,.045) 1px, transparent 1px);
   background-size: 32px 32px;
   mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, black 0%, transparent 70%);
   -webkit-mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, black 0%, transparent 70%);
@@ -1288,20 +1232,20 @@ const Home = () => {
 }
 .hp-mplan::after {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, var(--sky), var(--indigo), #c084fc);
+  background: linear-gradient(90deg, var(--sky), var(--sky-deep));
   opacity: 0; transition: opacity .35s;
 }
 .hp-mplan:hover::after { opacity: 1; }
 .hp-mplan:hover {
   transform: translateY(-4px);
-  box-shadow: 0 14px 44px rgba(0,0,0,.3), 0 0 40px -12px rgba(14,165,233,.08);
-  border-color: rgba(14,165,233,.12);
+  box-shadow: 0 14px 44px rgba(0,0,0,.3), 0 0 40px -12px rgba(55,187,236,.08);
+  border-color: rgba(55,187,236,.12);
 }
-.hp-mplan--pop { border-color: rgba(14,165,233,.25); }
+.hp-mplan--pop { border-color: rgba(55,187,236,.25); }
 .hp-mplan__badge {
   position: absolute; top: 14px; right: 14px;
   font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-  color: var(--sky); background: rgba(14,165,233,.1);
+  color: var(--sky); background: rgba(55,187,236,.1);
   padding: 4px 10px; border-radius: 6px;
 }
 .hp-mplan__name {
@@ -1327,12 +1271,20 @@ const Home = () => {
   border: 1px solid rgba(255,255,255,.07); color: rgba(255,255,255,.45);
   background: transparent; cursor: pointer; transition: all .2s;
 }
-.hp-mplan__cta:hover { border-color: rgba(14,165,233,.3); color: #fff; }
+.hp-mplan__cta:hover { border-color: rgba(55,187,236,.3); color: #fff; }
 .hp-mplan__cta--pop {
-  background: linear-gradient(135deg, var(--sky), var(--indigo));
+  background: var(--sky);
   color: #fff; border: none;
 }
-.hp-mplan__cta--pop:hover { box-shadow: 0 4px 18px rgba(14,165,233,.3); }
+.hp-mplan__cta--pop:hover { background: var(--sky-deep); box-shadow: 0 4px 18px rgba(55,187,236,.3); }
+
+/* ── Monthly plan highlight badges ── */
+.hp-mplan__highlights { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 4px; }
+.hp-mplan__hl {
+  font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--sky); background: rgba(55,187,236,.08);
+  padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+}
 
 /* ══════════════════════════════════════════
    CTA — gradient banner
@@ -1342,19 +1294,7 @@ const Home = () => {
   background: linear-gradient(145deg, #0c4a6e 0%, var(--dark) 100%);
 }
 .hp-cta > .hp-wrap { position: relative; z-index: 1; }
-.hp-cta::before {
-  content: ''; position: absolute; inset: 0;
-  background-image:
-    repeating-linear-gradient(135deg, transparent, transparent 50px, rgba(255,255,255,.012) 50px, rgba(255,255,255,.012) 51px),
-    repeating-linear-gradient(45deg, transparent, transparent 50px, rgba(255,255,255,.012) 50px, rgba(255,255,255,.012) 51px);
-  pointer-events: none;
-}
-.hp-cta::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  mix-blend-mode: overlay; opacity: .3;
-}
+
 .hp-cta__inner {
   display: flex; align-items: center; justify-content: space-between; gap: 48px;
 }
@@ -1414,7 +1354,8 @@ const Home = () => {
   .hp-hero__stats { flex-wrap: wrap; gap: 16px; width: 100%; }
   .hp-st { flex: 1 0 40%; }
   .hp-st:not(:last-child)::after { display: none; }
-  .hp-hero__btns { flex-direction: column; align-items: stretch; }  .hp-svc__grid { grid-template-columns: 1fr; }
+  .hp-hero__btns { flex-direction: column; align-items: stretch; }
+  .hp-svc__grid { grid-template-columns: 1fr; }
   .hp-proc__grid { grid-template-columns: 1fr; gap: 20px; }
   .hp-plans { grid-template-columns: 1fr; }
   .hp-combos__grid { grid-template-columns: 1fr; }
@@ -1422,7 +1363,6 @@ const Home = () => {
   .hp-tabs { flex-wrap: wrap; }
   .hp-cta__inner { flex-direction: column; text-align: center; }
   .hp-cta__actions { align-items: center; }
-  .hp-hero__btns { flex-direction: column; align-items: stretch; }
   .hp-btn { justify-content: center; }
   .hp-ft__inner { flex-direction: column; text-align: center; }
 }
@@ -1462,8 +1402,8 @@ const Home = () => {
 .dark .hp-svc { background: var(--bg-off); }
 .dark .hp-svc::before {
   background-image:
-    linear-gradient(rgba(14,165,233,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14,165,233,.04) 1px, transparent 1px);
+    linear-gradient(rgba(55,187,236,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(55,187,236,.04) 1px, transparent 1px);
 }
 .dark .hp-svc__card {
   background: linear-gradient(145deg, rgba(30,41,59,.9), rgba(15,23,42,.85));
@@ -1482,24 +1422,16 @@ const Home = () => {
 /* Process — dark */
 .dark .hp-proc { background: var(--bg); }
 .dark .hp-proc::after {
-  background: linear-gradient(90deg, transparent, rgba(14,165,233,.15), rgba(14,165,233,.3), rgba(14,165,233,.15), transparent);
+  background: linear-gradient(90deg, transparent, rgba(55,187,236,.15), rgba(55,187,236,.3), rgba(55,187,236,.15), transparent);
 }
-.dark .hp-proc__num { color: rgba(14,165,233,.14); }
-.dark .hp-proc__item:hover .hp-proc__num { color: rgba(14,165,233,.25); }
+.dark .hp-proc__num { color: rgba(55,187,236,.14); }
+.dark .hp-proc__item:hover .hp-proc__num { color: rgba(55,187,236,.25); }
 .dark .hp-proc__title { color: #f1f5f9; }
 .dark .hp-proc__desc { color: #94a3b8; }
 
 /* Pricing — dark */
 .dark .hp-pricing { background: var(--bg-off); }
-.dark .hp-pricing::before {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 80px,
-    rgba(14,165,233,.03) 80px,
-    rgba(14,165,233,.03) 81px
-  );
-}
+
 .dark .hp-tabs { background: rgba(255,255,255,.04); }
 .dark .hp-tab { color: #64748b; }
 .dark .hp-tab:hover { color: #f1f5f9; background: rgba(255,255,255,.03); }
@@ -1530,13 +1462,9 @@ const Home = () => {
 /* Combos — dark */
 .dark .hp-combos { background: var(--bg); }
 .dark .hp-combos > .hp-wrap::before {
-  background: linear-gradient(90deg, transparent, rgba(14,165,233,.15), rgba(14,165,233,.3), rgba(14,165,233,.15), transparent);
+  background: linear-gradient(90deg, transparent, rgba(55,187,236,.15), rgba(55,187,236,.3), rgba(55,187,236,.15), transparent);
 }
-.dark .hp-combos::before {
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(14,165,233,.03) 60px, rgba(14,165,233,.03) 61px),
-    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(14,165,233,.03) 60px, rgba(14,165,233,.03) 61px);
-}
+
 .dark .hp-combo {
   background: rgba(30,41,59,.6); border-color: rgba(255,255,255,.06);
 }

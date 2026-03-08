@@ -203,6 +203,19 @@ class EmailService {
     });
   }
 
+  async sendAccountDeletionEmail(user, scheduledDeletionAt) {
+    const deletionDate = new Date(scheduledDeletionAt).toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
+    return this.sendMail({
+      to: user.email,
+      subject: 'Account Deletion Scheduled - SkyWorld',
+      html: this.getAccountDeletionTemplate(user.name, deletionDate),
+    });
+  }
+
   async sendAuthOtpEmail(user, otp, purpose) {
     const actionLabel = purpose === 'register' ? 'verify your account' : 'complete login';
     const subject = purpose === 'register'
@@ -431,6 +444,79 @@ class EmailService {
               </div>
               <div class="divider"></div>
               <p class="help-text">Need help? <a href="mailto:support@skyworld.com">Contact our support team</a></p>
+            </div>
+            <div class="footer">
+              <img src="${this.iconLogoUrl}" alt="SkyWorld" class="footer-logo" />
+              <p>&copy; 2026 SkyWorld Ventures. All rights reserved.</p>
+              <p>This is an automated message — please do not reply directly.</p>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  getAccountDeletionTemplate(userName, deletionDate) {
+    const safeName = this.escapeHtml(userName);
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Account Deletion Scheduled - SkyWorld</title>
+        <style>
+          body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f1f5f9; }
+          .wrapper { width: 100%; background-color: #f1f5f9; padding: 40px 0; }
+          .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08); }
+          .header { background: linear-gradient(135deg, #37bbec 0%, #249fce 50%, #1a8ab8 100%); color: white; padding: 40px 30px; text-align: center; }
+          .header img { max-height: 44px; width: auto; margin-bottom: 16px; }
+          .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+          .header p { margin: 6px 0 0; font-size: 14px; opacity: 0.85; }
+          .content { padding: 36px 32px; }
+          .content h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; color: #0f172a; }
+          .content > p { margin: 0 0 16px; font-size: 15px; color: #475569; }
+          .deletion-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0; }
+          .deletion-box .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: #991b1b; margin-bottom: 8px; font-weight: 600; }
+          .deletion-date { font-size: 20px; font-weight: 700; color: #dc2626; }
+          .restore-note { background: #f0f9ff; border-left: 4px solid #37bbec; border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 24px 0; }
+          .restore-note strong { display: block; font-size: 14px; color: #0c4a6e; margin-bottom: 8px; }
+          .restore-note p { margin: 0; font-size: 13px; color: #475569; }
+          .btn-restore { display: inline-block; background: linear-gradient(135deg, #37bbec, #249fce); color: #ffffff !important; padding: 14px 40px; text-decoration: none; border-radius: 10px; font-size: 15px; font-weight: 600; letter-spacing: 0.3px; margin: 8px 0 16px; box-shadow: 0 4px 14px rgba(55, 187, 236, 0.35); }
+          .divider { height: 1px; background: #e2e8f0; margin: 28px 0; }
+          .help-text { font-size: 13px; color: #94a3b8; text-align: center; }
+          .help-text a { color: #37bbec; text-decoration: none; }
+          .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px 32px; text-align: center; }
+          .footer-logo { max-height: 28px; width: auto; margin-bottom: 12px; opacity: 0.7; }
+          .footer p { margin: 0 0 4px; font-size: 12px; color: #94a3b8; }
+        </style>
+      </head>
+      <body>
+        <div class="wrapper">
+          <div class="container">
+            <div class="header">
+              <img src="${this.logoUrl}" alt="SkyWorld" />
+              <h1>Account Deletion Scheduled</h1>
+              <p>Your account is scheduled for permanent deletion</p>
+            </div>
+            <div class="content">
+              <h2>Hello ${safeName},</h2>
+              <p>We're sorry to see you go. Your SkyWorld account has been scheduled for permanent deletion.</p>
+              <div class="deletion-box">
+                <div class="label">Permanent Deletion Date</div>
+                <div class="deletion-date">${deletionDate}</div>
+              </div>
+              <div class="restore-note">
+                <strong>Changed your mind?</strong>
+                <p>You can restore your account anytime within the next <strong>7 days</strong> by simply logging back in. Your data will remain intact during this period.</p>
+              </div>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center">
+                <a href="${process.env.FRONTEND_URL || 'https://skyworld.dev'}/login" class="btn-restore">Log In to Restore Account</a>
+              </td></tr></table>
+              <p style="font-size:13px;color:#94a3b8;text-align:center;">After ${deletionDate}, your account and all associated data will be permanently removed and cannot be recovered.</p>
+              <div class="divider"></div>
+              <p class="help-text">If you did not request this, please <a href="mailto:hello@skyworld.dev">contact support immediately</a>.</p>
             </div>
             <div class="footer">
               <img src="${this.iconLogoUrl}" alt="SkyWorld" class="footer-logo" />

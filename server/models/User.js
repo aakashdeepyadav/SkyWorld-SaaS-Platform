@@ -54,6 +54,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  scheduledDeletionAt: {
+    type: Date,
+    default: null
+  },
   emailVerified: {
     type: Boolean,
     default: false
