@@ -1,7 +1,11 @@
 import PDFDocument from 'pdfkit';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { ADMIN_DOCUMENT_LABELS } from '../utils/documentEmail.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /* ═══════════════════════════════════════════════════════════════════
    Brand Tokens
@@ -18,8 +22,8 @@ const borderColor = '#e2e8f0';
 const white = '#ffffff';
 
 const COMPANY_NAME = 'SkyWorld Ventures';
-const COMPANY_EMAIL = 'hello@skyworld.dev';
-const COMPANY_URL = 'skyworld.dev';
+const COMPANY_EMAIL = 'support@skyworld.buzz';
+const COMPANY_URL = 'skyworld.buzz';
 
 /* ═══════════════════════════════════════════════════════════════════
    Formatters
@@ -74,9 +78,17 @@ const getLogoPath = (variant = 'white') => {
   const names = variant === 'white'
     ? ['wordmark_logo_white_.png', 'wordmark_logo_all_white_fullname.png']
     : ['wordmark_logo_black_fullname.png', 'wordmark_logo_coloured_fullname.png'];
-  for (const name of names) {
-    const p = path.resolve('..', 'client', 'public', name);
-    if (fs.existsSync(p)) return p;
+  // Try relative to this file first, then relative to cwd
+  const bases = [
+    path.resolve(__dirname, '..', '..', 'client', 'public'),
+    path.resolve('..', 'client', 'public'),
+    path.resolve('client', 'public'),
+  ];
+  for (const base of bases) {
+    for (const name of names) {
+      const p = path.join(base, name);
+      if (fs.existsSync(p)) return p;
+    }
   }
   return null;
 };
@@ -470,12 +482,12 @@ export const buildDocumentDispatchEmail = ({
           <p style="margin:0 0 14px;color:#334155;font-size:14px;line-height:1.6;">Please find the following documents attached to this email:</p>
           <ul style="margin:8px 0 16px 20px;padding:0;font-size:14px;">${listHtml}</ul>
           ${customBlock}
-          <p style="margin:16px 0 0;color:#334155;font-size:14px;line-height:1.6;">For any questions, simply reply to this email or reach us at <a href="mailto:hello@skyworld.dev" style="color:#37bbec;text-decoration:none;">hello@skyworld.dev</a>.</p>
+          <p style="margin:16px 0 0;color:#334155;font-size:14px;line-height:1.6;">For any questions, simply reply to this email or reach us at <a href="mailto:support@skyworld.buzz" style="color:#37bbec;text-decoration:none;">support@skyworld.buzz</a>.</p>
         </div>
 
         <!-- Footer -->
         <div style="border-top:1px solid #e2e8f0;padding:16px 28px;text-align:center;">
-          <p style="margin:0;font-size:11px;color:#94a3b8;">SkyWorld Ventures &bull; skyworld.dev &bull; hello@skyworld.dev</p>
+          <p style="margin:0;font-size:11px;color:#94a3b8;">SkyWorld Ventures &bull; skyworld.dev &bull; support@skyworld.buzz</p>
         </div>
 
       </div>
@@ -489,7 +501,7 @@ export const buildDocumentDispatchEmail = ({
     ...docs.map((d) => `- ${d}`),
     customMessage ? `\nMessage: ${customMessage}` : '',
     '',
-    'For any questions, contact hello@skyworld.dev',
+    'For any questions, contact support@skyworld.buzz',
     '',
     `${COMPANY_NAME} • ${COMPANY_URL}`,
   ]

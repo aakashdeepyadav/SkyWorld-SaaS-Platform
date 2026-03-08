@@ -1,6 +1,10 @@
 import PDFDocument from 'pdfkit';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /* ═══════════════════════════════════════════════════════════════════
    Brand Tokens
@@ -16,8 +20,8 @@ const paidGreen = '#059669';
 const white = '#ffffff';
 
 const COMPANY_NAME = 'SkyWorld Ventures';
-const COMPANY_EMAIL = 'hello@skyworld.dev';
-const COMPANY_URL = 'skyworld.dev';
+const COMPANY_EMAIL = 'support@skyworld.buzz';
+const COMPANY_URL = 'skyworld.buzz';
 
 /* ═══════════════════════════════════════════════════════════════════
    Helpers

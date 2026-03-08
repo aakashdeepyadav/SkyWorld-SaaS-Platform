@@ -76,12 +76,71 @@ export const getDocumentRecipients = async (req, res, next) => {
   }
 };
 
+/**
+ * @route   GET /api/admin/documents/user-projects/:userId
+ * @desc    Get all projects and payment info for a specific user
+ * @access  Admin
+ */
+export const getUserProjects = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
+
+    const user = await User.findById(userId).select('_id name email role').lean();
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const projects = await Project.find({ clientId: userId })
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .lean();
+
+    // Fetch latest completed payment per project
+    const projectIds = projects.map((p) => p._id);
+    const payments = await Payment.find({
+      clientId: userId,
+      status: PAYMENT_STATUS.COMPLETED,
+    })
+      .sort({ paidAt: -1, createdAt: -1 })
+      .populate('projectId', 'title')
+      .lean();
+
+    // Map payments by projectId for quick lookup
+    const paymentsByProject = {};
+    for (const payment of payments) {
+      const pId = payment.projectId?._id?.toString();
+      if (pId && !paymentsByProject[pId]) {
+        paymentsByProject[pId] = payment;
+      }
+    }
+
+    // Also get latest payment not tied to any project (general)
+    const generalPayment = payments.find((p) => !p.projectId) || null;
+
+    const enrichedProjects = projects.map((project) => ({
+      ...project,
+      latestPayment: paymentsByProject[project._id.toString()] || null,
+    }));
+
+    res.json({
+      success: true,
+      user,
+      projects: enrichedProjects,
+      generalPayment,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const sendDocumentsToUser = async (req, res, next) => {
   let recipient = null;
   let requestedDocuments = [];
 
   try {
-    const { userId, documents, customMessage } = req.body || {};
+    const { userId, documents, customMessage, projectId } = req.body || {};
 
     if (!userId) {
       return res.status(400).json({
@@ -106,19 +165,25 @@ export const sendDocumentsToUser = async (req, res, next) => {
       });
     }
 
+    // Build payment and project query scoped to the selected project if provided
+    const paymentQuery = {
+      clientId: recipient._id,
+      status: PAYMENT_STATUS.COMPLETED,
+    };
+    if (projectId) paymentQuery.projectId = projectId;
+
     const [latestCompletedPayment, projects] = await Promise.all([
-      Payment.findOne({
-        clientId: recipient._id,
-        status: PAYMENT_STATUS.COMPLETED,
-      })
+      Payment.findOne(paymentQuery)
         .sort({ paidAt: -1, createdAt: -1 })
         .populate('clientId', 'name email')
         .populate('projectId', 'title')
         .lean(),
-      Project.find({ clientId: recipient._id })
-        .sort({ updatedAt: -1, createdAt: -1 })
-        .limit(6)
-        .lean(),
+      projectId
+        ? Project.find({ _id: projectId, clientId: recipient._id }).lean()
+        : Project.find({ clientId: recipient._id })
+          .sort({ updatedAt: -1, createdAt: -1 })
+          .limit(6)
+          .lean(),
     ]);
 
     const leadProject = projects[0] || null;

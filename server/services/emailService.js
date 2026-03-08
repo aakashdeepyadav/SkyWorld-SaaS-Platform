@@ -516,7 +516,7 @@ class EmailService {
               </td></tr></table>
               <p style="font-size:13px;color:#94a3b8;text-align:center;">After ${deletionDate}, your account and all associated data will be permanently removed and cannot be recovered.</p>
               <div class="divider"></div>
-              <p class="help-text">If you did not request this, please <a href="mailto:hello@skyworld.dev">contact support immediately</a>.</p>
+              <p class="help-text">If you did not request this, please <a href="mailto:support@skyworld.buzz">contact support immediately</a>.</p>
             </div>
             <div class="footer">
               <img src="${this.iconLogoUrl}" alt="SkyWorld" class="footer-logo" />
