@@ -73,10 +73,7 @@ const ComboDetail = () => {
     <div className="min-h-screen bg-surface-50">
       {/* ── Hero ── */}
       <div className="relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.08]"
-          style={{ background: gradientCSS }}
-        />
+        <div className="absolute inset-0 opacity-[0.08]" style={{ background: gradientCSS }} />
 
         <div className="relative max-w-5xl mx-auto px-6 pt-10 pb-16">
           <Link
@@ -104,13 +101,16 @@ const ComboDetail = () => {
                 >
                   Save {combo.discount}%
                 </span>
+                {combo.offerPercent > 0 && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-emerald-700 bg-emerald-50">
+                    +{combo.offerPercent}% off
+                  </span>
+                )}
               </div>
               <p className="text-gray-500 mt-2 max-w-2xl text-lg leading-relaxed">
                 {combo.tagline}
               </p>
-              <p className="text-sm text-gray-400 mt-1">
-                Best for: {combo.bestFor}
-              </p>
+              <p className="text-sm text-gray-400 mt-1">Best for: {combo.bestFor}</p>
             </div>
           </div>
         </div>
@@ -131,9 +131,7 @@ const ComboDetail = () => {
             <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold">
               Combo Price
             </p>
-            <p className="text-xl font-extrabold text-gray-900 mt-1">
-              {formatINR(combo.price)}
-            </p>
+            <p className="text-xl font-extrabold text-gray-900 mt-1">{formatINR(combo.price)}</p>
           </div>
           <div className="card text-center">
             <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold">You Save</p>
@@ -160,18 +158,13 @@ const ComboDetail = () => {
             {resolvedItems.map((item, i) => {
               if (item.type === 'addon') {
                 return (
-                  <div
-                    key={i}
-                    className="card flex items-start gap-4"
-                  >
+                  <div key={i} className="card flex items-start gap-4">
                     <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
                       <SparklesIcon className="w-5 h-5 text-amber-500" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-semibold text-gray-900">
-                          {item.label}
-                        </h3>
+                        <h3 className="text-base font-semibold text-gray-900">{item.label}</h3>
                         <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-50 text-amber-600">
                           Bonus Add-on
                         </span>
@@ -198,9 +191,7 @@ const ComboDetail = () => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="text-base font-semibold text-gray-900">
-                          {item.label}
-                        </h3>
+                        <h3 className="text-base font-semibold text-gray-900">{item.label}</h3>
                         <span
                           className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${cat?.lightBg || 'bg-gray-100'} ${cat?.accentText || 'text-gray-500'}`}
                         >
@@ -238,8 +229,6 @@ const ComboDetail = () => {
           </div>
         </section>
 
-
-
         {/* ── CTA ── */}
         <section className="text-center">
           <button
@@ -258,9 +247,7 @@ const ComboDetail = () => {
         {/* ── Other Combos ── */}
         {COMBO_PACKAGES.filter((c) => c.slug !== combo.slug).length > 0 && (
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-5">
-              Other combo packages
-            </h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-5">Other combo packages</h2>
             <div className="grid sm:grid-cols-2 gap-4">
               {COMBO_PACKAGES.filter((c) => c.slug !== combo.slug).map((other) => {
                 const otherGradient =
@@ -296,6 +283,11 @@ const ComboDetail = () => {
                       <span className="text-sm font-bold text-gray-900">
                         {formatINR(other.price)}
                       </span>
+                      {other.offerPercent > 0 && (
+                        <span className="text-[10px] font-bold text-emerald-600">
+                          {other.offerPercent}% off
+                        </span>
+                      )}
                     </div>
                   </Link>
                 );

@@ -18,6 +18,7 @@ const serviceSchema = new mongoose.Schema({
   description: { type: String, trim: true },
   tagline: { type: String, trim: true },
   basePrice: { type: Number, min: 0, default: 0 },
+  offerPercent: { type: Number, min: 0, max: 100, default: 0 },
   isActive: { type: Boolean, default: true },
   sortOrder: { type: Number, default: 0 },
 

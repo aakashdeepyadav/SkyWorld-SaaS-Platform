@@ -186,7 +186,17 @@ const Checkout = () => {
           <div className="px-6 py-6">
             {/* Quick info row */}
             <div className="flex items-center gap-4 text-sm text-gray-500 mb-6">
+              {catalogPlan?.offerPercent > 0 && (
+                <span className="text-gray-400 line-through text-xs">
+                  {formatINR(catalogPlan.offerOriginalPrice)}
+                </span>
+              )}
               <span className="font-semibold text-gray-900">{formatINR(planPrice)}</span>
+              {catalogPlan?.offerPercent > 0 && (
+                <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                  {catalogPlan.offerPercent}% off
+                </span>
+              )}
               {planDelivery && (
                 <>
                   <span className="w-1 h-1 rounded-full bg-gray-300" />

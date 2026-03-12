@@ -66,8 +66,9 @@ const EMPTY_FORM = {
   description: '',
   tagline: '',
   basePrice: '',
+  offerPercent: '',
   sortOrder: '',
-  delivery: '',
+  delivery: ''
   bestFor: '',
   popular: false,
   highlights: '',
@@ -195,6 +196,7 @@ const ServiceManagement = () => {
       description: formData.description.trim(),
       tagline: formData.tagline.trim(),
       basePrice: formData.basePrice ? Number(formData.basePrice) : 0,
+      offerPercent: formData.offerPercent ? Number(formData.offerPercent) : 0,
       sortOrder: formData.sortOrder ? Number(formData.sortOrder) : 0,
       popular: formData.popular,
     };
@@ -252,6 +254,7 @@ const ServiceManagement = () => {
       description: svc.description || '',
       tagline: svc.tagline || '',
       basePrice: svc.basePrice || '',
+      offerPercent: svc.offerPercent || '',
       sortOrder: svc.sortOrder || '',
       delivery: svc.delivery || '',
       bestFor: svc.bestFor || '',
@@ -512,6 +515,11 @@ function ServiceCard({ svc, onEdit, onDelete, onReactivate }) {
           {svc.delivery && <span className="text-[10px] text-gray-400">{svc.delivery}</span>}
         </div>
         <div className="flex items-center gap-2">
+          {svc.offerPercent > 0 && (
+            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+              {svc.offerPercent}% off
+            </span>
+          )}
           {svc.discount > 0 && (
             <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
               {svc.discount}% off
@@ -520,7 +528,16 @@ function ServiceCard({ svc, onEdit, onDelete, onReactivate }) {
           {svc.basePrice > 0 && (
             <span className="inline-flex items-center gap-0.5 text-sm font-bold text-gray-900 dark:text-white">
               <CurrencyRupeeIcon className="w-3.5 h-3.5 text-gray-400" />
-              {formatINR(svc.basePrice).replace('₹', '')}
+              {svc.offerPercent > 0 ? (
+                <>
+                  <span className="line-through text-gray-400 text-xs font-normal mr-1">
+                    {formatINR(svc.basePrice).replace('₹', '')}
+                  </span>
+                  {formatINR(Math.round(svc.basePrice * (1 - svc.offerPercent / 100))).replace('₹', '')}
+                </>
+              ) : (
+                formatINR(svc.basePrice).replace('₹', '')
+              )}
             </span>
           )}
         </div>
@@ -682,6 +699,25 @@ function ServiceModal({ formData, errors, editing, saving, onClose, onSubmit, on
                 placeholder="0"
               />
             </Field>
+            <Field label="Offer %" error={errors.offerPercent}>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                value={formData.offerPercent}
+                onChange={(e) => onChange('offerPercent', e.target.value)}
+                className={`input-field dark:bg-surface-700 dark:border-surface-600 dark:text-white ${errors.offerPercent ? 'border-red-400' : ''}`}
+                placeholder="0"
+              />
+              {formData.basePrice && formData.offerPercent > 0 && (
+                <p className="mt-0.5 text-[11px] text-emerald-600">
+                  Discounted: {formatINR(Math.round(Number(formData.basePrice) * (1 - Number(formData.offerPercent) / 100)))}
+                </p>
+              )}
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             {type === 'combo' && (
               <Field label="Original Price">
                 <input

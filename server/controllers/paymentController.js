@@ -260,7 +260,7 @@ export const createRazorpayOrder = async (req, res, next) => {
           starterService = await Service.findOne({
             _id: serviceId,
             isActive: true
-          }).select('category basePrice slug type');
+          }).select('category basePrice offerPercent slug type');
 
           if (!starterService) {
             return res.status(404).json({
@@ -284,7 +284,7 @@ export const createRazorpayOrder = async (req, res, next) => {
             category: resolvedServiceType,
             slug: resolvedPlan,
             isActive: true
-          }).select('category basePrice slug type');
+          }).select('category basePrice offerPercent slug type');
 
           // Fallback: any active service in category (backwards compat)
           if (!starterService) {
@@ -293,7 +293,7 @@ export const createRazorpayOrder = async (req, res, next) => {
               isActive: true
             })
               .sort({ updatedAt: -1, _id: -1 })
-              .select('category basePrice slug type');
+              .select('category basePrice offerPercent slug type');
           }
 
           if (!starterService) {
@@ -311,11 +311,16 @@ export const createRazorpayOrder = async (req, res, next) => {
           type: dbType,
           slug: resolvedPlan,
           isActive: true,
-        }).select('basePrice slug type');
+        }).select('basePrice offerPercent slug type');
       }
 
-      // Use hardcoded PLAN_PRICES as source of truth (matches client catalog)
-      derivedAmount = categoryPrices[resolvedPlan] ?? starterService?.basePrice;
+      // Use DB price with offer discount applied (falls back to PLAN_PRICES for safety)
+      const dbBasePrice = starterService?.basePrice;
+      const dbOffer = starterService?.offerPercent || 0;
+      const dbDiscountedPrice = dbBasePrice != null && dbOffer > 0
+        ? Math.round(dbBasePrice * (1 - dbOffer / 100))
+        : dbBasePrice;
+      derivedAmount = dbDiscountedPrice ?? categoryPrices[resolvedPlan];
     } else if (customRequest) {
       derivedAmount = customRequest.quotedPrice;
     }

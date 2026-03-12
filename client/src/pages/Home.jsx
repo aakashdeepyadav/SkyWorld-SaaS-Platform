@@ -408,7 +408,13 @@ const Home = () => {
                   )}
 
                   <div className="hp-plan__pricing">
+                    {plan.offerPercent > 0 && (
+                      <span className="hp-plan__was">{formatINR(plan.offerOriginalPrice)}</span>
+                    )}
                     <span className="hp-plan__amount">{formatINR(plan.price)}</span>
+                    {plan.offerPercent > 0 && (
+                      <span className="hp-plan__off">{plan.offerPercent}% off</span>
+                    )}
                     <span className="hp-plan__delivery">
                       <Icon name="clock" size={13} strokeWidth={2} /> {plan.delivery}
                     </span>
@@ -505,6 +511,9 @@ const Home = () => {
                   <div className="hp-combo__prices">
                     <span className="hp-combo__was">{formatINR(combo.originalPrice)}</span>
                     <span className="hp-combo__now">{formatINR(combo.price)}</span>
+                    {combo.offerPercent > 0 && (
+                      <span className="hp-combo__offer">{combo.offerPercent}% off</span>
+                    )}
                   </div>
                   <ul className="hp-combo__list">
                     {combo.includes.map((item, j) => (
@@ -576,8 +585,14 @@ const Home = () => {
                   )}
 
                   <div className="hp-mplan__price">
+                    {plan.offerPercent > 0 && (
+                      <span className="hp-mplan__was">{formatINR(plan.offerOriginalPrice)}</span>
+                    )}
                     <span className="hp-mplan__amt">{formatINR(plan.price)}</span>
                     <span className="hp-mplan__per">/month</span>
+                    {plan.offerPercent > 0 && (
+                      <span className="hp-mplan__off">{plan.offerPercent}% off</span>
+                    )}
                   </div>
                   <ul className="hp-mplan__list">
                     {plan.features.map((f) => (
@@ -1092,6 +1107,14 @@ const Home = () => {
 .hp-plan__amount {
   font-size: 28px; font-weight: 800; color: var(--dark); letter-spacing: -.03em;
 }
+.hp-plan__was {
+  font-size: 16px; color: var(--faint); text-decoration: line-through; margin-right: 4px;
+}
+.hp-plan__off {
+  display: inline-block; font-size: 11px; font-weight: 700; color: #059669;
+  background: #ecfdf5; padding: 1px 6px; border-radius: 4px; margin-left: 6px;
+  vertical-align: middle;
+}
 .hp-plan__delivery {
   display: flex; align-items: center; gap: 5px;
   font-size: 12px; color: var(--faint); margin-top: 4px;
@@ -1183,6 +1206,10 @@ const Home = () => {
 .hp-combo__now {
   font-size: 26px; font-weight: 800; color: var(--dark); letter-spacing: -.03em;
 }
+.hp-combo__offer {
+  font-size: 11px; font-weight: 700; color: #059669;
+  background: #ecfdf5; padding: 1px 6px; border-radius: 4px;
+}
 .hp-combo__list { list-style: none; padding: 0; margin: 0 0 18px; flex: 1; }
 .hp-combo__list li {
   display: flex; align-items: center; gap: 8px;
@@ -1270,6 +1297,13 @@ const Home = () => {
 }
 .hp-mplan__amt {
   font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -.03em;
+}
+.hp-mplan__was {
+  font-size: 15px; color: rgba(148,163,184,.5); text-decoration: line-through; margin-right: 4px;
+}
+.hp-mplan__off {
+  display: inline-block; font-size: 10px; font-weight: 700; color: #34d399;
+  background: rgba(16,185,129,.15); padding: 1px 6px; border-radius: 4px; margin-left: 6px;
 }
 .hp-mplan__per { font-size: 14px; color: rgba(148,163,184,.35); }
 .hp-mplan__list { list-style: none; padding: 0; margin: 0 0 24px; flex: 1; }

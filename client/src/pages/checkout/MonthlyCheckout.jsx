@@ -131,8 +131,15 @@ const MonthlyCheckout = () => {
                 <h1 className="text-xl font-bold text-white mt-0.5">{plan.name}</h1>
               </div>
               <div className="text-right">
+                {plan.offerPercent > 0 && (
+                  <p className="text-sm text-white/60 line-through">
+                    {formatINR(plan.offerOriginalPrice)}
+                  </p>
+                )}
                 <p className="text-2xl font-extrabold text-white">{formatINR(plan.price)}</p>
-                <p className="text-[11px] text-white/60">/month</p>
+                <p className="text-[11px] text-white/60">
+                  /month{plan.offerPercent > 0 ? ` · ${plan.offerPercent}% off` : ''}
+                </p>
               </div>
             </div>
           </div>

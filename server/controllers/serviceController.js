@@ -274,8 +274,19 @@ export const getCatalog = async (req, res, next) => {
 
     const allActive = await Service.find({ isActive: true }).sort({ sortOrder: 1, name: 1 }).lean();
 
-    // Helper: ensure every item carries a `price` alias for frontend compat
-    const withPrice = (doc) => ({ ...doc, price: doc.basePrice });
+    // Helper: compute offer-discounted price and expose originals when applicable
+    const withPrice = (doc) => {
+      const off = doc.offerPercent || 0;
+      if (off > 0) {
+        return {
+          ...doc,
+          price: Math.round(doc.basePrice * (1 - off / 100)),
+          offerOriginalPrice: doc.basePrice,
+          offerPercent: off,
+        };
+      }
+      return { ...doc, price: doc.basePrice };
+    };
 
     // Group plans by category
     const planCatalog = {};
@@ -291,7 +302,16 @@ export const getCatalog = async (req, res, next) => {
     const monthlyPlans = allActive.filter(s => s.type === 'monthly').map(withPrice);
     const addOns = allActive
       .filter(s => s.type === 'addon')
-      .map(a => ({ ...a, label: a.name, price: a.basePrice }));
+      .map(a => {
+        const off = a.offerPercent || 0;
+        const base = { ...a, label: a.name, price: a.basePrice };
+        if (off > 0) {
+          base.price = Math.round(a.basePrice * (1 - off / 100));
+          base.offerOriginalPrice = a.basePrice;
+          base.offerPercent = off;
+        }
+        return base;
+      });
 
     res.json({
       success: true,
@@ -345,6 +365,7 @@ export const updateService = async (req, res, next) => {
       'basePrice', 'isActive', 'sortOrder',
       'delivery', 'bestFor', 'popular', 'highlights', 'support',
       'features', 'excludes',
+      'offerPercent',
       'originalPrice', 'discount', 'includes', 'color', 'gradient',
       'responseTime', 'updates', 'notIncluded',
       'unit',

@@ -53,8 +53,9 @@ const MonthlyPlans = () => {
           {MONTHLY_PLANS.map((plan) => (
             <div
               key={plan.slug}
-              className={`relative card flex flex-col overflow-hidden transition-shadow hover:shadow-lg ${plan.popular ? 'border-2 border-sky-200 shadow-md' : ''
-                }`}
+              className={`relative card flex flex-col overflow-hidden transition-shadow hover:shadow-lg ${
+                plan.popular ? 'border-2 border-sky-200 shadow-md' : ''
+              }`}
             >
               {plan.popular && (
                 <div className="absolute top-0 right-0 bg-[#37BBEC] text-white text-[10px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-bl-xl">
@@ -64,9 +65,7 @@ const MonthlyPlans = () => {
 
               <div className="mb-4">
                 <h2 className="text-lg font-bold text-gray-900">{plan.name}</h2>
-                <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                  {plan.tagline}
-                </p>
+                <p className="text-xs text-gray-400 mt-1 leading-relaxed">{plan.tagline}</p>
               </div>
 
               {/* Highlights */}
@@ -84,11 +83,21 @@ const MonthlyPlans = () => {
               )}
 
               {/* Price */}
-              <div className="flex items-baseline gap-1.5 mb-1">
+              <div className="flex items-baseline gap-1.5 mb-1 flex-wrap">
+                {plan.offerPercent > 0 && (
+                  <span className="text-lg text-gray-400 line-through">
+                    {formatINR(plan.offerOriginalPrice)}
+                  </span>
+                )}
                 <span className="text-3xl font-extrabold text-gray-900">
                   {formatINR(plan.price)}
                 </span>
                 <span className="text-sm text-gray-400 font-medium">/month</span>
+                {plan.offerPercent > 0 && (
+                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                    {plan.offerPercent}% off
+                  </span>
+                )}
               </div>
 
               {/* Quick stats */}
@@ -114,15 +123,15 @@ const MonthlyPlans = () => {
 
               {/* Not included */}
 
-
               {/* Actions */}
               <div className="mt-auto space-y-2.5">
                 <button
                   onClick={() => handleGetStarted(plan)}
-                  className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 active:scale-[0.98] ${plan.popular
-                    ? 'text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25'
-                    : 'text-gray-700 bg-gray-100 hover:bg-gray-200:bg-surface-600'
-                    }`}
+                  className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 active:scale-[0.98] ${
+                    plan.popular
+                      ? 'text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25'
+                      : 'text-gray-700 bg-gray-100 hover:bg-gray-200:bg-surface-600'
+                  }`}
                 >
                   Get Started
                 </button>
@@ -140,9 +149,7 @@ const MonthlyPlans = () => {
         {/* FAQ-style info */}
         <div className="mt-16 grid sm:grid-cols-2 gap-6">
           <div className="card">
-            <h3 className="text-base font-bold text-gray-900 mb-3">
-              How billing works
-            </h3>
+            <h3 className="text-base font-bold text-gray-900 mb-3">How billing works</h3>
             <div className="space-y-3 text-sm text-gray-500 leading-relaxed">
               <p>
                 Plans are billed monthly. No long-term contracts — you can pause or cancel anytime
@@ -155,9 +162,7 @@ const MonthlyPlans = () => {
             </div>
           </div>
           <div className="card">
-            <h3 className="text-base font-bold text-gray-900 mb-3">
-              Switching plans
-            </h3>
+            <h3 className="text-base font-bold text-gray-900 mb-3">Switching plans</h3>
             <div className="space-y-3 text-sm text-gray-500 leading-relaxed">
               <p>Upgrade or downgrade anytime. Changes take effect from the next billing cycle.</p>
               <p>

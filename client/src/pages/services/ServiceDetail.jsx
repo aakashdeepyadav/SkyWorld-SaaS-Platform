@@ -109,9 +109,7 @@ const ServiceDetail = () => {
     <div className="min-h-screen bg-surface-50">
       {/* ── Hero ── */}
       <div className="relative overflow-hidden">
-        <div
-          className={`absolute inset-0 bg-gradient-to-br ${catalog.gradient} opacity-[0.06]`}
-        />
+        <div className={`absolute inset-0 bg-gradient-to-br ${catalog.gradient} opacity-[0.06]`} />
 
         <div className="relative max-w-6xl mx-auto px-6 pt-10 pb-16">
           <Link
@@ -147,18 +145,20 @@ const ServiceDetail = () => {
           </div>
 
           <div
-            className={`grid gap-6 max-w-5xl mx-auto ${catalog.plans.length === 2
-              ? 'lg:grid-cols-3'
-              : catalog.plans.length >= 3
-                ? 'lg:grid-cols-4'
-                : 'lg:grid-cols-2'
-              }`}
+            className={`grid gap-6 max-w-5xl mx-auto ${
+              catalog.plans.length === 2
+                ? 'lg:grid-cols-3'
+                : catalog.plans.length >= 3
+                  ? 'lg:grid-cols-4'
+                  : 'lg:grid-cols-2'
+            }`}
           >
             {catalog.plans.map((plan) => (
               <div
                 key={plan.slug}
-                className={`relative card overflow-hidden group flex flex-col ${plan.popular ? 'border-2 border-primary-200' : ''
-                  }`}
+                className={`relative card overflow-hidden group flex flex-col ${
+                  plan.popular ? 'border-2 border-primary-200' : ''
+                }`}
               >
                 {plan.popular && (
                   <div
@@ -187,10 +187,20 @@ const ServiceDetail = () => {
                   </div>
                 )}
 
-                <div className="flex items-baseline gap-1 mb-1">
+                <div className="flex items-baseline gap-2 mb-1">
+                  {plan.offerPercent > 0 && (
+                    <span className="text-lg text-gray-400 line-through">
+                      {formatINR(plan.offerOriginalPrice)}
+                    </span>
+                  )}
                   <span className="text-3xl font-extrabold text-gray-900">
                     {formatINR(plan.price)}
                   </span>
+                  {plan.offerPercent > 0 && (
+                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      {plan.offerPercent}% off
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-gray-500 flex items-center gap-1 mb-6">
                   <ClockIcon className="w-3.5 h-3.5" /> Delivery in {plan.delivery}
@@ -213,19 +223,17 @@ const ServiceDetail = () => {
                 {plan.support && (
                   <div className="flex items-center gap-2 px-3 py-2.5 mb-4 rounded-lg bg-emerald-50">
                     <SparklesIcon className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                    <span className="text-xs font-semibold text-emerald-700">
-                      {plan.support}
-                    </span>
+                    <span className="text-xs font-semibold text-emerald-700">{plan.support}</span>
                   </div>
                 )}
 
-
                 <Link
                   to={`/services/${slug}/${plan.slug}`}
-                  className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 active:scale-[0.98] mt-auto text-center block ${plan.popular
-                    ? `text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25`
-                    : 'text-gray-700 bg-gray-100 hover:bg-gray-200:bg-surface-600'
-                    }`}
+                  className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 active:scale-[0.98] mt-auto text-center block ${
+                    plan.popular
+                      ? `text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25`
+                      : 'text-gray-700 bg-gray-100 hover:bg-gray-200:bg-surface-600'
+                  }`}
                 >
                   View {plan.name}
                 </Link>
@@ -236,15 +244,11 @@ const ServiceDetail = () => {
             <div className="card border-dashed flex flex-col group">
               <div className="mb-5">
                 <h3 className="text-lg font-bold text-gray-900">Custom Plan</h3>
-                <p className="text-xs text-gray-400 mt-1">
-                  Beyond our fixed packages
-                </p>
+                <p className="text-xs text-gray-400 mt-1">Beyond our fixed packages</p>
               </div>
 
               <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-3xl font-extrabold text-gray-900">
-                  Tailored
-                </span>
+                <span className="text-3xl font-extrabold text-gray-900">Tailored</span>
               </div>
               <p className="text-sm text-gray-500 flex items-center gap-1 mb-6">
                 <SparklesIcon className="w-3.5 h-3.5" /> Scope-based timeline
@@ -276,7 +280,6 @@ const ServiceDetail = () => {
             </div>
           </div>
         </section>
-
       </div>
     </div>
   );

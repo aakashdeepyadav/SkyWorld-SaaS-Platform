@@ -69,9 +69,7 @@ const AddOns = () => {
                     <PlusIcon className="w-5 h-5 text-amber-600" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-gray-900">
-                      {addon.label}
-                    </h3>
+                    <h3 className="text-base font-semibold text-gray-900">{addon.label}</h3>
                     {addon.description && (
                       <p className="text-xs text-gray-500 mt-1 leading-relaxed">
                         {addon.description}
@@ -80,13 +78,21 @@ const AddOns = () => {
                   </div>
                 </div>
 
-                <div className="flex items-baseline gap-1 mb-1 mt-auto">
+                <div className="flex items-baseline gap-1.5 mb-1 mt-auto flex-wrap">
+                  {addon.offerPercent > 0 && (
+                    <span className="text-base text-gray-400 line-through">
+                      {formatINR(addon.offerOriginalPrice)}
+                    </span>
+                  )}
                   <span className="text-2xl font-extrabold text-gray-900">
                     {formatINR(addon.price)}
                   </span>
                   {addon.unit && (
-                    <span className="text-sm text-gray-400 font-medium">
-                      {addon.unit}
+                    <span className="text-sm text-gray-400 font-medium">{addon.unit}</span>
+                  )}
+                  {addon.offerPercent > 0 && (
+                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      {addon.offerPercent}% off
                     </span>
                   )}
                 </div>
@@ -101,8 +107,6 @@ const AddOns = () => {
             ))}
           </div>
         </section>
-
-
 
         {/* ── CTA ── */}
         <section className="text-center">

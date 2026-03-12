@@ -190,7 +190,14 @@ const ComboCheckout = () => {
                 <span className="font-semibold text-emerald-600">-{formatINR(savings)}</span>
               </div>
               <div className="flex justify-between pt-2 border-t border-gray-100">
-                <span className="font-semibold text-gray-900">Total</span>
+                <span className="font-semibold text-gray-900">
+                  Total
+                  {combo.offerPercent > 0 && (
+                    <span className="ml-2 text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      {combo.offerPercent}% off
+                    </span>
+                  )}
+                </span>
                 <span className="font-extrabold text-gray-900">{formatINR(combo.price)}</span>
               </div>
             </div>
