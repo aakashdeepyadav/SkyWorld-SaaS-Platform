@@ -132,6 +132,9 @@ const DeveloperDashboard = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-gray-900 dark:text-white">{project.title}</h3>
+                      {project.projectCode && (
+                        <p className="text-xs text-gray-400 mt-0.5">{project.projectCode}</p>
+                      )}
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
                         {project.description}
                       </p>

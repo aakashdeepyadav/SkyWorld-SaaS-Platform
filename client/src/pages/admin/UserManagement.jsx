@@ -150,6 +150,11 @@ const UserManagement = () => {
                             {u.name}
                           </p>
                           <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
+                            {u.userCode && (
+                              <span className="font-medium text-gray-500 dark:text-gray-400 mr-1.5">
+                                {u.userCode}
+                              </span>
+                            )}
                             {u.email}
                           </p>
                         </div>

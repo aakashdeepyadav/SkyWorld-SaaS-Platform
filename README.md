@@ -33,15 +33,15 @@ A **production-grade SaaS platform** where clients can request, track, and pay f
 
 ## Tech Stack
 
-| Layer | Technologies |
-|---|---|
+| Layer        | Technologies                                                    |
+| ------------ | --------------------------------------------------------------- |
 | **Frontend** | React 18, Vite 5, Tailwind CSS 3.3, React Query, React Router 6 |
-| **Backend** | Node.js, Express 4, Mongoose 8, JWT (HTTP-only cookies) |
-| **Database** | MongoDB Atlas |
-| **Payments** | Razorpay |
-| **Storage** | Cloudinary |
-| **Email** | Nodemailer + Brevo SMTP |
-| **Deploy** | Vercel (frontend) + Render (backend) |
+| **Backend**  | Node.js, Express 4, Mongoose 8, JWT (HTTP-only cookies)         |
+| **Database** | MongoDB Atlas                                                   |
+| **Payments** | Razorpay                                                        |
+| **Storage**  | Cloudinary                                                      |
+| **Email**    | Nodemailer + Brevo SMTP                                         |
+| **Deploy**   | Vercel (frontend) + Render (backend)                            |
 
 ---
 
@@ -73,6 +73,7 @@ cp client/.env.example client/.env
 ```
 
 **Server** (`server/.env`):
+
 ```env
 NODE_ENV=development
 PORT=5000
@@ -85,6 +86,7 @@ FRONTEND_URL=http://localhost:5173
 ```
 
 **Client** (`client/.env`):
+
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
@@ -138,11 +140,11 @@ SkyWorld/
 
 ## User Roles
 
-| Role | Access | Assignment |
-|---|---|---|
-| **Client** | Request services, track projects, make payments, chat | Default on signup |
-| **Developer** | View assigned projects, update progress, chat | Assigned by admin |
-| **Admin** | Full access — users, services, requests, projects, payments | Manual |
+| Role          | Access                                                      | Assignment        |
+| ------------- | ----------------------------------------------------------- | ----------------- |
+| **Client**    | Request services, track projects, make payments, chat       | Default on signup |
+| **Developer** | View assigned projects, update progress, chat               | Assigned by admin |
+| **Admin**     | Full access — users, services, requests, projects, payments | Manual            |
 
 ---
 
@@ -150,33 +152,33 @@ SkyWorld/
 
 All endpoints prefixed with `/api`. See [docs/API.md](./docs/API.md) for full reference.
 
-| Resource | Endpoints | Description |
-|---|---|---|
-| `/auth` | 10 | Register, login, OAuth, OTP, password reset |
-| `/users` | 8 | User management, profile, avatar |
-| `/services` | 5 | Service catalog CRUD |
-| `/requests` | 5 | Service request lifecycle |
-| `/custom-requests` | 4 | Custom request + quoting |
-| `/projects` | 5 | Project management |
-| `/payments` | 4 | Razorpay orders & verification |
-| `/messages` | 3 | Per-project messaging |
-| `/files` | 3 | Cloudinary file management |
-| `/admin/stats` | 1 | Platform analytics |
+| Resource           | Endpoints | Description                                 |
+| ------------------ | --------- | ------------------------------------------- |
+| `/auth`            | 10        | Register, login, OAuth, OTP, password reset |
+| `/users`           | 8         | User management, profile, avatar            |
+| `/services`        | 5         | Service catalog CRUD                        |
+| `/requests`        | 5         | Service request lifecycle                   |
+| `/custom-requests` | 4         | Custom request + quoting                    |
+| `/projects`        | 5         | Project management                          |
+| `/payments`        | 4         | Razorpay orders & verification              |
+| `/messages`        | 3         | Per-project messaging                       |
+| `/files`           | 3         | Cloudinary file management                  |
+| `/admin/stats`     | 1         | Platform analytics                          |
 
 ---
 
 ## Security
 
-| Measure | Detail |
-|---|---|
-| Password hashing | bcrypt (cost 12) |
-| Account lockout | 5 failed attempts → 30min lock |
-| JWT | Short access (15m) + refresh (7d) in HTTP-only cookies |
-| CSRF | Origin/referrer header validation |
-| Rate limiting | Per-endpoint (auth: 5/15min, global: 200/15min) |
-| Input sanitization | express-validator + mongo-sanitize |
-| File validation | MIME whitelist, size limits, no SVG (XSS risk) |
-| Audit trail | Action logging with 90-day TTL auto-cleanup |
+| Measure            | Detail                                                 |
+| ------------------ | ------------------------------------------------------ |
+| Password hashing   | bcrypt (cost 12)                                       |
+| Account lockout    | 5 failed attempts → 30min lock                         |
+| JWT                | Short access (15m) + refresh (7d) in HTTP-only cookies |
+| CSRF               | Origin/referrer header validation                      |
+| Rate limiting      | Per-endpoint (auth: 5/15min, global: 200/15min)        |
+| Input sanitization | express-validator + mongo-sanitize                     |
+| File validation    | MIME whitelist, size limits, no SVG (XSS risk)         |
+| Audit trail        | Action logging with 90-day TTL auto-cleanup            |
 
 ---
 
@@ -202,17 +204,17 @@ docker run -p 80:80 skyworld-client
 
 ## Documentation
 
-| Document | Description |
-|---|---|
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | System architecture |
-| [docs/API.md](./docs/API.md) | API endpoint reference |
-| [docs/DATABASE.md](./docs/DATABASE.md) | Database schema |
-| [docs/SECURITY.md](./docs/SECURITY.md) | Security details |
-| [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) | Deployment guide |
-| [docs/SRS.md](./docs/SRS.md) | Software Requirements Spec |
-| [docs/RBAC_FLOW.md](./docs/RBAC_FLOW.md) | Role-based access flow |
-| [docs/UI_UX_DESIGN.md](./docs/UI_UX_DESIGN.md) | UI/UX design docs |
-| [docs/USER_MANUAL.md](./docs/USER_MANUAL.md) | End-user manual |
+| Document                                       | Description                |
+| ---------------------------------------------- | -------------------------- |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | System architecture        |
+| [docs/API.md](./docs/API.md)                   | API endpoint reference     |
+| [docs/DATABASE.md](./docs/DATABASE.md)         | Database schema            |
+| [docs/SECURITY.md](./docs/SECURITY.md)         | Security details           |
+| [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)     | Deployment guide           |
+| [docs/SRS.md](./docs/SRS.md)                   | Software Requirements Spec |
+| [docs/RBAC_FLOW.md](./docs/RBAC_FLOW.md)       | Role-based access flow     |
+| [docs/UI_UX_DESIGN.md](./docs/UI_UX_DESIGN.md) | UI/UX design docs          |
+| [docs/USER_MANUAL.md](./docs/USER_MANUAL.md)   | End-user manual            |
 
 ---
 

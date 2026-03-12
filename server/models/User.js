@@ -1,9 +1,21 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import Counter from './Counter.js';
 import { ROLES } from '../utils/constants.js';
 
+const USER_CODE_PREFIX = {
+  [ROLES.ADMIN]: 'ADM',
+  [ROLES.DEVELOPER]: 'DEV',
+  [ROLES.CLIENT]: 'CLT',
+};
+
 const userSchema = new mongoose.Schema({
+  userCode: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
   email: {
     type: String,
     required: [true, 'Email is required'],
@@ -166,6 +178,7 @@ const userSchema = new mongoose.Schema({
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ createdAt: -1 });
+userSchema.index({ userCode: 1 });
 
 // Normalize Gmail dots before password hashing
 userSchema.pre('save', function (next) {
@@ -194,6 +207,16 @@ userSchema.pre('save', async function (next) {
   } catch (error) {
     next(error);
   }
+});
+
+// Auto-generate userCode on creation or role change
+userSchema.pre('save', async function (next) {
+  if (this.isNew || this.isModified('role')) {
+    const prefix = USER_CODE_PREFIX[this.role] || 'USR';
+    const seq = await Counter.getNextSequence(`user_${prefix}`);
+    this.userCode = `${prefix}-${String(seq).padStart(3, '0')}`;
+  }
+  next();
 });
 
 // Virtual: check if account is currently locked
@@ -271,6 +294,7 @@ userSchema.methods.incrementPasswordResetAttempts = async function () {
 userSchema.methods.toPublicJSON = function () {
   return {
     _id: this._id,
+    userCode: this.userCode,
     email: this.email,
     name: this.name,
     phone: this.phone,

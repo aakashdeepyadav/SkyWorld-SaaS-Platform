@@ -218,10 +218,17 @@ const ClientDashboard = () => {
                     className="p-3 rounded-xl border border-gray-100 dark:border-surface-700 hover:bg-gray-50 dark:hover:bg-surface-700/50 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                        {project.title}
-                      </h3>
-                      <span className={`${getStatusBadge(project.status)} capitalize`}>
+                      <div className="min-w-0 flex-1 mr-2">
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {project.title}
+                        </h3>
+                        {project.projectCode && (
+                          <p className="text-xs text-gray-400 mt-0.5">{project.projectCode}</p>
+                        )}
+                      </div>
+                      <span
+                        className={`${getStatusBadge(project.status)} capitalize flex-shrink-0`}
+                      >
                         {project.status}
                       </span>
                     </div>

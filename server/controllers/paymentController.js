@@ -49,7 +49,7 @@ const isServiceRequestDuplicateError = (error) => {
  */
 export const getPayments = async (req, res, next) => {
   try {
-    const { status, page = 1, limit = 10 } = req.query;
+    const { status, projectId, page = 1, limit = 10 } = req.query;
     const query = {};
 
     // Role-based filtering
@@ -59,12 +59,13 @@ export const getPayments = async (req, res, next) => {
     // Admin and Developer see all
 
     if (status) query.status = status;
+    if (projectId && isMongoObjectId(projectId)) query.projectId = projectId;
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const payments = await Payment.find(query)
-      .populate('clientId', 'name email')
-      .populate('projectId', 'title')
+      .populate('clientId', 'name email userCode')
+      .populate('projectId', 'title projectCode')
       .populate('customRequestId', 'serviceType fullName')
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -93,8 +94,8 @@ export const getPayments = async (req, res, next) => {
 export const getPayment = async (req, res, next) => {
   try {
     const payment = await Payment.findById(req.params.id)
-      .populate('clientId', 'name email')
-      .populate('projectId', 'title')
+      .populate('clientId', 'name email userCode')
+      .populate('projectId', 'title projectCode')
       .populate('serviceRequestId', 'title');
 
     if (!payment) {

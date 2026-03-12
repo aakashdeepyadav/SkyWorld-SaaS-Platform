@@ -83,9 +83,14 @@ const ProjectList = () => {
                 className="card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-200 group"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-primary-600 transition-colors flex-1 mr-2">
-                    {project.title}
-                  </h3>
+                  <div className="flex-1 mr-2 min-w-0">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-primary-600 transition-colors">
+                      {project.title}
+                    </h3>
+                    {project.projectCode && (
+                      <p className="text-xs text-gray-400 mt-0.5">{project.projectCode}</p>
+                    )}
+                  </div>
                   <span className={`${getStatusBadge(project.status)} capitalize flex-shrink-0`}>
                     {project.status}
                   </span>

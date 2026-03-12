@@ -193,6 +193,9 @@ const AdminDashboard = () => {
                 >
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      {project.projectCode && (
+                        <span className="text-gray-400 mr-1.5">{project.projectCode}</span>
+                      )}
                       {project.title}
                     </p>
                     <span

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { CreditCardIcon } from '@heroicons/react/24/outline';
@@ -14,6 +15,38 @@ const getStatusBadge = (status) => {
     refunded: 'badge-danger',
   };
   return map[status] || 'badge-primary';
+};
+
+const SERVICE_LABELS = {
+  'web-development': 'Web Development',
+  'app-development': 'App Development',
+  'branding-creative': 'Branding & Design',
+  combo: 'Combo Package',
+  monthly: 'Monthly Plan',
+  addon: 'Add-On',
+};
+
+const PHASE_LABELS = {
+  advance: 'Advance 50%',
+  final: 'Final 50%',
+  full: 'Full Payment',
+};
+
+const PHASE_BADGE = {
+  advance:
+    'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 ring-1 ring-amber-200 dark:ring-amber-500/20',
+  final:
+    'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-200 dark:ring-emerald-500/20',
+  full: 'bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400 ring-1 ring-sky-200 dark:ring-sky-500/20',
+};
+
+const formatProjectLabel = (payment) => {
+  if (payment.projectId?.title) return payment.projectId.title;
+  const svc = SERVICE_LABELS[payment.serviceType] || payment.serviceType;
+  const plan = payment.plan?.replace(/-/g, ' ');
+  if (svc && plan) return `${svc} — ${plan}`;
+  if (svc) return svc;
+  return 'N/A';
 };
 
 const PaymentList = () => {
@@ -96,6 +129,9 @@ const PaymentList = () => {
                     Project
                   </th>
                   <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-5 py-3">
+                    Phase
+                  </th>
+                  <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-5 py-3">
                     Amount
                   </th>
                   <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-5 py-3">
@@ -112,36 +148,80 @@ const PaymentList = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-surface-700">
-                {data.payments.map((payment) => (
-                  <tr
-                    key={payment._id}
-                    className="hover:bg-gray-50/50 dark:hover:bg-surface-700/50 transition-colors"
-                  >
-                    <td className="px-5 py-3.5">
-                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {payment.projectId?.title || 'N/A'}
-                      </p>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {formatINR(payment.amount)}
-                      </p>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className={`${getStatusBadge(payment.status)} capitalize`}>
-                        {payment.status}
-                      </span>
-                    </td>
-                    {user?.role !== 'client' && (
-                      <td className="px-5 py-3.5 text-sm text-gray-600 dark:text-gray-400">
-                        {payment.clientId?.name || 'N/A'}
+                {data.payments.map((payment) => {
+                  const phase = payment.paymentPhase || 'advance';
+                  const projectLink = payment.projectId?._id
+                    ? `/projects/${payment.projectId._id}`
+                    : null;
+
+                  return (
+                    <tr
+                      key={payment._id}
+                      className="hover:bg-gray-50/50 dark:hover:bg-surface-700/50 transition-colors"
+                    >
+                      <td className="px-5 py-3.5">
+                        {projectLink ? (
+                          <Link to={projectLink} className="group">
+                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                              {formatProjectLabel(payment)}
+                            </p>
+                            {payment.projectId?.projectCode && (
+                              <p className="text-xs text-gray-400 mt-0.5">
+                                {payment.projectId.projectCode}
+                              </p>
+                            )}
+                          </Link>
+                        ) : (
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                              {formatProjectLabel(payment)}
+                            </p>
+                          </div>
+                        )}
                       </td>
-                    )}
-                    <td className="px-5 py-3.5 text-xs text-gray-400 dark:text-gray-500">
-                      {new Date(payment.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
+                      <td className="px-5 py-3.5">
+                        <span
+                          className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${PHASE_BADGE[phase] || PHASE_BADGE.advance}`}
+                        >
+                          {PHASE_LABELS[phase] || phase}
+                        </span>
+                        {payment.totalPlanPrice > 0 && (
+                          <p className="text-[11px] text-gray-400 mt-0.5">
+                            of {formatINR(payment.totalPlanPrice)}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {formatINR(payment.amount)}
+                        </p>
+                        {payment.invoiceNumber && (
+                          <p className="text-[11px] text-gray-400 mt-0.5">
+                            {payment.invoiceNumber}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className={`${getStatusBadge(payment.status)} capitalize`}>
+                          {payment.status}
+                        </span>
+                      </td>
+                      {user?.role !== 'client' && (
+                        <td className="px-5 py-3.5">
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {payment.clientId?.name || 'N/A'}
+                          </p>
+                          {payment.clientId?.userCode && (
+                            <p className="text-[11px] text-gray-400">{payment.clientId.userCode}</p>
+                          )}
+                        </td>
+                      )}
+                      <td className="px-5 py-3.5 text-xs text-gray-400 dark:text-gray-500">
+                        {new Date(payment.createdAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

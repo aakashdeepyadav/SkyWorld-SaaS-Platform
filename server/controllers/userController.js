@@ -158,18 +158,15 @@ export const updateUserRole = async (req, res, next) => {
       });
     }
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { role },
-      { new: true, runValidators: true }
-    ).select('-password');
+    targetUser.role = role;
+    await targetUser.save();
 
-    await createAuditLog(req, 'role_updated', 'user', user._id, { newRole: role, updatedBy: req.user._id });
+    await createAuditLog(req, 'role_updated', 'user', targetUser._id, { newRole: role, oldUserCode: targetUser.userCode, updatedBy: req.user._id });
 
     res.json({
       success: true,
       message: 'User role updated successfully',
-      user: user.toPublicJSON()
+      user: targetUser.toPublicJSON()
     });
   } catch (error) {
     next(error);

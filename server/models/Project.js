@@ -1,5 +1,15 @@
 import mongoose from 'mongoose';
+import Counter from './Counter.js';
 import { DELIVERY_STATUS, PAYMENT_STATUS, PROJECT_STATUS, SERVICE_CATEGORIES } from '../utils/constants.js';
+
+const PROJECT_CODE_PREFIX = {
+  [SERVICE_CATEGORIES.WEB_DEVELOPMENT]: 'WEB',
+  [SERVICE_CATEGORIES.APP_DEVELOPMENT]: 'APP',
+  [SERVICE_CATEGORIES.BRANDING_CREATIVE]: 'BRD',
+  combo: 'CMB',
+  monthly: 'MNT',
+  addon: 'ADN',
+};
 
 const PROJECT_PROGRESS_BY_STATUS = Object.freeze({
   [PROJECT_STATUS.PLANNING]: 25,
@@ -32,6 +42,11 @@ const milestoneSchema = new mongoose.Schema({
 }, { _id: false });
 
 const projectSchema = new mongoose.Schema({
+  projectCode: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
   serviceRequestId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'ServiceRequest',
@@ -129,6 +144,16 @@ projectSchema.pre('validate', function (next) {
   next();
 });
 
+// Auto-generate projectCode on first save
+projectSchema.pre('save', async function (next) {
+  if (this.isNew && !this.projectCode) {
+    const prefix = PROJECT_CODE_PREFIX[this.serviceType] || 'PRJ';
+    const seq = await Counter.getNextSequence(`project_${prefix}`);
+    this.projectCode = `${prefix}-${String(seq).padStart(3, '0')}`;
+  }
+  next();
+});
+
 projectSchema.pre('findOneAndUpdate', function (next) {
   const update = this.getUpdate() || {};
   const set = update.$set || {};
@@ -169,6 +194,7 @@ projectSchema.index({ clientId: 1 });
 projectSchema.index({ developerIds: 1 });
 projectSchema.index({ status: 1 });
 projectSchema.index({ createdAt: -1 });
+projectSchema.index({ projectCode: 1 });
 projectSchema.index({ title: 'text', description: 'text' });
 
 const Project = mongoose.model('Project', projectSchema);
