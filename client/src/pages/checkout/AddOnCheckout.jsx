@@ -9,11 +9,9 @@ import {
   ArrowLeftIcon,
   CheckIcon,
   PlusIcon,
-  MinusIcon,
+  XMarkIcon,
   LockClosedIcon,
   ShieldCheckIcon,
-  SparklesIcon,
-  ShoppingCartIcon,
 } from '@heroicons/react/24/outline';
 
 const AddOnCheckout = () => {
@@ -23,7 +21,6 @@ const AddOnCheckout = () => {
   const [searchParams] = useSearchParams();
   const [isPaying, setIsPaying] = useState(false);
 
-  /* Pre-select add-on from query param (e.g. ?selected=Chatbot+integration) */
   const preSelected = searchParams.get('selected');
 
   const [selected, setSelected] = useState(() => {
@@ -52,13 +49,11 @@ const AddOnCheckout = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-surface-50 dark:bg-surface-900 px-6 py-20">
-        <div className="max-w-2xl mx-auto card dark:bg-surface-800 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sign in to continue</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            You need an account to purchase add-on services.
-          </p>
-          <div className="mt-6 flex items-center justify-center gap-3">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6">
+        <div className="text-center">
+          <h1 className="text-xl font-bold text-gray-900">Sign in to continue</h1>
+          <p className="text-sm text-gray-500 mt-1">You need an account to purchase add-ons.</p>
+          <div className="mt-4 flex items-center justify-center gap-3">
             <Link to="/login?redirect=/checkout/addons" className="btn-primary">
               Sign In
             </Link>
@@ -123,7 +118,7 @@ const AddOnCheckout = () => {
           plan: 'custom',
           addons: description.slice(0, 255),
         },
-        theme: { color: '#F59E0B' },
+        theme: { color: '#37BBEC' },
       });
       checkout.on('payment.failed', (response) => {
         toast.error(response?.error?.description || 'Payment failed');
@@ -137,36 +132,28 @@ const AddOnCheckout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface-50 dark:bg-surface-900">
-      <div className="max-w-3xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-lg mx-auto px-5 py-10">
         <Link
           to="/addons"
-          className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-6"
+          className="inline-flex items-center text-sm text-gray-400 hover:text-gray-600 transition-colors mb-6"
         >
-          <ArrowLeftIcon className="w-4 h-4 mr-1.5" /> Back to Add-Ons
+          <ArrowLeftIcon className="w-3.5 h-3.5 mr-1" /> Back
         </Link>
 
-        <div className="card dark:bg-surface-800 dark:border-surface-700 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Header */}
-          <div className="-mx-6 -mt-6 px-6 py-5 mb-6 bg-[#37BBEC] relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
-            <div className="relative flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-                <ShoppingCartIcon className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white">Add-On Checkout</h1>
-                <p className="text-sm text-white/70">Select the extras you need</p>
-              </div>
+          <div className="bg-[#37BBEC] px-6 py-5 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_60%)]" />
+            <div className="relative">
+              <p className="text-sm font-medium text-white/70">Extras</p>
+              <h1 className="text-xl font-bold text-white mt-0.5">Add-Ons</h1>
             </div>
           </div>
 
-          {/* Add-on selector */}
-          <div className="mb-8">
-            <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-              Available Add-Ons
-            </h2>
-            <div className="space-y-2.5">
+          <div className="px-6 py-6">
+            {/* Add-on selector */}
+            <div className="space-y-2 mb-6">
               {ADD_ONS.map((addon) => {
                 const isSelected = selected[addon.label] > 0;
                 return (
@@ -174,41 +161,34 @@ const AddOnCheckout = () => {
                     key={addon.label}
                     type="button"
                     onClick={() => toggleAddOn(addon.label)}
-                    className={`w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all duration-200 ${isSelected
-                      ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30'
-                      : 'bg-gray-50 dark:bg-surface-700 border-gray-100 dark:border-surface-600 hover:border-gray-200 dark:hover:border-surface-500'
-                      }`}
+                    className={`w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-200 ${
+                      isSelected
+                        ? 'bg-[#37BBEC]/5 border-[#37BBEC]/20'
+                        : 'bg-gray-50 border-gray-100 hover:border-gray-200'
+                    }`}
                   >
                     <div
-                      className={`w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center transition-colors ${isSelected ? 'bg-amber-500 text-white' : 'bg-gray-200 dark:bg-surface-600'
-                        }`}
+                      className={`w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center transition-colors ${
+                        isSelected ? 'bg-[#37BBEC] text-white' : 'bg-gray-200'
+                      }`}
                     >
                       {isSelected ? (
-                        <CheckIcon className="w-3.5 h-3.5" strokeWidth={3} />
+                        <CheckIcon className="w-3 h-3" strokeWidth={3} />
                       ) : (
-                        <PlusIcon className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-sm font-medium ${isSelected
-                          ? 'text-gray-900 dark:text-white'
-                          : 'text-gray-700 dark:text-gray-300'
-                          }`}
-                      >
-                        {addon.label}
-                      </p>
-                      {addon.description && (
-                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">
-                          {addon.description}
-                        </p>
+                        <PlusIcon className="w-3 h-3 text-gray-400" />
                       )}
                     </div>
                     <span
-                      className={`text-sm font-bold flex-shrink-0 ${isSelected
-                        ? 'text-amber-600 dark:text-amber-400'
-                        : 'text-gray-500 dark:text-gray-400'
-                        }`}
+                      className={`text-sm flex-1 truncate ${
+                        isSelected ? 'font-medium text-gray-900' : 'text-gray-600'
+                      }`}
+                    >
+                      {addon.label}
+                    </span>
+                    <span
+                      className={`text-sm font-bold flex-shrink-0 ${
+                        isSelected ? 'text-[#37BBEC]' : 'text-gray-400'
+                      }`}
                     >
                       {formatINR(addon.price)}
                       {addon.unit && (
@@ -219,46 +199,38 @@ const AddOnCheckout = () => {
                 );
               })}
             </div>
-          </div>
 
-          {/* Selected items summary */}
-          {itemCount > 0 && (
-            <div className="mb-8 border-t border-gray-100 dark:border-surface-700 pt-6">
-              <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                Your Selection ({itemCount} item{itemCount !== 1 ? 's' : ''})
-              </h2>
-              <div className="space-y-2">
-                {selectedItems.map((addon) => (
-                  <div key={addon.label} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <SparklesIcon className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300">{addon.label}</span>
+            {/* Selected summary */}
+            {itemCount > 0 && (
+              <div className="border-t border-gray-100 pt-4 mb-6">
+                <div className="space-y-1.5">
+                  {selectedItems.map((addon) => (
+                    <div key={addon.label} className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 truncate">{addon.label}</span>
+                      <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                        <span className="font-semibold text-gray-900">
+                          {formatINR(addon.price)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => toggleAddOn(addon.label)}
+                          className="w-4 h-4 rounded flex items-center justify-center text-gray-300 hover:text-red-500 transition-colors"
+                        >
+                          <XMarkIcon className="w-3.5 h-3.5" strokeWidth={2.5} />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        {formatINR(addon.price)}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => toggleAddOn(addon.label)}
-                        className="w-5 h-5 rounded flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                      >
-                        <MinusIcon className="w-3.5 h-3.5" strokeWidth={2.5} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Pay button */}
-          <div className="border-t border-gray-100 dark:border-surface-700 pt-6">
+            {/* CTA */}
             {itemCount > 0 ? (
               <>
-                <div className="flex items-center justify-between mb-5">
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Total</span>
-                  <span className="text-2xl font-extrabold text-gray-900 dark:text-white">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-semibold text-gray-900">Total</span>
+                  <span className="text-2xl font-extrabold text-gray-900">
                     {formatINR(totalAmount)}
                   </span>
                 </div>
@@ -266,37 +238,31 @@ const AddOnCheckout = () => {
                 <button
                   onClick={handlePay}
                   disabled={isPaying}
-                  className="w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/20 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <LockClosedIcon className="w-4 h-4" />
                   {isPaying ? 'Processing...' : `Pay ${formatINR(totalAmount)}`}
                 </button>
 
-                <p className="text-[11px] text-gray-400 text-center mt-3">
-                  Full amount charged upfront. Add-ons are delivered alongside your project.
+                <p className="text-[11px] text-gray-400 text-center mt-2.5">
+                  Full amount upfront — delivered with your project
                 </p>
               </>
             ) : (
-              <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">
-                Select one or more add-ons above to continue.
+              <p className="text-sm text-gray-400 text-center py-3">
+                Select add-ons above to continue
               </p>
             )}
           </div>
         </div>
 
-        {/* Trust signals */}
-        <div className="flex items-center justify-center gap-6 mt-8 text-gray-400 dark:text-gray-500">
-          <div className="flex items-center gap-1.5 text-xs">
-            <ShieldCheckIcon className="w-4 h-4" />
-            <span>Secure Payment</span>
+        {/* Trust */}
+        <div className="flex items-center justify-center gap-5 mt-6 text-gray-400">
+          <div className="flex items-center gap-1 text-[11px]">
+            <ShieldCheckIcon className="w-3.5 h-3.5" /> Secure
           </div>
-          <div className="flex items-center gap-1.5 text-xs">
-            <LockClosedIcon className="w-4 h-4" />
-            <span>SSL Encrypted</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs">
-            <CheckIcon className="w-4 h-4" />
-            <span>Quality Guaranteed</span>
+          <div className="flex items-center gap-1 text-[11px]">
+            <LockClosedIcon className="w-3.5 h-3.5" /> Encrypted
           </div>
         </div>
       </div>

@@ -198,8 +198,7 @@ SkyWorld/
 │   │   └── cloudinaryService.js # Upload, delete, avatar management
 │   └── utils/
 │       ├── constants.js      # Enums (roles, statuses, file types, rate limits)
-│       ├── logger.js         # Winston logger config
-│       └── testEmail.js      # Email testing utility
+│       └── logger.js         # Winston logger config
 │
 └── docs/                     # Existing documentation
     ├── API.md

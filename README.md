@@ -131,8 +131,7 @@ SkyWorld/
 │   └── utils/                # Constants, Logger
 │
 ├── docs/                     # Architecture, API, Database, Security, SRS docs
-├── render.yaml               # Render deployment config
-└── PROJECT_DOCS.md           # Full technical documentation
+└── render.yaml               # Render deployment config
 ```
 
 ---
@@ -149,7 +148,7 @@ SkyWorld/
 
 ## API Overview
 
-All endpoints prefixed with `/api`. See [PROJECT_DOCS.md](./PROJECT_DOCS.md) or [docs/API.md](./docs/API.md) for full reference.
+All endpoints prefixed with `/api`. See [docs/API.md](./docs/API.md) for full reference.
 
 | Resource | Endpoints | Description |
 |---|---|---|
@@ -205,7 +204,6 @@ docker run -p 80:80 skyworld-client
 
 | Document | Description |
 |---|---|
-| [PROJECT_DOCS.md](./PROJECT_DOCS.md) | Comprehensive technical documentation |
 | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | System architecture |
 | [docs/API.md](./docs/API.md) | API endpoint reference |
 | [docs/DATABASE.md](./docs/DATABASE.md) | Database schema |

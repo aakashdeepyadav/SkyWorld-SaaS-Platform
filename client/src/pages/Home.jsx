@@ -1,7 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import { formatINR } from '../utils/currency';
 import { useCatalog } from '../context/CatalogContext';
 
@@ -155,7 +154,6 @@ const Home = () => {
   const [scrolled, setScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState('web-development');
   const { user, logout } = useAuth();
-  const { isDark } = useTheme();
   const navigate = useNavigate();
   const authed = Boolean(user);
 
@@ -183,8 +181,8 @@ const Home = () => {
               alt="SkyWorld"
               className="hp-nav__logo"
               style={{
-                opacity: scrolled && !isDark ? 0 : 1,
-                position: scrolled && !isDark ? 'absolute' : 'relative',
+                opacity: scrolled ? 0 : 1,
+                position: scrolled ? 'absolute' : 'relative',
               }}
             />
             <img
@@ -192,8 +190,8 @@ const Home = () => {
               alt="SkyWorld"
               className="hp-nav__logo"
               style={{
-                opacity: scrolled && !isDark ? 1 : 0,
-                position: scrolled && !isDark ? 'relative' : 'absolute',
+                opacity: scrolled ? 1 : 0,
+                position: scrolled ? 'relative' : 'absolute',
               }}
             />
           </Link>
@@ -248,8 +246,6 @@ const Home = () => {
               people love.
             </span>
           </h1>
-
-
 
           <div className="hp-hero__btns" style={{ animationDelay: '.76s' }}>
             {authed ? (
@@ -540,8 +536,6 @@ const Home = () => {
         </div>
       </section>
 
-
-
       {/* ═══ MONTHLY PLANS ═══ */}
       <section className="hp-monthly">
         <div className="hp-wrap">
@@ -557,7 +551,7 @@ const Home = () => {
                 fontWeight: 600,
                 marginTop: 8,
               }}
-              className="text-sky-600 dark:text-sky-400 hover:underline"
+              className="text-sky-600 hover:underline"
             >
               Compare all plans <span>&rarr;</span>
             </Link>
@@ -657,6 +651,16 @@ const Home = () => {
           </div>
           <div className="hp-ft__social">
             <a
+              href="https://www.linkedin.com/in/skyworld-ventures/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
+            </a>
+            <a
               href="https://www.youtube.com/@SkyWorldVentures"
               target="_blank"
               rel="noopener noreferrer"
@@ -664,6 +668,16 @@ const Home = () => {
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.546 12 3.546 12 3.546s-7.505 0-9.377.504A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.504 9.376.504 9.376.504s7.505 0 9.377-.504a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+            </a>
+            <a
+              href="https://www.instagram.com/skyworld.ventures/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
               </svg>
             </a>
             <a
@@ -677,13 +691,13 @@ const Home = () => {
               </svg>
             </a>
             <a
-              href="https://www.instagram.com/skyworldventures/"
+              href="https://www.facebook.com/profile.php?id=61585059613967"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Instagram"
+              aria-label="Facebook"
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
             </a>
           </div>
@@ -1382,102 +1396,7 @@ const Home = () => {
   .hp-combo { padding: 24px 20px 22px; }
 }
 
-/* ══════════════════════════════════════════
-   DARK MODE
-   ══════════════════════════════════════════ */
-.dark .hp {
-  --bg: #0f172a; --bg-off: #0c1220; --card: rgba(30,41,59,.75);
-  --border: rgba(255,255,255,.06);
-}
-.dark .hp-sect-h { color: #f1f5f9; }
-.dark .hp-sect-sub { color: #94a3b8; }
-.dark .hp-nav--s {
-  background: rgba(15,23,42,.82);
-  box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 4px 20px rgba(0,0,0,.12);
-}
-.dark .hp-nav__link--dark { color: #64748b; }
-.dark .hp-nav__link--dark:hover { color: #f1f5f9; }
 
-/* Services — dark */
-.dark .hp-svc { background: var(--bg-off); }
-.dark .hp-svc::before {
-  background-image:
-    linear-gradient(rgba(55,187,236,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(55,187,236,.04) 1px, transparent 1px);
-}
-.dark .hp-svc__card {
-  background: linear-gradient(145deg, rgba(30,41,59,.9), rgba(15,23,42,.85));
-  border-color: rgba(255,255,255,.06);
-}
-.dark .hp-svc__card:hover {
-  border-color: rgba(var(--c),.3);
-  box-shadow: 0 0 0 1px rgba(var(--c),.08), 0 20px 50px -14px rgba(var(--c),.2);
-}
-.dark .hp-svc__name { color: #f1f5f9; }
-.dark .hp-svc__tagline { color: #94a3b8; }
-.dark .hp-svc__from { color: #f1f5f9; }
-.dark .hp-svc__count { color: #64748b; }
-.dark .hp-svc__foot { border-top-color: rgba(255,255,255,.06); }
-
-/* Process — dark */
-.dark .hp-proc { background: var(--bg); }
-.dark .hp-proc::after {
-  background: linear-gradient(90deg, transparent, rgba(55,187,236,.15), rgba(55,187,236,.3), rgba(55,187,236,.15), transparent);
-}
-.dark .hp-proc__num { color: rgba(55,187,236,.14); }
-.dark .hp-proc__item:hover .hp-proc__num { color: rgba(55,187,236,.25); }
-.dark .hp-proc__title { color: #f1f5f9; }
-.dark .hp-proc__desc { color: #94a3b8; }
-
-/* Pricing — dark */
-.dark .hp-pricing { background: var(--bg-off); }
-
-.dark .hp-tabs { background: rgba(255,255,255,.04); }
-.dark .hp-tab { color: #64748b; }
-.dark .hp-tab:hover { color: #f1f5f9; background: rgba(255,255,255,.03); }
-.dark .hp-tab--on {
-  background: rgba(30,41,59,.9); color: #f1f5f9;
-  box-shadow: 0 1px 4px rgba(0,0,0,.2), 0 2px 12px rgba(0,0,0,.1);
-}
-.dark .hp-plan {
-  background: rgba(30,41,59,.6); border-color: rgba(255,255,255,.06);
-}
-.dark .hp-plan:hover {
-  box-shadow: 0 16px 48px rgba(0,0,0,.35); border-color: rgba(var(--c),.18);
-}
-.dark .hp-plan--pop {
-  border-color: rgba(var(--c),.3);
-  box-shadow: 0 0 0 1px rgba(var(--c),.08), 0 8px 30px rgba(var(--c),.1);
-}
-.dark .hp-plan__name { color: #f1f5f9; }
-.dark .hp-plan__for { color: #94a3b8; }
-.dark .hp-plan__amount { color: #f1f5f9; }
-.dark .hp-plan__list li { color: #cbd5e1; }
-.dark .hp-plan__pricing { border-bottom-color: rgba(255,255,255,.06); }
-.dark .hp-plan__cta {
-  background: rgba(30,41,59,.7); border-color: rgba(255,255,255,.07); color: #cbd5e1;
-}
-.dark .hp-plan__cta:hover { border-color: rgba(var(--c),.35); color: rgb(var(--c)); }
-
-/* Combos — dark */
-.dark .hp-combos { background: var(--bg); }
-.dark .hp-combos > .hp-wrap::before {
-  background: linear-gradient(90deg, transparent, rgba(55,187,236,.15), rgba(55,187,236,.3), rgba(55,187,236,.15), transparent);
-}
-
-.dark .hp-combo {
-  background: rgba(30,41,59,.6); border-color: rgba(255,255,255,.06);
-}
-.dark .hp-combo:hover {
-  box-shadow: 0 18px 50px rgba(var(--c),.12); border-color: rgba(var(--c),.18);
-}
-.dark .hp-combo__name { color: #f1f5f9; }
-.dark .hp-combo__tagline { color: #94a3b8; }
-.dark .hp-combo__was { color: #64748b; }
-.dark .hp-combo__now { color: #f1f5f9; }
-.dark .hp-combo__list li { color: #cbd5e1; }
-.dark .hp-combo__cta { background: #f1f5f9; color: #0f172a; }
-.dark .hp-combo__cta:hover { background: #fff; }
       `}</style>
     </div>
   );

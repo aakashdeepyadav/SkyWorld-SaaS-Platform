@@ -9,8 +9,6 @@ import {
   ArrowLeftIcon,
   CheckIcon,
   XMarkIcon,
-  ClockIcon,
-  ArrowPathIcon,
   LockClosedIcon,
   ShieldCheckIcon,
   CalendarDaysIcon,
@@ -27,15 +25,11 @@ const MonthlyCheckout = () => {
 
   if (!plan) {
     return (
-      <div className="min-h-screen bg-surface-50 dark:bg-surface-900 px-6 py-20">
-        <div className="max-w-2xl mx-auto card dark:bg-surface-800 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Invalid checkout session
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            The maintenance plan you selected is not available.
-          </p>
-          <Link to="/plans/monthly" className="btn-primary mt-6 inline-flex">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6">
+        <div className="text-center">
+          <h1 className="text-xl font-bold text-gray-900">Invalid checkout</h1>
+          <p className="text-sm text-gray-500 mt-1">This plan is not available.</p>
+          <Link to="/plans/monthly" className="btn-primary mt-4 inline-flex">
             View Plans
           </Link>
         </div>
@@ -45,13 +39,11 @@ const MonthlyCheckout = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-surface-50 dark:bg-surface-900 px-6 py-20">
-        <div className="max-w-2xl mx-auto card dark:bg-surface-800 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sign in to continue</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            You need an account to subscribe to a maintenance plan.
-          </p>
-          <div className="mt-6 flex items-center justify-center gap-3">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6">
+        <div className="text-center">
+          <h1 className="text-xl font-bold text-gray-900">Sign in to continue</h1>
+          <p className="text-sm text-gray-500 mt-1">You need an account to subscribe.</p>
+          <div className="mt-4 flex items-center justify-center gap-3">
             <Link to={`/login?redirect=/checkout/monthly/${slug}`} className="btn-primary">
               Sign In
             </Link>
@@ -106,7 +98,7 @@ const MonthlyCheckout = () => {
         },
         prefill,
         notes: { serviceType: 'monthly', plan: plan.slug },
-        theme: { color: '#0EA5E9' },
+        theme: { color: '#37BBEC' },
       });
       checkout.on('payment.failed', (response) => {
         toast.error(response?.error?.description || 'Payment failed');
@@ -120,177 +112,107 @@ const MonthlyCheckout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface-50 dark:bg-surface-900">
-      <div className="max-w-3xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-lg mx-auto px-5 py-10">
         <Link
           to={`/plans/monthly/${plan.slug}`}
-          className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-6"
+          className="inline-flex items-center text-sm text-gray-400 hover:text-gray-600 transition-colors mb-6"
         >
-          <ArrowLeftIcon className="w-4 h-4 mr-1.5" /> Back to {plan.name}
+          <ArrowLeftIcon className="w-3.5 h-3.5 mr-1" /> Back
         </Link>
 
-        {/* Main checkout card */}
-        <div className="card dark:bg-surface-800 dark:border-surface-700 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Header */}
-          <div className="-mx-6 -mt-6 px-6 py-5 mb-6 bg-[#37BBEC] relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
-            <div className="relative flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-                <CalendarDaysIcon className="w-6 h-6 text-white" />
-              </div>
+          <div className="bg-[#37BBEC] px-6 py-5 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_60%)]" />
+            <div className="relative flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold text-white">Subscribe</h1>
-                <p className="text-sm text-white/70">{plan.name} &middot; Monthly Plan</p>
+                <p className="text-sm font-medium text-white/70">Monthly Plan</p>
+                <h1 className="text-xl font-bold text-white mt-0.5">{plan.name}</h1>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-extrabold text-white">{formatINR(plan.price)}</p>
+                <p className="text-[11px] text-white/60">/month</p>
               </div>
             </div>
           </div>
 
-          {/* Plan summary */}
-          <div className="mb-8">
-            <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-              Plan Details
-            </h2>
-            <div className="grid sm:grid-cols-2 gap-3">
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-surface-700 border border-gray-100 dark:border-surface-600">
-                <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">
-                  Plan
-                </p>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {plan.name}
-                  </span>
-                  {plan.popular && (
-                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400">
-                      Popular
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-surface-700 border border-gray-100 dark:border-surface-600">
-                <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">
-                  Billing
-                </p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white mt-1.5">
-                  {formatINR(plan.price)}/month
-                </p>
-              </div>
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-surface-700 border border-gray-100 dark:border-surface-600">
-                <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">
-                  Response Time
-                </p>
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <ClockIcon className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {plan.responseTime}
-                  </span>
-                </div>
-              </div>
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-surface-700 border border-gray-100 dark:border-surface-600">
-                <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">
-                  Updates Included
-                </p>
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <ArrowPathIcon className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {plan.updates}
-                  </span>
-                </div>
-              </div>
+          <div className="px-6 py-6">
+            {/* Quick stats */}
+            <div className="flex items-center gap-4 text-sm text-gray-500 mb-5 pb-5 border-b border-gray-100">
+              {plan.responseTime && <span>Response: {plan.responseTime}</span>}
+              {plan.updates && (
+                <>
+                  <span className="w-1 h-1 rounded-full bg-gray-300" />
+                  <span>{plan.updates} updates</span>
+                </>
+              )}
             </div>
-          </div>
 
-          {/* Features */}
-          <div className="mb-8 border-t border-gray-100 dark:border-surface-700 pt-6">
-            <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-              What you get every month
-            </h2>
-            <div className="grid sm:grid-cols-2 gap-2">
-              {plan.features.map((f) => (
-                <div key={f} className="flex items-center gap-2 text-sm">
-                  <CheckIcon className="w-4 h-4 text-emerald-500 flex-shrink-0" strokeWidth={3} />
-                  <span className="text-gray-700 dark:text-gray-300">{f}</span>
+            {/* Features — compact */}
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-5">
+              {plan.features.slice(0, 8).map((f) => (
+                <div key={f} className="flex items-center gap-1.5 text-[13px] text-gray-600">
+                  <CheckIcon className="w-3.5 h-3.5 text-[#37BBEC] flex-shrink-0" strokeWidth={3} />
+                  <span className="truncate">{f}</span>
                 </div>
               ))}
             </div>
-          </div>
+            {plan.features.length > 8 && (
+              <p className="text-[11px] text-gray-400 mb-5">
+                +{plan.features.length - 8} more included
+              </p>
+            )}
 
-          {/* Not included */}
-          {plan.notIncluded?.length > 0 && (
-            <div className="mb-8 border-t border-gray-100 dark:border-surface-700 pt-6">
-              <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                Not included
-              </h2>
-              <div className="grid sm:grid-cols-2 gap-2">
-                {plan.notIncluded.map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-sm">
+            {/* Not included — only show first few */}
+            {plan.notIncluded?.length > 0 && (
+              <div className="mb-5 pb-5 border-b border-gray-100">
+                {plan.notIncluded.slice(0, 3).map((item) => (
+                  <div key={item} className="flex items-center gap-1.5 text-[13px] text-gray-400">
                     <XMarkIcon
-                      className="w-4 h-4 text-gray-300 dark:text-gray-600 flex-shrink-0"
+                      className="w-3.5 h-3.5 text-gray-300 flex-shrink-0"
                       strokeWidth={2.5}
                     />
-                    <span className="text-gray-400 dark:text-gray-500">{item}</span>
+                    <span className="truncate">{item}</span>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Billing info */}
-          <div className="mb-8 border-t border-gray-100 dark:border-surface-700 pt-6">
-            <div className="p-4 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-100 dark:border-sky-500/20">
-              <div className="flex items-start gap-3">
-                <CalendarDaysIcon className="w-5 h-5 text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
-                <div className="text-sm">
-                  <p className="font-semibold text-gray-900 dark:text-white">
-                    Monthly billing — cancel anytime
-                  </p>
-                  <p className="text-gray-500 dark:text-gray-400 mt-1 text-xs leading-relaxed">
-                    First month charged today. We&apos;ll send a renewal reminder before each
-                    billing cycle. You can pause or cancel with 7 days notice.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Pay button */}
-          <div className="border-t border-gray-100 dark:border-surface-700 pt-6">
-            <div className="flex items-center justify-between mb-5">
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                First Month
-              </span>
-              <span className="text-2xl font-extrabold text-gray-900 dark:text-white">
-                {formatINR(plan.price)}
-              </span>
+            {/* Billing note */}
+            <div className="flex items-center gap-2.5 mb-6 p-3 rounded-lg bg-[#37BBEC]/5 border border-[#37BBEC]/10">
+              <CalendarDaysIcon className="w-4 h-4 text-[#37BBEC] flex-shrink-0" />
+              <p className="text-[12px] text-gray-600">
+                Monthly billing — cancel anytime with 7 days notice
+              </p>
             </div>
 
+            {/* CTA */}
             <button
               onClick={handlePay}
               disabled={isPaying}
-              className="w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl font-semibold text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/20 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <LockClosedIcon className="w-4 h-4" />
-              {isPaying ? 'Processing...' : `Subscribe — ${formatINR(plan.price)}/month`}
+              {isPaying ? 'Processing...' : `Subscribe — ${formatINR(plan.price)}/mo`}
             </button>
 
-            <p className="text-[11px] text-gray-400 text-center mt-3">
-              Your plan starts immediately after payment. No long-term contracts.
+            <p className="text-[11px] text-gray-400 text-center mt-2.5">
+              Starts immediately. No long-term contracts.
             </p>
           </div>
         </div>
 
-        {/* Trust signals */}
-        <div className="flex items-center justify-center gap-6 mt-8 text-gray-400 dark:text-gray-500">
-          <div className="flex items-center gap-1.5 text-xs">
-            <ShieldCheckIcon className="w-4 h-4" />
-            <span>Secure Payment</span>
+        {/* Trust */}
+        <div className="flex items-center justify-center gap-5 mt-6 text-gray-400">
+          <div className="flex items-center gap-1 text-[11px]">
+            <ShieldCheckIcon className="w-3.5 h-3.5" /> Secure
           </div>
-          <div className="flex items-center gap-1.5 text-xs">
-            <LockClosedIcon className="w-4 h-4" />
-            <span>SSL Encrypted</span>
+          <div className="flex items-center gap-1 text-[11px]">
+            <LockClosedIcon className="w-3.5 h-3.5" /> Encrypted
           </div>
-          <div className="flex items-center gap-1.5 text-xs">
-            <CalendarDaysIcon className="w-4 h-4" />
-            <span>Cancel Anytime</span>
+          <div className="flex items-center gap-1 text-[11px]">
+            <CalendarDaysIcon className="w-3.5 h-3.5" /> Cancel anytime
           </div>
         </div>
       </div>

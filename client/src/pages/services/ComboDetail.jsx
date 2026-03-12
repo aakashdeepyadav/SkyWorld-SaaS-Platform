@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
@@ -36,9 +36,9 @@ const ComboDetail = () => {
 
   if (!combo) {
     return (
-      <div className="min-h-screen bg-surface-50 dark:bg-surface-900 px-6 py-20">
-        <div className="max-w-3xl mx-auto card dark:bg-surface-800 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Combo not found</h1>
+      <div className="min-h-screen bg-surface-50 px-6 py-20">
+        <div className="max-w-3xl mx-auto card text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Combo not found</h1>
           <p className="text-sm text-gray-500 mt-2">
             The combo package you are looking for does not exist.
           </p>
@@ -70,18 +70,18 @@ const ComboDetail = () => {
   });
 
   return (
-    <div className="min-h-screen bg-surface-50 dark:bg-surface-900">
+    <div className="min-h-screen bg-surface-50">
       {/* ── Hero ── */}
       <div className="relative overflow-hidden">
         <div
-          className="absolute inset-0 opacity-[0.08] dark:opacity-[0.14]"
+          className="absolute inset-0 opacity-[0.08]"
           style={{ background: gradientCSS }}
         />
 
         <div className="relative max-w-5xl mx-auto px-6 pt-10 pb-16">
           <Link
             to="/"
-            className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-8"
+            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700:text-gray-200 transition-colors mb-8"
           >
             <ArrowLeftIcon className="w-4 h-4 mr-1.5" /> Back to Home
           </Link>
@@ -95,7 +95,7 @@ const ComboDetail = () => {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
                   {combo.name}
                 </h1>
                 <span
@@ -105,10 +105,10 @@ const ComboDetail = () => {
                   Save {combo.discount}%
                 </span>
               </div>
-              <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-2xl text-lg leading-relaxed">
+              <p className="text-gray-500 mt-2 max-w-2xl text-lg leading-relaxed">
                 {combo.tagline}
               </p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+              <p className="text-sm text-gray-400 mt-1">
                 Best for: {combo.bestFor}
               </p>
             </div>
@@ -119,7 +119,7 @@ const ComboDetail = () => {
       <div className="max-w-5xl mx-auto px-6 pb-20 space-y-12">
         {/* ── Pricing Summary ── */}
         <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="card dark:bg-surface-800 dark:border-surface-700 text-center">
+          <div className="card text-center">
             <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold">
               Original Price
             </p>
@@ -127,23 +127,23 @@ const ComboDetail = () => {
               {formatINR(combo.originalPrice)}
             </p>
           </div>
-          <div className="card dark:bg-surface-800 dark:border-surface-700 text-center">
+          <div className="card text-center">
             <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold">
               Combo Price
             </p>
-            <p className="text-xl font-extrabold text-gray-900 dark:text-white mt-1">
+            <p className="text-xl font-extrabold text-gray-900 mt-1">
               {formatINR(combo.price)}
             </p>
           </div>
-          <div className="card dark:bg-surface-800 dark:border-surface-700 text-center">
+          <div className="card text-center">
             <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold">You Save</p>
             <p className="text-xl font-extrabold mt-1" style={{ color: `rgb(${combo.color})` }}>
               {formatINR(combo.originalPrice - combo.price)}
             </p>
           </div>
-          <div className="card dark:bg-surface-800 dark:border-surface-700 text-center">
+          <div className="card text-center">
             <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold">Delivery</p>
-            <p className="text-xl font-bold text-gray-900 dark:text-white mt-1 flex items-center justify-center gap-1.5">
+            <p className="text-xl font-bold text-gray-900 mt-1 flex items-center justify-center gap-1.5">
               <ClockIcon className="w-5 h-5 text-gray-400" />
               {combo.delivery}
             </p>
@@ -152,7 +152,7 @@ const ComboDetail = () => {
 
         {/* ── What's Included ── */}
         <section>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
             What&apos;s included in this combo
           </h2>
 
@@ -162,21 +162,21 @@ const ComboDetail = () => {
                 return (
                   <div
                     key={i}
-                    className="card dark:bg-surface-800 dark:border-surface-700 flex items-start gap-4"
+                    className="card flex items-start gap-4"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
                       <SparklesIcon className="w-5 h-5 text-amber-500" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-base font-semibold text-gray-900">
                           {item.label}
                         </h3>
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-50 text-amber-600">
                           Bonus Add-on
                         </span>
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-gray-500 mt-1">
                         Included free with this combo package.
                       </p>
                     </div>
@@ -189,16 +189,16 @@ const ComboDetail = () => {
               const cat = item.catData;
 
               return (
-                <div key={i} className="card dark:bg-surface-800 dark:border-surface-700">
+                <div key={i} className="card">
                   <div className="flex items-start gap-4 mb-4">
                     <div
-                      className={`w-10 h-10 rounded-xl ${cat?.lightBg || 'bg-gray-100 dark:bg-surface-700'} flex items-center justify-center flex-shrink-0`}
+                      className={`w-10 h-10 rounded-xl ${cat?.lightBg || 'bg-gray-100'} flex items-center justify-center flex-shrink-0`}
                     >
                       <Icon className={`w-5 h-5 ${cat?.accentText || 'text-gray-500'}`} />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-base font-semibold text-gray-900">
                           {item.label}
                         </h3>
                         <span
@@ -208,13 +208,13 @@ const ComboDetail = () => {
                         </span>
                       </div>
                       {plan && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        <p className="text-sm text-gray-500 mt-1">
                           {plan.bestFor} &middot; Delivery in {plan.delivery}
                         </p>
                       )}
                     </div>
                     {plan && (
-                      <span className="text-sm font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                      <span className="text-sm font-bold text-gray-900 whitespace-nowrap">
                         {formatINR(plan.price)}
                       </span>
                     )}
@@ -227,7 +227,7 @@ const ComboDetail = () => {
                             className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"
                             strokeWidth={3}
                           />
-                          <span className="text-gray-600 dark:text-gray-400">{feat}</span>
+                          <span className="text-gray-600">{feat}</span>
                         </div>
                       ))}
                     </div>
@@ -250,7 +250,7 @@ const ComboDetail = () => {
             Get This Combo — {formatINR(combo.price)}
             <span>&rarr;</span>
           </button>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-3">
+          <p className="text-sm text-gray-400 mt-3">
             You save {formatINR(combo.originalPrice - combo.price)}
           </p>
         </section>
@@ -258,7 +258,7 @@ const ComboDetail = () => {
         {/* ── Other Combos ── */}
         {COMBO_PACKAGES.filter((c) => c.slug !== combo.slug).length > 0 && (
           <section>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">
+            <h2 className="text-lg font-bold text-gray-900 mb-5">
               Other combo packages
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -269,7 +269,7 @@ const ComboDetail = () => {
                   <Link
                     key={other.slug}
                     to={`/combos/${other.slug}`}
-                    className="card dark:bg-surface-800 dark:border-surface-700 hover:shadow-md transition-shadow group"
+                    className="card hover:shadow-md transition-shadow group"
                   >
                     <div className="flex items-center gap-3 mb-2">
                       <div
@@ -278,7 +278,7 @@ const ComboDetail = () => {
                       >
                         <TagIcon className="w-4 h-4" style={{ color: `rgb(${other.color})` }} />
                       </div>
-                      <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                      <h3 className="text-base font-semibold text-gray-900 group-hover:text-primary-600:text-primary-400 transition-colors">
                         {other.name}
                       </h3>
                       <span
@@ -288,12 +288,12 @@ const ComboDetail = () => {
                         Save {other.discount}%
                       </span>
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{other.tagline}</p>
+                    <p className="text-sm text-gray-500">{other.tagline}</p>
                     <div className="flex items-center gap-3 mt-2">
                       <span className="text-sm text-gray-400 line-through">
                         {formatINR(other.originalPrice)}
                       </span>
-                      <span className="text-sm font-bold text-gray-900 dark:text-white">
+                      <span className="text-sm font-bold text-gray-900">
                         {formatINR(other.price)}
                       </span>
                     </div>

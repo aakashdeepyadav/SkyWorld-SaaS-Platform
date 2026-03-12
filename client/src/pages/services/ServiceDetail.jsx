@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import { useQuery } from 'react-query';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../services/api';
@@ -67,9 +67,9 @@ const ServiceDetail = () => {
   /* ─── Not found ─── */
   if (!catalog) {
     return (
-      <div className="min-h-screen bg-surface-50 dark:bg-surface-900 px-6 py-20">
-        <div className="max-w-3xl mx-auto card dark:bg-surface-800 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Service not found</h1>
+      <div className="min-h-screen bg-surface-50 px-6 py-20">
+        <div className="max-w-3xl mx-auto card text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Service not found</h1>
           <p className="text-sm text-gray-500 mt-2">
             The service you are looking for does not exist.
           </p>
@@ -106,17 +106,17 @@ const ServiceDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface-50 dark:bg-surface-900">
+    <div className="min-h-screen bg-surface-50">
       {/* ── Hero ── */}
       <div className="relative overflow-hidden">
         <div
-          className={`absolute inset-0 bg-gradient-to-br ${catalog.gradient} opacity-[0.06] dark:opacity-[0.12]`}
+          className={`absolute inset-0 bg-gradient-to-br ${catalog.gradient} opacity-[0.06]`}
         />
 
         <div className="relative max-w-6xl mx-auto px-6 pt-10 pb-16">
           <Link
             to="/"
-            className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-8"
+            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700:text-gray-200 transition-colors mb-8"
           >
             <ArrowLeftIcon className="w-4 h-4 mr-1.5" /> Back to Home
           </Link>
@@ -128,10 +128,10 @@ const ServiceDetail = () => {
               <Icon className={`w-7 h-7 ${catalog.accentText}`} />
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
                 {serviceName}
               </h1>
-              <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-2xl text-lg leading-relaxed">
+              <p className="text-gray-500 mt-2 max-w-2xl text-lg leading-relaxed">
                 {serviceSubtitle}
               </p>
             </div>
@@ -143,7 +143,7 @@ const ServiceDetail = () => {
         {/* ── Plan Cards ── */}
         <section>
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Choose your plan</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Choose your plan</h2>
           </div>
 
           <div
@@ -157,7 +157,7 @@ const ServiceDetail = () => {
             {catalog.plans.map((plan) => (
               <div
                 key={plan.slug}
-                className={`relative card dark:bg-surface-800 dark:border-surface-700 overflow-hidden group flex flex-col ${plan.popular ? 'border-2 border-primary-200 dark:border-primary-500/30' : ''
+                className={`relative card overflow-hidden group flex flex-col ${plan.popular ? 'border-2 border-primary-200' : ''
                   }`}
               >
                 {plan.popular && (
@@ -169,8 +169,8 @@ const ServiceDetail = () => {
                 )}
 
                 <div className="mb-5">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">{plan.name}</h3>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{plan.bestFor}</p>
+                  <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
+                  <p className="text-xs text-gray-400 mt-1">{plan.bestFor}</p>
                 </div>
 
                 {/* Highlight badges */}
@@ -188,11 +188,11 @@ const ServiceDetail = () => {
                 )}
 
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
+                  <span className="text-3xl font-extrabold text-gray-900">
                     {formatINR(plan.price)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-6">
+                <p className="text-sm text-gray-500 flex items-center gap-1 mb-6">
                   <ClockIcon className="w-3.5 h-3.5" /> Delivery in {plan.delivery}
                 </p>
 
@@ -204,16 +204,16 @@ const ServiceDetail = () => {
                         className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"
                         strokeWidth={3}
                       />
-                      <span className="text-gray-700 dark:text-gray-300">{item}</span>
+                      <span className="text-gray-700">{item}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Support info */}
                 {plan.support && (
-                  <div className="flex items-center gap-2 px-3 py-2.5 mb-4 rounded-lg bg-emerald-50 dark:bg-emerald-500/10">
-                    <SparklesIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                  <div className="flex items-center gap-2 px-3 py-2.5 mb-4 rounded-lg bg-emerald-50">
+                    <SparklesIcon className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span className="text-xs font-semibold text-emerald-700">
                       {plan.support}
                     </span>
                   </div>
@@ -224,7 +224,7 @@ const ServiceDetail = () => {
                   to={`/services/${slug}/${plan.slug}`}
                   className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 active:scale-[0.98] mt-auto text-center block ${plan.popular
                     ? `text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25`
-                    : 'text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-surface-700 hover:bg-gray-200 dark:hover:bg-surface-600'
+                    : 'text-gray-700 bg-gray-100 hover:bg-gray-200:bg-surface-600'
                     }`}
                 >
                   View {plan.name}
@@ -233,20 +233,20 @@ const ServiceDetail = () => {
             ))}
 
             {/* Custom Plan Card */}
-            <div className="card dark:bg-surface-800 dark:border-surface-700 border-dashed flex flex-col group">
+            <div className="card border-dashed flex flex-col group">
               <div className="mb-5">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Custom Plan</h3>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                <h3 className="text-lg font-bold text-gray-900">Custom Plan</h3>
+                <p className="text-xs text-gray-400 mt-1">
                   Beyond our fixed packages
                 </p>
               </div>
 
               <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
+                <span className="text-3xl font-extrabold text-gray-900">
                   Tailored
                 </span>
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-6">
+              <p className="text-sm text-gray-500 flex items-center gap-1 mb-6">
                 <SparklesIcon className="w-3.5 h-3.5" /> Scope-based timeline
               </p>
 
@@ -262,14 +262,14 @@ const ServiceDetail = () => {
                       className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"
                       strokeWidth={3}
                     />
-                    <span className="text-gray-700 dark:text-gray-300">{item}</span>
+                    <span className="text-gray-700">{item}</span>
                   </div>
                 ))}
               </div>
 
               <button
                 onClick={handleCustom}
-                className="w-full py-3 px-6 rounded-xl font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-surface-700 hover:bg-gray-200 dark:hover:bg-surface-600 transition-all duration-200 active:scale-[0.98] mt-auto"
+                className="w-full py-3 px-6 rounded-xl font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200:bg-surface-600 transition-all duration-200 active:scale-[0.98] mt-auto"
               >
                 Request Custom Quote
               </button>

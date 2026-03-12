@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+﻿import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useModal } from '../../context/ModalContext';
 import { api } from '../../services/api';
@@ -82,14 +82,14 @@ export default function MeetingModal() {
   if (confirmed) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-        <div className="bg-white dark:bg-surface-800 rounded-2xl max-w-md w-full p-6 space-y-4">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-500/20 mx-auto">
-            <CheckCircle className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+        <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 mx-auto">
+            <CheckCircle className="h-6 w-6 text-emerald-600" />
           </div>
-          <h2 className="text-xl font-bold text-center text-gray-900 dark:text-white">
+          <h2 className="text-xl font-bold text-center text-gray-900">
             Meeting Confirmed!
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
+          <p className="text-sm text-gray-600 text-center">
             Your meeting has been scheduled. Check your email for details.
           </p>
           <button
@@ -106,18 +106,18 @@ export default function MeetingModal() {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="min-h-screen px-4 py-8 bg-black/50 flex items-center justify-center">
-        <div className="bg-white dark:bg-surface-800 rounded-2xl max-w-2xl w-full shadow-2xl">
+        <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-surface-700">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
               <Calendar className="h-5 w-5 text-primary-600" />
               Book a Meeting
             </h2>
             <button
               onClick={closeModal}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-surface-700 rounded-lg transition"
+              className="p-1 hover:bg-gray-100:bg-surface-700 rounded-lg transition"
             >
-              <X className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+              <X className="h-6 w-6 text-gray-600" />
             </button>
           </div>
 
@@ -125,29 +125,29 @@ export default function MeetingModal() {
           <form onSubmit={handleBooking} className="p-6 space-y-6">
             {/* Personal Info */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Your Information</h3>
+              <h3 className="font-semibold text-gray-900">Your Information</h3>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Full Name
                   </label>
                   <input
                     type="text"
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-200 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-900"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Email
                   </label>
                   <input
                     type="email"
                     value={clientEmail}
                     onChange={(e) => setClientEmail(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-200 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-900"
                     required
                   />
                 </div>
@@ -156,7 +156,7 @@ export default function MeetingModal() {
 
             {/* Date Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select Date
               </label>
               <input
@@ -165,7 +165,7 @@ export default function MeetingModal() {
                 onChange={(e) => setSelectedDate(e.target.value)}
                 min={minDate}
                 max={maxDate}
-                className="w-full px-4 py-2 border border-gray-200 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-900"
                 required
               />
             </div>
@@ -173,7 +173,7 @@ export default function MeetingModal() {
             {/* Time Slots */}
             {selectedDate && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   Available Time Slots
                 </label>
                 {loadingSlots ? (
@@ -181,7 +181,7 @@ export default function MeetingModal() {
                     <Loader className="h-5 w-5 animate-spin text-primary-600" />
                   </div>
                 ) : slots.length === 0 ? (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-500">
                     No slots available for this date
                   </p>
                 ) : (
@@ -194,7 +194,7 @@ export default function MeetingModal() {
                         className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
                           selectedSlot === slot
                             ? 'bg-primary-600 text-white'
-                            : 'bg-gray-100 dark:bg-surface-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-surface-600'
+                            : 'bg-gray-100 text-gray-900 hover:bg-gray-200:bg-surface-600'
                         }`}
                       >
                         {formatTime12(slot)}
@@ -206,8 +206,8 @@ export default function MeetingModal() {
             )}
 
             {/* Meeting Info */}
-            <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 rounded-lg p-4">
-              <p className="text-sm text-blue-900 dark:text-blue-200 flex items-start gap-2">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-900 flex items-start gap-2">
                 <Video className="h-4 w-4 flex-shrink-0 mt-0.5" />
                 This is a video call meeting. You'll receive a meeting link via email.
               </p>
@@ -218,7 +218,7 @@ export default function MeetingModal() {
               <button
                 type="button"
                 onClick={closeModal}
-                className="flex-1 px-4 py-2 border border-gray-200 dark:border-surface-600 rounded-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-surface-700"
+                className="flex-1 px-4 py-2 border border-gray-200 rounded-lg font-medium text-gray-700 hover:bg-gray-50:bg-surface-700"
               >
                 Cancel
               </button>

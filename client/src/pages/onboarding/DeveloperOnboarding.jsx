@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -56,15 +56,15 @@ const faqItems = [
 ];
 
 const shellCard =
-  'rounded-2xl border border-surface-200 bg-white p-6 shadow-card dark:border-surface-700 dark:bg-surface-800';
+  'rounded-2xl border border-surface-200 bg-white p-6 shadow-card';
 const innerCard =
-  'rounded-xl border border-surface-200 bg-surface-50 p-4 dark:border-surface-600 dark:bg-surface-700/40';
+  'rounded-xl border border-surface-200 bg-surface-50 p-4';
 
 function SectionHeader({ title, subtitle }) {
   return (
     <>
-      <h2 className="text-2xl font-bold text-surface-900 dark:text-white">{title}</h2>
-      {subtitle && <p className="mt-2 text-surface-600 dark:text-surface-300">{subtitle}</p>}
+      <h2 className="text-2xl font-bold text-surface-900">{title}</h2>
+      {subtitle && <p className="mt-2 text-surface-600">{subtitle}</p>}
     </>
   );
 }
@@ -149,7 +149,7 @@ export default function DeveloperOnboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-50 dark:bg-surface-950">
+    <div className="min-h-screen bg-surface-50">
       <header className="relative overflow-hidden border-b border-accent-400/30 bg-[#0F1626] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,.22),transparent_58%)]" />
         <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
@@ -223,20 +223,20 @@ export default function DeveloperOnboarding() {
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         {/* Progress Banner */}
         {isAuthed && (
-          <div className="mb-8 rounded-2xl border border-accent-200 bg-accent-50 p-6 dark:border-accent-500/30 dark:bg-accent-500/10">
+          <div className="mb-8 rounded-2xl border border-accent-200 bg-accent-50 p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   {allEssentialComplete ? (
-                    <Trophy className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                    <Trophy className="h-5 w-5 text-emerald-600" />
                   ) : (
-                    <Zap className="h-5 w-5 text-accent-600 dark:text-accent-400" />
+                    <Zap className="h-5 w-5 text-accent-600" />
                   )}
-                  <p className="font-semibold text-accent-900 dark:text-accent-100">
+                  <p className="font-semibold text-accent-900">
                     {allEssentialComplete ? '✨ Setup Complete!' : `Complete Your Setup`}
                   </p>
                 </div>
-                <p className="text-sm text-accent-700 dark:text-accent-200">
+                <p className="text-sm text-accent-700">
                   {allEssentialComplete
                     ? 'You have completed all essential steps. Start accepting requests now!'
                     : `You have reviewed ${completedEssential} of ${essentialSections.length} essential sections`}
@@ -253,16 +253,16 @@ export default function DeveloperOnboarding() {
             {!allEssentialComplete && (
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-accent-700 dark:text-accent-300">
+                  <span className="text-xs font-medium text-accent-700">
                     Essential Progress
                   </span>
-                  <span className="text-xs font-semibold text-accent-800 dark:text-accent-200">
+                  <span className="text-xs font-semibold text-accent-800">
                     {progressPercent}%
                   </span>
                 </div>
-                <div className="h-2 bg-accent-200 dark:bg-accent-500/30 rounded-full overflow-hidden">
+                <div className="h-2 bg-accent-200 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-accent-600 dark:bg-accent-500 transition-all duration-500"
+                    className="h-full bg-accent-600 transition-all duration-500"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
@@ -274,7 +274,7 @@ export default function DeveloperOnboarding() {
           <aside className="mb-8 lg:mb-0">
             <div className="space-y-4 lg:sticky lg:top-24">
               <div className={shellCard}>
-                <p className="text-xs font-semibold uppercase tracking-wide text-surface-500 dark:text-surface-300">
+                <p className="text-xs font-semibold uppercase tracking-wide text-surface-500">
                   Guide Navigation
                 </p>
                 <nav className="mt-4 space-y-1">
@@ -284,11 +284,11 @@ export default function DeveloperOnboarding() {
                       <button
                         key={item.id}
                         onClick={() => jumpTo(item.id)}
-                        className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-surface-700 transition hover:bg-accent-50 hover:text-accent-700 dark:text-surface-200 dark:hover:bg-surface-700 dark:hover:text-accent-300 flex items-center justify-between group"
+                        className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-surface-700 transition hover:bg-accent-50 hover:text-accent-700:bg-surface-700:text-accent-300 flex items-center justify-between group"
                       >
                         <span>{item.label}</span>
                         {isViewed && (
-                          <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <CheckCircle2 className="h-4 w-4 text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                         )}
                       </button>
                     );
@@ -296,29 +296,29 @@ export default function DeveloperOnboarding() {
                 </nav>
               </div>
               <div className={shellCard}>
-                <p className="text-sm font-semibold text-surface-900 dark:text-white mb-3">
+                <p className="text-sm font-semibold text-surface-900 mb-3">
                   Progress Summary
                 </p>
                 <div className="space-y-3">
                   <div>
                     <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-surface-600 dark:text-surface-400">
+                      <span className="text-surface-600">
                         Essential Steps
                       </span>
-                      <span className="font-semibold text-surface-900 dark:text-white">
+                      <span className="font-semibold text-surface-900">
                         {completedEssential}/{essentialSections.length}
                       </span>
                     </div>
-                    <div className="h-2 bg-surface-200 dark:bg-surface-700 rounded-full overflow-hidden">
+                    <div className="h-2 bg-surface-200 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-accent-600 dark:bg-accent-500 transition-all"
+                        className="h-full bg-accent-600 transition-all"
                         style={{ width: `${progressPercent}%` }}
                       />
                     </div>
                   </div>
                   {allEssentialComplete && (
-                    <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30">
-                      <p className="text-xs font-semibold text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
+                    <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+                      <p className="text-xs font-semibold text-emerald-900 flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4" />
                         Ready to accept!
                       </p>
@@ -327,20 +327,20 @@ export default function DeveloperOnboarding() {
                 </div>
               </div>
               <div className={shellCard}>
-                <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                <p className="text-sm font-semibold text-surface-900">
                   Quick access
                 </p>
                 <div className="mt-3 space-y-2">
                   <Link
                     to="/contact"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-accent-600 dark:text-accent-400"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-accent-600"
                   >
                     Contact Support
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link
                     to="/faq"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-accent-600 dark:text-accent-400"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-accent-600"
                   >
                     Platform FAQ
                     <ArrowRight className="h-4 w-4" />
@@ -380,11 +380,11 @@ export default function DeveloperOnboarding() {
                   },
                 ].map((block) => (
                   <div key={block.title} className={innerCard}>
-                    <block.icon className="h-5 w-5 text-accent-600 dark:text-accent-400" />
-                    <p className="mt-3 text-sm font-semibold text-surface-900 dark:text-white">
+                    <block.icon className="h-5 w-5 text-accent-600" />
+                    <p className="mt-3 text-sm font-semibold text-surface-900">
                       {block.title}
                     </p>
-                    <p className="mt-1 text-sm text-surface-600 dark:text-surface-300">
+                    <p className="mt-1 text-sm text-surface-600">
                       {block.text}
                     </p>
                   </div>
@@ -416,15 +416,15 @@ export default function DeveloperOnboarding() {
                   },
                 ].map((step) => (
                   <div key={step.title} className={innerCard}>
-                    <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                    <p className="text-sm font-semibold text-surface-900">
                       {step.title}
                     </p>
-                    <p className="mt-2 text-sm text-surface-600 dark:text-surface-300">
+                    <p className="mt-2 text-sm text-surface-600">
                       {step.text}
                     </p>
                     <Link
                       to={step.link}
-                      className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-accent-600 dark:text-accent-400"
+                      className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-accent-600"
                     >
                       Open
                       <ArrowRight className="h-4 w-4" />
@@ -447,8 +447,8 @@ export default function DeveloperOnboarding() {
                   { t: 'Submit final deliverables and closure notes', i: CheckCircle2 },
                 ].map((step) => (
                   <div key={step.t} className={innerCard}>
-                    <step.i className="h-5 w-5 text-accent-600 dark:text-accent-400" />
-                    <p className="mt-3 text-sm font-semibold text-surface-900 dark:text-white">
+                    <step.i className="h-5 w-5 text-accent-600" />
+                    <p className="mt-3 text-sm font-semibold text-surface-900">
                       {step.t}
                     </p>
                   </div>
@@ -456,20 +456,20 @@ export default function DeveloperOnboarding() {
               </div>
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 <div className={innerCard}>
-                  <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                  <p className="text-sm font-semibold text-surface-900">
                     Execution pages
                   </p>
                   <div className="mt-3 space-y-2">
                     <Link
                       to={requestsLink}
-                      className="inline-flex items-center gap-2 text-sm font-medium text-accent-600 dark:text-accent-400"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-accent-600"
                     >
                       Open Requests
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                     <Link
                       to={projectsLink}
-                      className="inline-flex items-center gap-2 text-sm font-medium text-accent-600 dark:text-accent-400"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-accent-600"
                     >
                       Open Projects
                       <ArrowRight className="h-4 w-4" />
@@ -477,10 +477,10 @@ export default function DeveloperOnboarding() {
                   </div>
                 </div>
                 <div className={innerCard}>
-                  <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                  <p className="text-sm font-semibold text-surface-900">
                     Communication rule
                   </p>
-                  <p className="mt-2 text-sm text-surface-600 dark:text-surface-300">
+                  <p className="mt-2 text-sm text-surface-600">
                     Keep technical decisions, change requests, and sign-offs inside project context
                     for traceability.
                   </p>
@@ -495,20 +495,20 @@ export default function DeveloperOnboarding() {
               />
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 <div className={innerCard}>
-                  <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                  <p className="text-sm font-semibold text-surface-900">
                     Required practices
                   </p>
-                  <ul className="mt-3 space-y-2 text-sm text-surface-600 dark:text-surface-300">
+                  <ul className="mt-3 space-y-2 text-sm text-surface-600">
                     <li>Use clear milestone naming and date-tagged file versions.</li>
                     <li>Include setup notes and key assumptions for handoff.</li>
                     <li>Call out blockers immediately, not at deadline time.</li>
                   </ul>
                 </div>
                 <div className={innerCard}>
-                  <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                  <p className="text-sm font-semibold text-surface-900">
                     Project discipline
                   </p>
-                  <ul className="mt-3 space-y-2 text-sm text-surface-600 dark:text-surface-300">
+                  <ul className="mt-3 space-y-2 text-sm text-surface-600">
                     <li>Ship reviewable increments instead of large late bundles.</li>
                     <li>Confirm acceptance criteria before major changes.</li>
                     <li>Close milestones only after deliverable validation.</li>
@@ -523,7 +523,7 @@ export default function DeveloperOnboarding() {
                 subtitle="Reliable communication is part of delivery quality."
               />
               <div className="mt-6 grid gap-4 md:grid-cols-2">
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-100">
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
                   <p className="font-semibold">Do</p>
                   <ul className="mt-2 space-y-1">
                     <li>Post progress updates proactively.</li>
@@ -531,7 +531,7 @@ export default function DeveloperOnboarding() {
                     <li>Share risk early with mitigation plan.</li>
                   </ul>
                 </div>
-                <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-100">
+                <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
                   <p className="font-semibold">Avoid</p>
                   <ul className="mt-2 space-y-1">
                     <li>Silent delays or hidden blockers.</li>
@@ -549,27 +549,27 @@ export default function DeveloperOnboarding() {
               />
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 <div className={innerCard}>
-                  <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                  <p className="text-sm font-semibold text-surface-900">
                     Performance focus
                   </p>
-                  <ul className="mt-3 space-y-2 text-sm text-surface-600 dark:text-surface-300">
+                  <ul className="mt-3 space-y-2 text-sm text-surface-600">
                     <li>Response speed and communication quality</li>
                     <li>On-time milestone completion</li>
                     <li>Revision discipline and closure quality</li>
                   </ul>
                 </div>
                 <div className={innerCard}>
-                  <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                  <p className="text-sm font-semibold text-surface-900">
                     Payout alignment
                   </p>
-                  <p className="mt-2 text-sm text-surface-600 dark:text-surface-300">
+                  <p className="mt-2 text-sm text-surface-600">
                     Keep profile and security details updated. Payout progression follows approved
                     completion flow.
                   </p>
                   <div className="mt-3">
                     <Link
                       to={dashboardLink}
-                      className="inline-flex items-center gap-2 text-sm font-medium text-accent-600 dark:text-accent-400"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-accent-600"
                     >
                       Open Dashboard
                       <ArrowRight className="h-4 w-4" />
@@ -586,24 +586,24 @@ export default function DeveloperOnboarding() {
               />
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 <div className={innerCard}>
-                  <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                  <p className="text-sm font-semibold text-surface-900">
                     Profile controls
                   </p>
                   <Link
                     to={profileLink}
-                    className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-accent-600 dark:text-accent-400"
+                    className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-accent-600"
                   >
                     Open Profile
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
                 <div className={innerCard}>
-                  <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                  <p className="text-sm font-semibold text-surface-900">
                     Security settings
                   </p>
                   <Link
                     to={settingsLink}
-                    className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-accent-600 dark:text-accent-400"
+                    className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-accent-600"
                   >
                     Open Settings
                     <ArrowRight className="h-4 w-4" />
@@ -620,12 +620,12 @@ export default function DeveloperOnboarding() {
                   return (
                     <div
                       key={item.id}
-                      className="overflow-hidden rounded-xl border border-surface-200 dark:border-surface-600"
+                      className="overflow-hidden rounded-xl border border-surface-200"
                     >
                       <button
                         type="button"
                         onClick={() => setOpenFaq(isOpen ? '' : item.id)}
-                        className="flex w-full items-center justify-between bg-white px-4 py-3 text-left text-sm font-semibold text-surface-900 hover:bg-surface-50 dark:bg-surface-800 dark:text-white dark:hover:bg-surface-700"
+                        className="flex w-full items-center justify-between bg-white px-4 py-3 text-left text-sm font-semibold text-surface-900 hover:bg-surface-50:bg-surface-700"
                         aria-expanded={isOpen}
                       >
                         {item.q}
@@ -634,7 +634,7 @@ export default function DeveloperOnboarding() {
                         />
                       </button>
                       {isOpen && (
-                        <div className="border-t border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-600 dark:border-surface-600 dark:bg-surface-700/40 dark:text-surface-300">
+                        <div className="border-t border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-600">
                           {item.a}
                         </div>
                       )}
@@ -644,7 +644,7 @@ export default function DeveloperOnboarding() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-accent-200 bg-accent-50 p-6 dark:border-accent-500/30 dark:bg-accent-500/10">
+            <section className="rounded-2xl border border-accent-200 bg-accent-50 p-6">
               <SectionHeader
                 title="Support and Next Action"
                 subtitle="Move from onboarding to active delivery with clear process ownership."
@@ -652,16 +652,16 @@ export default function DeveloperOnboarding() {
               <div className="mt-6 grid gap-4 md:grid-cols-3">
                 {supportLinks.map((item) => (
                   <div key={item.title} className={innerCard}>
-                    <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                    <p className="text-sm font-semibold text-surface-900">
                       {item.title}
                     </p>
-                    <p className="mt-1 text-sm text-surface-600 dark:text-surface-300">
+                    <p className="mt-1 text-sm text-surface-600">
                       {item.desc}
                     </p>
                     {item.type === 'internal' ? (
                       <Link
                         to={item.to}
-                        className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-accent-600 dark:text-accent-400"
+                        className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-accent-600"
                       >
                         Open
                         <ArrowRight className="h-4 w-4" />
@@ -671,7 +671,7 @@ export default function DeveloperOnboarding() {
                         href={item.to}
                         target={item.to.startsWith('http') ? '_blank' : undefined}
                         rel={item.to.startsWith('http') ? 'noreferrer' : undefined}
-                        className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-accent-600 dark:text-accent-400"
+                        className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-accent-600"
                       >
                         Open
                         <ExternalLink className="h-4 w-4" />

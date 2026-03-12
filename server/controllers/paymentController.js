@@ -313,8 +313,8 @@ export const createRazorpayOrder = async (req, res, next) => {
         }).select('basePrice slug type');
       }
 
-      // Prefer DB price, fall back to hardcoded PLAN_PRICES
-      derivedAmount = starterService?.basePrice ?? categoryPrices[resolvedPlan];
+      // Use hardcoded PLAN_PRICES as source of truth (matches client catalog)
+      derivedAmount = categoryPrices[resolvedPlan] ?? starterService?.basePrice;
     } else if (customRequest) {
       derivedAmount = customRequest.quotedPrice;
     }

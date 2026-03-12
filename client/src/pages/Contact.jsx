@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
@@ -41,8 +41,8 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface-50 dark:bg-surface-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto card dark:bg-surface-800 dark:border-surface-700 sm:p-12 animate-fade-in">
+    <div className="min-h-screen bg-surface-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto card sm:p-12 animate-fade-in">
         <Link
           to="/"
           className="text-primary-500 hover:text-primary-600 text-sm font-medium mb-6 inline-flex items-center"
@@ -50,14 +50,14 @@ const Contact = () => {
           &larr; Back to Home
         </Link>
 
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Contact Us</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Contact Us</h1>
+        <p className="text-sm text-gray-500 mb-8">
           Have a question or project in mind? Fill in the details below and we'll get back to you
           shortly.
         </p>
 
         {status === 'success' && (
-          <div className="mb-6 rounded-xl border border-green-200 dark:border-green-500/30 bg-green-50 dark:bg-green-500/10 p-5 text-center">
+          <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-5 text-center">
             <svg
               className="mx-auto mb-3 w-10 h-10 text-green-500"
               fill="none"
@@ -71,20 +71,20 @@ const Contact = () => {
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <p className="text-base font-semibold text-green-700 dark:text-green-300 mb-1">
+            <p className="text-base font-semibold text-green-700 mb-1">
               Message sent successfully!
             </p>
-            <p className="text-sm text-green-600 dark:text-green-400">
+            <p className="text-sm text-green-600">
               Thank you for reaching out. We'll get back to you soon.
             </p>
-            <p className="text-xs text-green-500/70 dark:text-green-400/50 mt-3">
+            <p className="text-xs text-green-500/70 mt-3">
               Redirecting to homepage in {countdown}s…
             </p>
           </div>
         )}
 
         {status === 'error' && (
-          <div className="mb-6 rounded-xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300">
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             Something went wrong. Please try again or email us directly at{' '}
             <a href="mailto:support@skyworld.buzz" className="underline">
               support@skyworld.buzz
@@ -98,7 +98,7 @@ const Contact = () => {
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                className="block text-sm font-medium text-gray-700 mb-1.5"
               >
                 Full Name <span className="text-red-400">*</span>
               </label>
@@ -110,7 +110,7 @@ const Contact = () => {
                 value={form.name}
                 onChange={handleChange}
                 placeholder="John Doe"
-                className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
               />
             </div>
 
@@ -118,7 +118,7 @@ const Contact = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                className="block text-sm font-medium text-gray-700 mb-1.5"
               >
                 Email Address <span className="text-red-400">*</span>
               </label>
@@ -130,7 +130,7 @@ const Contact = () => {
                 value={form.email}
                 onChange={handleChange}
                 placeholder="you@example.com"
-                className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
               />
             </div>
 
@@ -138,7 +138,7 @@ const Contact = () => {
             <div>
               <label
                 htmlFor="phone"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                className="block text-sm font-medium text-gray-700 mb-1.5"
               >
                 Phone Number
               </label>
@@ -149,7 +149,7 @@ const Contact = () => {
                 value={form.phone}
                 onChange={handleChange}
                 placeholder="+91 98765 43210"
-                className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
               />
             </div>
 
@@ -157,7 +157,7 @@ const Contact = () => {
             <div>
               <label
                 htmlFor="subject"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                className="block text-sm font-medium text-gray-700 mb-1.5"
               >
                 Subject <span className="text-red-400">*</span>
               </label>
@@ -169,7 +169,7 @@ const Contact = () => {
                 value={form.subject}
                 onChange={handleChange}
                 placeholder="Project inquiry, feedback, etc."
-                className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
               />
             </div>
 
@@ -177,7 +177,7 @@ const Contact = () => {
             <div>
               <label
                 htmlFor="message"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                className="block text-sm font-medium text-gray-700 mb-1.5"
               >
                 Message <span className="text-red-400">*</span>
               </label>
@@ -189,7 +189,7 @@ const Contact = () => {
                 value={form.message}
                 onChange={handleChange}
                 placeholder="Tell us about your project or question…"
-                className="w-full rounded-lg border border-gray-300 dark:border-surface-600 bg-white dark:bg-surface-700 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition resize-none"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition resize-none"
               />
             </div>
 
@@ -204,7 +204,7 @@ const Contact = () => {
         )}
 
         {status !== 'success' && (
-          <div className="mt-10 text-sm text-gray-500 dark:text-gray-400">
+          <div className="mt-10 text-sm text-gray-500">
             Or email us directly at{' '}
             <a
               href="mailto:support@skyworld.buzz"

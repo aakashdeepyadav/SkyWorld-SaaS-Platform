@@ -1,4 +1,6 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+
+const THEME_KEY = 'skyworld-theme';
 
 const ThemeContext = createContext(null);
 export const useTheme = () => {
@@ -10,26 +12,19 @@ export const useTheme = () => {
 };
 
 /**
- * ThemeProvider — follows system appearance by default,
- * but allows manual override via toggleTheme.
+ * ThemeProvider — defaults to light, user can toggle manually.
+ * Choice is persisted in localStorage. No automatic / system-preference mode.
  */
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() =>
-    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  );
-  const userOverrideRef = useRef(false);
-
-  // Listen for system preference changes — only if user hasn't manually toggled
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => {
-      if (!userOverrideRef.current) {
-        setTheme(e.matches ? 'dark' : 'light');
-      }
-    };
-    mq.addEventListener('change', handleChange);
-    return () => mq.removeEventListener('change', handleChange);
-  }, []);
+  const [theme, setTheme] = useState(() => {
+    try {
+      const saved = localStorage.getItem(THEME_KEY);
+      if (saved === 'dark' || saved === 'light') return saved;
+    } catch {
+      /* ignore */
+    }
+    return 'light';
+  });
 
   useEffect(() => {
     const root = document.documentElement;
@@ -41,8 +36,15 @@ export const ThemeProvider = ({ children }) => {
   }, [theme]);
 
   const toggleTheme = () => {
-    userOverrideRef.current = true;
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem(THEME_KEY, next);
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
   };
   const isDark = theme === 'dark';
 

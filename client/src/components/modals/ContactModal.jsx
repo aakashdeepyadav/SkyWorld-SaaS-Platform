@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useModal } from '../../context/ModalContext';
 import { X, Mail, CheckCircle, Loader } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -42,12 +42,12 @@ export default function ContactModal() {
   if (status === 'success') {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-        <div className="bg-white dark:bg-surface-800 rounded-2xl max-w-md w-full p-6 space-y-4 text-center">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-500/20 mx-auto">
-            <CheckCircle className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+        <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 text-center">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 mx-auto">
+            <CheckCircle className="h-6 w-6 text-emerald-600" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Message Sent!</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <h2 className="text-xl font-bold text-gray-900">Message Sent!</h2>
+          <p className="text-sm text-gray-600">
             Thank you for reaching out. We'll get back to you soon.
           </p>
         </div>
@@ -58,29 +58,29 @@ export default function ContactModal() {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="min-h-screen px-4 py-8 bg-black/50 flex items-center justify-center">
-        <div className="bg-white dark:bg-surface-800 rounded-2xl max-w-2xl w-full shadow-2xl">
+        <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-surface-700">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
               <Mail className="h-5 w-5 text-primary-600" />
               Contact Us
             </h2>
             <button
               onClick={closeModal}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-surface-700 rounded-lg transition"
+              className="p-1 hover:bg-gray-100:bg-surface-700 rounded-lg transition"
             >
-              <X className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+              <X className="h-6 w-6 text-gray-600" />
             </button>
           </div>
 
           {/* Content */}
           <div className="p-6">
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-sm text-gray-600 mb-6">
               Have a question? Fill in the details below and we'll get back to you shortly.
             </p>
 
             {status === 'error' && (
-              <div className="mb-6 rounded-xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300">
+              <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                 Something went wrong. Please try again or email us at{' '}
                 <a href="mailto:support@skyworld.buzz" className="underline font-medium">
                   support@skyworld.buzz
@@ -91,7 +91,7 @@ export default function ContactModal() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Full Name *
                 </label>
                 <input
@@ -100,14 +100,14 @@ export default function ContactModal() {
                   value={form.name}
                   onChange={handleChange}
                   placeholder="John Doe"
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400"
                   required
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email *
                 </label>
                 <input
@@ -116,14 +116,14 @@ export default function ContactModal() {
                   value={form.email}
                   onChange={handleChange}
                   placeholder="john@example.com"
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400"
                   required
                 />
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Phone (Optional)
                 </label>
                 <input
@@ -132,13 +132,13 @@ export default function ContactModal() {
                   value={form.phone}
                   onChange={handleChange}
                   placeholder="+1 (555) 000-0000"
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400"
                 />
               </div>
 
               {/* Subject */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Subject *
                 </label>
                 <input
@@ -147,14 +147,14 @@ export default function ContactModal() {
                   value={form.subject}
                   onChange={handleChange}
                   placeholder="How can we help?"
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400"
                   required
                 />
               </div>
 
               {/* Message */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Message *
                 </label>
                 <textarea
@@ -163,7 +163,7 @@ export default function ContactModal() {
                   onChange={handleChange}
                   placeholder="Tell us more..."
                   rows="5"
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 resize-none"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 resize-none"
                   required
                 />
               </div>
@@ -173,7 +173,7 @@ export default function ContactModal() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-4 py-2 border border-gray-200 dark:border-surface-600 rounded-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-surface-700"
+                  className="flex-1 px-4 py-2 border border-gray-200 rounded-lg font-medium text-gray-700 hover:bg-gray-50:bg-surface-700"
                 >
                   Cancel
                 </button>

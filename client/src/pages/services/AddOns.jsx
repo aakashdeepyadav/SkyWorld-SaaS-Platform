@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+﻿import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
 import { useCatalog } from '../../context/CatalogContext';
@@ -26,28 +26,28 @@ const AddOns = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface-50 dark:bg-surface-900">
+    <div className="min-h-screen bg-surface-50">
       {/* ── Hero ── */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.06] to-orange-500/[0.06] dark:from-amber-500/[0.12] dark:to-orange-500/[0.12]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.06] to-orange-500/[0.06]" />
 
         <div className="relative max-w-5xl mx-auto px-6 pt-10 pb-16">
           <Link
             to="/"
-            className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-8"
+            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700:text-gray-200 transition-colors mb-8"
           >
             <ArrowLeftIcon className="w-4 h-4 mr-1.5" /> Back to Home
           </Link>
 
           <div className="flex items-start gap-5">
-            <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center flex-shrink-0">
               <SparklesIcon className="w-7 h-7 text-amber-500" />
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
                 Add-On Services
               </h1>
-              <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-2xl text-lg leading-relaxed">
+              <p className="text-gray-500 mt-2 max-w-2xl text-lg leading-relaxed">
                 Extras you can add to any plan or combo.
               </p>
             </div>
@@ -62,18 +62,18 @@ const AddOns = () => {
             {ADD_ONS.map((addon) => (
               <div
                 key={addon.label}
-                className="card dark:bg-surface-800 dark:border-surface-700 flex flex-col group hover:shadow-md transition-shadow"
+                className="card flex flex-col group hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10 flex items-center justify-center flex-shrink-0">
-                    <PlusIcon className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center flex-shrink-0">
+                    <PlusIcon className="w-5 h-5 text-amber-600" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-base font-semibold text-gray-900">
                       {addon.label}
                     </h3>
                     {addon.description && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                      <p className="text-xs text-gray-500 mt-1 leading-relaxed">
                         {addon.description}
                       </p>
                     )}
@@ -81,11 +81,11 @@ const AddOns = () => {
                 </div>
 
                 <div className="flex items-baseline gap-1 mb-1 mt-auto">
-                  <span className="text-2xl font-extrabold text-gray-900 dark:text-white">
+                  <span className="text-2xl font-extrabold text-gray-900">
                     {formatINR(addon.price)}
                   </span>
                   {addon.unit && (
-                    <span className="text-sm text-gray-400 dark:text-gray-500 font-medium">
+                    <span className="text-sm text-gray-400 font-medium">
                       {addon.unit}
                     </span>
                   )}
@@ -93,7 +93,7 @@ const AddOns = () => {
 
                 <button
                   onClick={() => handleAddOn(addon.label)}
-                  className="w-full mt-4 py-2.5 px-4 rounded-xl text-sm font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors active:scale-[0.98]"
+                  className="w-full mt-4 py-2.5 px-4 rounded-xl text-sm font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100:bg-amber-500/20 transition-colors active:scale-[0.98]"
                 >
                   Add to Request
                 </button>
