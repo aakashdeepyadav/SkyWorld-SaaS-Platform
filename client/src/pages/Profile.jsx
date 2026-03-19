@@ -148,7 +148,17 @@ const Profile = () => {
   return (
     <div className="mx-auto max-w-5xl space-y-6 animate-fade-in">
       <section className="overflow-hidden rounded-3xl border border-gray-200/80 bg-white shadow-card dark:border-surface-700 dark:bg-surface-800/80">
-        <div className="h-28 bg-gradient-to-r from-surface-900 via-surface-800 to-primary-700" />
+        <div className="relative h-32">
+          {/* Hero banner background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-surface-900 via-surface-800 to-primary-700" />
+          {/* Brand overlay gradient for extra depth */}
+          <div className="absolute inset-0 opacity-25 bg-hero-pattern" />
+          {/* Soft glows */}
+          <div className="absolute -top-10 left-8 h-44 w-44 rounded-full bg-primary-400/25 blur-3xl" />
+          <div className="absolute -bottom-14 right-10 h-56 w-56 rounded-full bg-accent-400/20 blur-3xl" />
+          {/* Fade into card body so the content feels anchored */}
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-white dark:to-surface-800" />
+        </div>
         <div className="px-5 pb-7 sm:px-8">
           <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-end gap-4">
@@ -186,18 +196,20 @@ const Profile = () => {
                 </button>
               </div>
               <div className="pb-0.5">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {user?.name || 'Profile'}
-                </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {user?.userCode && (
-                    <span className="font-medium text-gray-600 dark:text-gray-300 mr-2">
-                      {user.userCode}
-                    </span>
-                  )}
-                  {user?.email}
-                </p>
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{roleMeta.subtitle}</p>
+                <div className="rounded-2xl border border-white/70 bg-white/75 px-4 py-3 backdrop-blur shadow-card dark:border-surface-700/50 dark:bg-surface-800/55">
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {user?.name || 'Profile'}
+                  </h1>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    {user?.userCode && (
+                      <span className="font-medium text-gray-600 dark:text-gray-300 mr-2">
+                        {user.userCode}
+                      </span>
+                    )}
+                    {user?.email}
+                  </p>
+                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{roleMeta.subtitle}</p>
+                </div>
               </div>
             </div>
 
