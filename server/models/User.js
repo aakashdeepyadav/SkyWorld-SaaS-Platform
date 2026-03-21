@@ -4,17 +4,66 @@ import crypto from 'crypto';
 import Counter from './Counter.js';
 import { ROLES } from '../utils/constants.js';
 
-const USER_CODE_PREFIX = {
-  [ROLES.ADMIN]: 'ADM',
-  [ROLES.DEVELOPER]: 'DEV',
-  [ROLES.CLIENT]: 'CLT',
+const USER_CODE_DIGITS = 7;
+
+export const USER_CODE_CONFIG = {
+  [ROLES.ADMIN]: {
+    prefix: 'A',
+    counterKey: 'user_ADM',
+  },
+  [ROLES.DEVELOPER]: {
+    prefix: 'D',
+    counterKey: 'user_DEV',
+  },
+  [ROLES.CLIENT]: {
+    prefix: 'C',
+    counterKey: 'user_CLT',
+  },
+};
+
+const DEFAULT_USER_CODE_CONFIG = {
+  prefix: 'U',
+  counterKey: 'user_USR',
+};
+
+const USER_CODE_PREFIX_MAP = {
+  ADM: 'A',
+  DEV: 'D',
+  CLT: 'C',
+  A: 'A',
+  D: 'D',
+  C: 'C',
+};
+
+export const formatUserCode = (prefix, sequence) =>
+  `${prefix}${String(sequence).padStart(USER_CODE_DIGITS, '0')}`;
+
+export const normalizeUserCode = (userCode) => {
+  if (!userCode) return userCode;
+
+  const normalizedValue = String(userCode).trim().toUpperCase();
+  const match = normalizedValue.match(/^(ADM|DEV|CLT|A|D|C)-?0*(\d+)$/);
+
+  if (!match) {
+    return normalizedValue;
+  }
+
+  const prefix = USER_CODE_PREFIX_MAP[match[1]];
+  const sequence = Number.parseInt(match[2], 10);
+
+  if (!prefix || Number.isNaN(sequence)) {
+    return normalizedValue;
+  }
+
+  return formatUserCode(prefix, sequence);
 };
 
 const userSchema = new mongoose.Schema({
   userCode: {
     type: String,
     unique: true,
-    sparse: true
+    sparse: true,
+    get: normalizeUserCode,
   },
   email: {
     type: String,
@@ -171,14 +220,15 @@ const userSchema = new mongoose.Schema({
     }
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: { getters: true },
+  toObject: { getters: true }
 });
 
 // Indexes
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ createdAt: -1 });
-userSchema.index({ userCode: 1 });
 
 // Normalize Gmail dots before password hashing
 userSchema.pre('save', function (next) {
@@ -212,9 +262,9 @@ userSchema.pre('save', async function (next) {
 // Auto-generate userCode on creation or role change
 userSchema.pre('save', async function (next) {
   if (this.isNew || this.isModified('role')) {
-    const prefix = USER_CODE_PREFIX[this.role] || 'USR';
-    const seq = await Counter.getNextSequence(`user_${prefix}`);
-    this.userCode = `${prefix}-${String(seq).padStart(3, '0')}`;
+    const { prefix, counterKey } = USER_CODE_CONFIG[this.role] || DEFAULT_USER_CODE_CONFIG;
+    const seq = await Counter.getNextSequence(counterKey);
+    this.userCode = formatUserCode(prefix, seq);
   }
   next();
 });
