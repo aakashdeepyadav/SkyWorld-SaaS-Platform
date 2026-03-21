@@ -5,16 +5,16 @@ import IntegrationCredential from '../models/IntegrationCredential.js';
 import { authenticate } from '../middleware/auth.js';
 import { adminOnly } from '../middleware/rbac.js';
 import { apiRateLimiter } from '../middleware/rateLimiter.js';
+import {
+  GOOGLE_INTEGRATION_SCOPES,
+  upsertGoogleCredential,
+} from '../services/googleIntegrationService.js';
 import { logger } from '../utils/logger.js';
+import { invalidateMeetCapabilityCache } from '../services/meetingService.js';
 
 const router = Router();
 
-const SCOPES = [
-  'openid',
-  'https://www.googleapis.com/auth/userinfo.email',
-  'https://www.googleapis.com/auth/calendar',
-  'https://www.googleapis.com/auth/spreadsheets',
-];
+const SCOPES = GOOGLE_INTEGRATION_SCOPES;
 
 /**
  * Build an OAuth2 client from env vars.
@@ -41,6 +41,8 @@ router.get('/google/status', apiRateLimiter, async (req, res, next) => {
     }
     return res.json({
       connected: true,
+      email: cred.email,
+      calendarId: cred.calendarId,
       connectedAt: cred.connectedAt,
     });
   } catch (error) {
@@ -54,8 +56,10 @@ router.get('/google/status', apiRateLimiter, async (req, res, next) => {
 const oauthStateTokens = new Map();
 setInterval(() => {
   const now = Date.now();
-  for (const [key, ts] of oauthStateTokens) {
-    if (now - ts > 10 * 60 * 1000) oauthStateTokens.delete(key);
+  for (const [key, state] of oauthStateTokens) {
+    if (!state?.createdAt || now - state.createdAt > 10 * 60 * 1000) {
+      oauthStateTokens.delete(key);
+    }
   }
 }, 60_000);
 
@@ -63,7 +67,10 @@ router.get('/google/url', authenticate, adminOnly, apiRateLimiter, async (req, r
   try {
     const oauth2Client = getOAuth2Client();
     const stateNonce = crypto.randomBytes(16).toString('hex');
-    oauthStateTokens.set(stateNonce, Date.now());
+    oauthStateTokens.set(stateNonce, {
+      createdAt: Date.now(),
+      adminUserId: String(req.user._id),
+    });
 
     const url = oauth2Client.generateAuthUrl({
       access_type: 'offline',
@@ -101,7 +108,12 @@ router.get('/google/callback', async (req, res) => {
       logger.warn('OAuth callback with invalid or missing state parameter');
       return res.redirect(`${frontendUrl}/admin/settings?oauth=error&reason=invalid_state`);
     }
+    const stateRecord = oauthStateTokens.get(state);
     oauthStateTokens.delete(state);
+    if (!stateRecord?.adminUserId) {
+      logger.warn('OAuth callback state did not include admin identity');
+      return res.redirect(`${frontendUrl}/admin/settings?oauth=error&reason=invalid_state`);
+    }
 
     const oauth2Client = getOAuth2Client();
 
@@ -153,40 +165,19 @@ router.get('/google/callback', async (req, res) => {
       }
     }
 
-    // Upsert the credential (singleton per provider)
-    let cred = await IntegrationCredential.getGoogle();
-    if (cred) {
-      cred.setRefreshToken(tokens.refresh_token);
-      if (tokens.access_token) {
-        cred.setAccessToken(
-          tokens.access_token,
-          tokens.expiry_date ? new Date(tokens.expiry_date) : null
-        );
-      }
-      cred.email = email;
-      cred.calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
-      cred.scopes = SCOPES;
-      cred.connectedAt = new Date();
-      await cred.save();
-    } else {
-      cred = new IntegrationCredential({
-        provider: 'google',
-        calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
-        email,
-        scopes: SCOPES,
-        connectedAt: new Date(),
-      });
-      cred.setRefreshToken(tokens.refresh_token);
-      if (tokens.access_token) {
-        cred.setAccessToken(
-          tokens.access_token,
-          tokens.expiry_date ? new Date(tokens.expiry_date) : null
-        );
-      }
-      await cred.save();
-    }
+    await upsertGoogleCredential({
+      tokens,
+      ownerUserId: stateRecord.adminUserId,
+      email,
+      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
+      connectedAt: new Date(),
+    });
 
-    logger.info(`Google OAuth connected successfully for ${email} by admin ${state}`);
+    invalidateMeetCapabilityCache();
+
+    logger.info(
+      `Google OAuth connected successfully for ${email} by admin ${stateRecord.adminUserId}`
+    );
 
     // Redirect back to admin settings with success
     return res.redirect(`${frontendUrl}/admin/settings?oauth=success`);
@@ -216,6 +207,7 @@ router.delete('/google/disconnect', authenticate, adminOnly, apiRateLimiter, asy
     }
 
     await IntegrationCredential.deleteOne({ _id: cred._id });
+    invalidateMeetCapabilityCache();
     logger.info(`Google OAuth disconnected by admin ${req.user._id}`);
 
     return res.json({ success: true, message: 'Google integration disconnected.' });
