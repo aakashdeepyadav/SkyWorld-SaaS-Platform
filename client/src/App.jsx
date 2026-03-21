@@ -219,6 +219,14 @@ function App() {
             }
           />
           <Route
+            path="/contact"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <Contact />
+              </Suspense>
+            }
+          />
+          <Route
             path="/onboarding/client"
             element={
               <Suspense fallback={<PageLoader />}>
@@ -459,7 +467,6 @@ function App() {
 
             {/* Support Pages — rendered within Layout with sidebar visible */}
             <Route path="/book-meeting" element={<BookMeeting />} />
-            <Route path="/contact" element={<Contact />} />
 
             {/* Legacy routes redirect to new paths */}
             <Route path="/custom-request" element={<Navigate to="/request" replace />} />
