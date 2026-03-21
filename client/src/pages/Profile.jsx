@@ -148,20 +148,62 @@ const Profile = () => {
   return (
     <div className="mx-auto max-w-5xl space-y-6 animate-fade-in">
       <section className="overflow-hidden rounded-3xl border border-gray-200/80 bg-white shadow-card dark:border-surface-700 dark:bg-surface-800/80">
-        <div className="relative h-32">
-          {/* Hero banner background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-surface-900 via-surface-800 to-primary-700" />
-          {/* Brand overlay gradient for extra depth */}
-          <div className="absolute inset-0 opacity-25 bg-hero-pattern" />
-          {/* Soft glows */}
-          <div className="absolute -top-10 left-8 h-44 w-44 rounded-full bg-primary-400/25 blur-3xl" />
-          <div className="absolute -bottom-14 right-10 h-56 w-56 rounded-full bg-accent-400/20 blur-3xl" />
-          {/* Fade into card body so the content feels anchored */}
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-white dark:to-surface-800" />
+        <div className="relative overflow-hidden border-b border-slate-900/10 bg-slate-950 px-5 py-6 sm:px-8 dark:border-white/10">
+          <div className="absolute right-6 top-6 hidden h-20 w-20 rounded-3xl border border-white/10 bg-white/5 lg:block" />
+          <div className="absolute right-24 top-16 hidden h-12 w-12 rounded-2xl bg-primary-500/15 lg:block" />
+          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">
+                Profile
+              </p>
+              <h1 className="mt-3 text-2xl font-semibold text-white sm:text-3xl">
+                {user?.name || 'Profile'}
+              </h1>
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-slate-300">
+                {user?.userCode && (
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-medium text-white">
+                    {user.userCode}
+                  </span>
+                )}
+                {user?.email && (
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                    <EnvelopeIcon className="h-4 w-4 text-slate-400" />
+                    {user.email}
+                  </span>
+                )}
+              </div>
+              <p className="mt-4 max-w-xl text-sm leading-6 text-slate-300">{roleMeta.subtitle}</p>
+            </div>
+
+            <div className="flex flex-wrap gap-2 lg:justify-end">
+              <button
+                type="button"
+                onClick={handleEditToggle}
+                className={
+                  editing
+                    ? 'btn-secondary !py-2.5 !px-4 !border-white/15 !bg-white/5 !text-white hover:!bg-white/10'
+                    : 'btn-primary !py-2.5 !px-4'
+                }
+              >
+                {editing ? 'Cancel' : 'Edit Profile'}
+              </button>
+              {editing && (
+                <button
+                  type="submit"
+                  form="profile-form"
+                  disabled={loading || !hasChanges}
+                  className="btn-primary !py-2.5 !px-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Saving...' : 'Save Changes'}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="px-5 pb-7 sm:px-8">
-          <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div className="flex items-end gap-4">
+
+        <div className="px-5 py-6 sm:px-8 sm:py-8">
+          <div className="grid gap-6 lg:grid-cols-[auto,minmax(0,1fr)]">
+            <div className="flex flex-col items-start gap-3">
               <div className="relative">
                 <input
                   ref={fileInputRef}
@@ -170,22 +212,24 @@ const Profile = () => {
                   onChange={handleAvatarChange}
                   className="hidden"
                 />
-                {user?.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt={user?.name || 'Profile avatar'}
-                    className="h-24 w-24 rounded-2xl object-cover border-4 border-white dark:border-surface-800 shadow-card"
-                  />
-                ) : (
-                  <div className="h-24 w-24 rounded-2xl border-4 border-white dark:border-surface-800 bg-gradient-to-br from-primary-600 to-primary-400 text-white shadow-card flex items-center justify-center text-3xl font-semibold">
-                    {user?.name?.charAt(0).toUpperCase() || '?'}
-                  </div>
-                )}
+                <div className="rounded-[32px] border border-gray-200 bg-slate-50 p-1 shadow-card dark:border-surface-700 dark:bg-surface-900">
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user?.name || 'Profile avatar'}
+                      className="h-28 w-28 rounded-[28px] object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-28 w-28 items-center justify-center rounded-[28px] bg-slate-900 text-3xl font-semibold text-white dark:bg-surface-700">
+                      {user?.name?.charAt(0).toUpperCase() || '?'}
+                    </div>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={avatarLoading}
-                  className="absolute -right-2 -bottom-2 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-70 dark:border-surface-600 dark:bg-surface-800 dark:text-gray-300 dark:hover:bg-surface-700"
+                  className="absolute bottom-0 right-0 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-70 dark:border-surface-600 dark:bg-surface-800 dark:text-gray-300 dark:hover:bg-surface-700"
                   title="Upload profile photo"
                 >
                   {avatarLoading ? (
@@ -195,55 +239,93 @@ const Profile = () => {
                   )}
                 </button>
               </div>
-              <div className="pb-0.5">
-                <div className="rounded-2xl border border-white/70 bg-white/75 px-4 py-3 backdrop-blur shadow-card dark:border-surface-700/50 dark:bg-surface-800/55">
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {user?.name || 'Profile'}
-                  </h1>
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {user?.userCode && (
-                      <span className="font-medium text-gray-600 dark:text-gray-300 mr-2">
-                        {user.userCode}
-                      </span>
-                    )}
-                    {user?.email}
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Upload PNG, JPG, GIF, or WebP up to 5MB.
+              </p>
+            </div>
+
+            <div className="space-y-5">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-surface-700 dark:bg-surface-900/50">
+                  <UserCircleIcon className="h-5 w-5 text-gray-900 dark:text-white" />
+                  <p className="mt-4 text-[11px] font-medium uppercase tracking-[0.24em] text-gray-500 dark:text-gray-400">
+                    Role
                   </p>
-                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{roleMeta.subtitle}</p>
+                  <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
+                    {roleMeta.label}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-surface-700 dark:bg-surface-900/50">
+                  <CheckBadgeIcon
+                    className={`h-5 w-5 ${
+                      user?.isActive !== false ? 'text-emerald-500' : 'text-red-500'
+                    }`}
+                  />
+                  <p className="mt-4 text-[11px] font-medium uppercase tracking-[0.24em] text-gray-500 dark:text-gray-400">
+                    Account
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
+                    {user?.isActive !== false ? 'Active' : 'Inactive'}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-surface-700 dark:bg-surface-900/50">
+                  <ShieldCheckIcon className="h-5 w-5 text-primary-500" />
+                  <p className="mt-4 text-[11px] font-medium uppercase tracking-[0.24em] text-gray-500 dark:text-gray-400">
+                    Login Method
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
+                    {user?.authMethod === 'google' ? 'Google Sign-In' : 'Email Sign-In'}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-surface-700 dark:bg-surface-900/50">
+                  <CalendarIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                  <p className="mt-4 text-[11px] font-medium uppercase tracking-[0.24em] text-gray-500 dark:text-gray-400">
+                    Member Since
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
+                    {memberSince}
+                  </p>
                 </div>
               </div>
-            </div>
 
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={handleEditToggle}
-                className={editing ? 'btn-secondary !py-2 !px-4' : 'btn-primary !py-2 !px-4'}
-              >
-                {editing ? 'Cancel' : 'Edit Profile'}
-              </button>
-              {editing && (
-                <button
-                  type="submit"
-                  form="profile-form"
-                  disabled={loading || !hasChanges}
-                  className="btn-primary !py-2 !px-4 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? 'Saving...' : 'Save Changes'}
-                </button>
+              {user?.company || user?.phone ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {user?.company && (
+                    <div className="flex items-center gap-3 rounded-2xl border border-gray-200 px-4 py-3 dark:border-surface-700">
+                      <BuildingOfficeIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
+                          Company
+                        </p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {user.company}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {user?.phone && (
+                    <div className="flex items-center gap-3 rounded-2xl border border-gray-200 px-4 py-3 dark:border-surface-700">
+                      <PhoneIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
+                          Phone
+                        </p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {user.phone}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-gray-300 px-4 py-4 text-sm text-gray-500 dark:border-surface-600 dark:text-gray-400">
+                  Add your company and phone number to make delivery coordination easier.
+                </div>
               )}
             </div>
-          </div>
-
-          <div className="mt-5 flex flex-wrap items-center gap-2">
-            <span className={`${roleMeta.badgeClass} !text-[11px]`}>{roleMeta.label}</span>
-            <span
-              className={`${user?.isActive !== false ? 'badge-success' : 'badge-danger'} !text-[11px]`}
-            >
-              {user?.isActive !== false ? 'Active Account' : 'Inactive Account'}
-            </span>
-            <span className="badge !text-[11px] bg-gray-100 text-gray-700 ring-1 ring-gray-200 dark:bg-surface-700/70 dark:text-gray-300 dark:ring-surface-600">
-              {user?.authMethod === 'google' ? 'Google Sign-In' : 'Email Sign-In'}
-            </span>
           </div>
         </div>
       </section>
