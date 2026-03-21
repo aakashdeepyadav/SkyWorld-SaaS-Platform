@@ -3,6 +3,12 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { formatINR } from '../utils/currency';
 import { useCatalog } from '../context/CatalogContext';
+import {
+  Seo,
+  absoluteUrl,
+  buildOrganizationSchema,
+  buildWebsiteSchema,
+} from '../components/seo/Seo';
 
 /* ─── Scroll-triggered entrance ─── */
 const FadeIn = ({ children, className = '', delay = 0, as: Tag = 'div' }) => {
@@ -169,9 +175,37 @@ const Home = () => {
   }, []);
 
   const activeCatalog = PLAN_CATALOG[activeTab];
+  const homeStructuredData = [
+    buildOrganizationSchema(),
+    buildWebsiteSchema(),
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'SkyWorld service categories',
+      itemListElement: CATEGORY_ORDER.map((slug, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: PLAN_CATALOG[slug]?.name || slug,
+        url: absoluteUrl(`/services/${slug}`),
+      })),
+    },
+  ];
 
   return (
     <div className="hp">
+      <Seo
+        title="SkyWorld Ventures | Web Development, Branding & App Services"
+        description="SkyWorld Ventures helps growing businesses launch websites, branding systems, combo packages, app experiences, and monthly maintenance with transparent pricing."
+        canonicalPath="/"
+        keywords={[
+          'website design for businesses',
+          'branding and design services',
+          'app development agency',
+          'combo website packages',
+          'website maintenance plans',
+        ]}
+        structuredData={homeStructuredData}
+      />
       {/* ═══ NAV ═══ */}
       <nav className={`hp-nav ${scrolled ? 'hp-nav--s' : ''}`}>
         <div className="hp-nav__in">

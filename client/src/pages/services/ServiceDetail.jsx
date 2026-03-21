@@ -6,6 +6,12 @@ import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
 import { useCatalog } from '../../context/CatalogContext';
 import {
+  Seo,
+  buildAggregateOffer,
+  buildBreadcrumbSchema,
+  buildServiceSchema,
+} from '../../components/seo/Seo';
+import {
   CheckIcon,
   XMarkIcon,
   ArrowLeftIcon,
@@ -83,6 +89,26 @@ const ServiceDetail = () => {
 
   const serviceName = dbService?.name || catalog.name;
   const serviceSubtitle = dbService?.description || catalog.tagline;
+  const servicePath = `/services/${slug}`;
+  const planPrices = catalog.plans.map((plan) => plan.price);
+  const serviceStructuredData = [
+    buildBreadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: serviceName, path: servicePath },
+    ]),
+    buildServiceSchema({
+      name: serviceName,
+      description: serviceSubtitle,
+      path: servicePath,
+      serviceType: serviceName,
+      offers: buildAggregateOffer({
+        path: servicePath,
+        lowPrice: Math.min(...planPrices),
+        highPrice: Math.max(...planPrices),
+        offerCount: catalog.plans.length,
+      }),
+    }),
+  ];
 
   /* ─── Checkout handler ─── */
   const handlePlanCheckout = (planSlug) => {
@@ -107,6 +133,18 @@ const ServiceDetail = () => {
 
   return (
     <div className="min-h-screen bg-surface-50">
+      <Seo
+        title={`${serviceName} Services & Pricing | SkyWorld Ventures`}
+        description={`${serviceSubtitle} Compare ${catalog.plans.length} ${catalog.name.toLowerCase()} plans from ${formatINR(Math.min(...planPrices))} to ${formatINR(Math.max(...planPrices))}.`}
+        path={servicePath}
+        keywords={[
+          serviceName,
+          `${catalog.name} packages`,
+          `${catalog.name} pricing`,
+          `${catalog.name} services`,
+        ]}
+        structuredData={serviceStructuredData}
+      />
       {/* ── Hero ── */}
       <div className="relative overflow-hidden">
         <div className={`absolute inset-0 bg-gradient-to-br ${catalog.gradient} opacity-[0.06]`} />

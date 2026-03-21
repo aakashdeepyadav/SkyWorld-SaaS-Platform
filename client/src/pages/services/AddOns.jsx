@@ -3,6 +3,11 @@ import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
 import { useCatalog } from '../../context/CatalogContext';
 import {
+  Seo,
+  absoluteUrl,
+  buildBreadcrumbSchema,
+} from '../../components/seo/Seo';
+import {
   ArrowLeftIcon,
   SparklesIcon,
   PlusIcon,
@@ -15,6 +20,23 @@ const AddOns = () => {
   const { ADD_ONS } = useCatalog();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const addOnStructuredData = [
+    buildBreadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Add-On Services', path: '/addons' },
+    ]),
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'SkyWorld add-on services',
+      itemListElement: ADD_ONS.map((addon, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: addon.label,
+        url: absoluteUrl('/addons'),
+      })),
+    },
+  ];
 
   const handleAddOn = (label) => {
     const target = `/checkout/addons?selected=${encodeURIComponent(label)}`;
@@ -27,6 +49,18 @@ const AddOns = () => {
 
   return (
     <div className="min-h-screen bg-surface-50">
+      <Seo
+        title="Add-On Services | SkyWorld Ventures"
+        description="Explore add-on services from SkyWorld Ventures including Google Business Profile setup, local SEO, chatbot integration, extra pages, and support upgrades."
+        path="/addons"
+        keywords={[
+          'add-on services',
+          'local SEO add-on',
+          'Google Business Profile setup',
+          'chatbot integration',
+        ]}
+        structuredData={addOnStructuredData}
+      />
       {/* ── Hero ── */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.06] to-orange-500/[0.06]" />

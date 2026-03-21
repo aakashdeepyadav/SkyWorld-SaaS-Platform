@@ -6,6 +6,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import RoleRoute from './components/common/RoleRoute';
 import Layout from './components/layout/Layout';
 import ScrollToTop from './components/common/ScrollToTop';
+import { RouteSeoDefaults } from './components/seo/Seo';
 
 /* ── Suspense fallback ── */
 const PageLoader = () => (
@@ -116,6 +117,7 @@ function App() {
     <ModalProvider>
       <>
         <ScrollToTop />
+        <RouteSeoDefaults />
         <Routes>
           {/* Root */}
           <Route

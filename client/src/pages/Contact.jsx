@@ -1,29 +1,56 @@
-﻿import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+  Seo,
+  buildBreadcrumbSchema,
+  buildOrganizationSchema,
+} from '../components/seo/Seo';
 
 const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
 
 const Contact = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
-  const [status, setStatus] = useState('idle'); // idle | sending | success | error
+  const [status, setStatus] = useState('idle');
   const [countdown, setCountdown] = useState(5);
+  const contactStructuredData = [
+    buildOrganizationSchema(),
+    buildBreadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Contact', path: '/contact' },
+    ]),
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ContactPage',
+      name: 'Contact SkyWorld Ventures',
+      url: 'https://skyworld.buzz/contact',
+      description:
+        'Contact SkyWorld Ventures for website development, branding, app development, combo packages, or support.',
+      mainEntity: {
+        '@type': 'Organization',
+        name: 'SkyWorld Ventures',
+        email: 'support@skyworld.buzz',
+      },
+    },
+  ];
 
-  // Auto-redirect to home after success
   useEffect(() => {
     if (status !== 'success') return;
     if (countdown <= 0) {
       navigate('/');
       return;
     }
-    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+
+    const timer = setTimeout(() => setCountdown((current) => current - 1), 1000);
     return () => clearTimeout(timer);
-  }, [status, countdown, navigate]);
+  }, [countdown, navigate, status]);
 
-  const handleChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+  const handleChange = (event) => {
+    setForm((previous) => ({ ...previous, [event.target.name]: event.target.value }));
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setStatus('sending');
 
     try {
@@ -42,6 +69,19 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-surface-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Seo
+        title="Contact SkyWorld Ventures"
+        description="Contact SkyWorld Ventures for website development, branding, app development, maintenance plans, combo packages, or project support."
+        path="/contact"
+        keywords={[
+          'contact SkyWorld Ventures',
+          'website project inquiry',
+          'branding consultation',
+          'app development inquiry',
+        ]}
+        structuredData={contactStructuredData}
+      />
+
       <div className="max-w-2xl mx-auto card sm:p-12 animate-fade-in">
         <Link
           to="/"
@@ -52,14 +92,14 @@ const Contact = () => {
 
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Contact Us</h1>
         <p className="text-sm text-gray-500 mb-8">
-          Have a question or project in mind? Fill in the details below and we'll get back to you
-          shortly.
+          Have a question or project in mind? Fill in the details below and we&apos;ll get back to
+          you shortly.
         </p>
 
         {status === 'success' && (
           <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-5 text-center">
             <svg
-              className="mx-auto mb-3 w-10 h-10 text-green-500"
+              className="mx-auto mb-3 h-10 w-10 text-green-500"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -71,15 +111,11 @@ const Contact = () => {
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <p className="text-base font-semibold text-green-700 mb-1">
-              Message sent successfully!
-            </p>
+            <p className="text-base font-semibold text-green-700 mb-1">Message sent successfully.</p>
             <p className="text-sm text-green-600">
-              Thank you for reaching out. We'll get back to you soon.
+              Thank you for reaching out. We&apos;ll get back to you soon.
             </p>
-            <p className="text-xs text-green-500/70 mt-3">
-              Redirecting to homepage in {countdown}s…
-            </p>
+            <p className="text-xs text-green-500/70 mt-3">Redirecting to homepage in {countdown}s.</p>
           </div>
         )}
 
@@ -94,12 +130,8 @@ const Contact = () => {
 
         {status !== 'success' && (
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Name */}
             <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-1.5"
-              >
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Full Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -114,12 +146,8 @@ const Contact = () => {
               />
             </div>
 
-            {/* Email */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1.5"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Email Address <span className="text-red-400">*</span>
               </label>
               <input
@@ -134,12 +162,8 @@ const Contact = () => {
               />
             </div>
 
-            {/* Phone */}
             <div>
-              <label
-                htmlFor="phone"
-                className="block text-sm font-medium text-gray-700 mb-1.5"
-              >
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Phone Number
               </label>
               <input
@@ -153,12 +177,8 @@ const Contact = () => {
               />
             </div>
 
-            {/* Subject */}
             <div>
-              <label
-                htmlFor="subject"
-                className="block text-sm font-medium text-gray-700 mb-1.5"
-              >
+              <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Subject <span className="text-red-400">*</span>
               </label>
               <input
@@ -173,12 +193,8 @@ const Contact = () => {
               />
             </div>
 
-            {/* Message */}
             <div>
-              <label
-                htmlFor="message"
-                className="block text-sm font-medium text-gray-700 mb-1.5"
-              >
+              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Message <span className="text-red-400">*</span>
               </label>
               <textarea
@@ -188,7 +204,7 @@ const Contact = () => {
                 required
                 value={form.message}
                 onChange={handleChange}
-                placeholder="Tell us about your project or question…"
+                placeholder="Tell us about your project or question..."
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition resize-none"
               />
             </div>
@@ -198,7 +214,7 @@ const Contact = () => {
               disabled={status === 'sending'}
               className="w-full sm:w-auto px-8 py-2.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {status === 'sending' ? 'Sending…' : 'Send Message'}
+              {status === 'sending' ? 'Sending...' : 'Send Message'}
             </button>
           </form>
         )}
@@ -206,10 +222,7 @@ const Contact = () => {
         {status !== 'success' && (
           <div className="mt-10 text-sm text-gray-500">
             Or email us directly at{' '}
-            <a
-              href="mailto:support@skyworld.buzz"
-              className="text-primary-500 hover:underline"
-            >
+            <a href="mailto:support@skyworld.buzz" className="text-primary-500 hover:underline">
               support@skyworld.buzz
             </a>
           </div>

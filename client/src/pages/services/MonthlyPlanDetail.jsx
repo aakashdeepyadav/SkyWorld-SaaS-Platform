@@ -3,6 +3,12 @@ import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
 import { useCatalog } from '../../context/CatalogContext';
 import {
+  Seo,
+  buildBreadcrumbSchema,
+  buildOffer,
+  buildServiceSchema,
+} from '../../components/seo/Seo';
+import {
   ArrowLeftIcon,
   CheckIcon,
   XMarkIcon,
@@ -47,6 +53,24 @@ const MonthlyPlanDetail = () => {
   };
 
   const otherPlans = MONTHLY_PLANS.filter((p) => p.slug !== plan.slug);
+  const planPath = `/plans/monthly/${plan.slug}`;
+  const monthlyPlanStructuredData = [
+    buildBreadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Monthly Maintenance Plans', path: '/plans/monthly' },
+      { name: plan.name, path: planPath },
+    ]),
+    buildServiceSchema({
+      name: plan.name,
+      description: plan.tagline,
+      path: planPath,
+      serviceType: 'Monthly maintenance plan',
+      offers: buildOffer({
+        path: planPath,
+        price: plan.price,
+      }),
+    }),
+  ];
 
   const statCards = [
     {
@@ -68,6 +92,18 @@ const MonthlyPlanDetail = () => {
 
   return (
     <div className="min-h-screen bg-surface-50">
+      <Seo
+        title={`${plan.name} Monthly Plan | SkyWorld Ventures`}
+        description={`${plan.tagline} Review pricing, response time, updates included, and features in the ${plan.name} monthly maintenance plan.`}
+        path={planPath}
+        keywords={[
+          plan.name,
+          'monthly maintenance plan',
+          'website support plan',
+          'website maintenance pricing',
+        ]}
+        structuredData={monthlyPlanStructuredData}
+      />
       {/* Hero */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-sky-500/[0.05] to-indigo-500/[0.05]" />

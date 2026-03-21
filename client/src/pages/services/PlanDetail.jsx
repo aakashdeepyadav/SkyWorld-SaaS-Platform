@@ -6,6 +6,12 @@ import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
 import { useCatalog } from '../../context/CatalogContext';
 import {
+  Seo,
+  buildBreadcrumbSchema,
+  buildOffer,
+  buildServiceSchema,
+} from '../../components/seo/Seo';
+import {
   CheckIcon,
   XMarkIcon,
   ArrowLeftIcon,
@@ -71,6 +77,24 @@ const PlanDetail = () => {
 
   const advanceAmount = Math.ceil(plan.price / 2);
   const otherPlans = catalog.plans.filter((p) => p.slug !== planSlug);
+  const planPath = `/services/${slug}/${plan.slug}`;
+  const planStructuredData = [
+    buildBreadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: catalog.name, path: `/services/${slug}` },
+      { name: plan.name, path: planPath },
+    ]),
+    buildServiceSchema({
+      name: `${plan.name} - ${catalog.name}`,
+      description: `${plan.bestFor}. Delivery in ${plan.delivery}.`,
+      path: planPath,
+      serviceType: catalog.name,
+      offers: buildOffer({
+        path: planPath,
+        price: plan.price,
+      }),
+    }),
+  ];
 
   const handleCheckout = () => {
     const params = new URLSearchParams({ service: slug, plan: planSlug });
@@ -85,6 +109,18 @@ const PlanDetail = () => {
 
   return (
     <div className="min-h-screen bg-surface-50">
+      <Seo
+        title={`${plan.name} | ${catalog.name} Pricing | SkyWorld Ventures`}
+        description={`${plan.name} is built for ${plan.bestFor.toLowerCase()}. View pricing, delivery timeline, included features, and payment breakdown from SkyWorld Ventures.`}
+        path={planPath}
+        keywords={[
+          plan.name,
+          `${catalog.name} pricing`,
+          `${plan.name} package`,
+          `${catalog.name} plan`,
+        ]}
+        structuredData={planStructuredData}
+      />
       {/* Hero */}
       <div className="relative overflow-hidden">
         <div className={`absolute inset-0 bg-gradient-to-br ${catalog.gradient} opacity-[0.06]`} />

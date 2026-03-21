@@ -4,6 +4,12 @@ import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
 import { useCatalog } from '../../context/CatalogContext';
 import {
+  Seo,
+  buildBreadcrumbSchema,
+  buildOffer,
+  buildServiceSchema,
+} from '../../components/seo/Seo';
+import {
   CheckIcon,
   ArrowLeftIcon,
   ClockIcon,
@@ -51,6 +57,24 @@ const ComboDetail = () => {
   }
 
   const gradientCSS = GRADIENT_MAP[combo.gradient] || 'linear-gradient(135deg, #0ea5e9, #6366f1)';
+  const comboPath = `/combos/${combo.slug}`;
+  const comboStructuredData = [
+    buildBreadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Combo Packages', path: comboPath },
+      { name: combo.name, path: comboPath },
+    ]),
+    buildServiceSchema({
+      name: combo.name,
+      description: combo.tagline,
+      path: comboPath,
+      serviceType: 'Combo Package',
+      offers: buildOffer({
+        path: comboPath,
+        price: combo.price,
+      }),
+    }),
+  ];
 
   const handleGetCombo = () => {
     const target = `/checkout/combo/${combo.slug}`;
@@ -71,6 +95,18 @@ const ComboDetail = () => {
 
   return (
     <div className="min-h-screen bg-surface-50">
+      <Seo
+        title={`${combo.name} Combo Package | SkyWorld Ventures`}
+        description={`${combo.tagline} See what is included, delivery timing, and how much you save with the ${combo.name} combo package.`}
+        path={comboPath}
+        keywords={[
+          combo.name,
+          'combo package',
+          'bundled website package',
+          combo.bestFor,
+        ]}
+        structuredData={comboStructuredData}
+      />
       {/* ── Hero ── */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.08]" style={{ background: gradientCSS }} />

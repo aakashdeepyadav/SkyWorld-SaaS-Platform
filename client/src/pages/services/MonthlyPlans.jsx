@@ -3,6 +3,11 @@ import { useAuth } from '../../context/AuthContext';
 import { formatINR } from '../../utils/currency';
 import { useCatalog } from '../../context/CatalogContext';
 import {
+  Seo,
+  absoluteUrl,
+  buildBreadcrumbSchema,
+} from '../../components/seo/Seo';
+import {
   ArrowLeftIcon,
   CheckIcon,
   XMarkIcon,
@@ -14,6 +19,23 @@ const MonthlyPlans = () => {
   const { MONTHLY_PLANS } = useCatalog();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const monthlyPlansStructuredData = [
+    buildBreadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Monthly Maintenance Plans', path: '/plans/monthly' },
+    ]),
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'SkyWorld monthly maintenance plans',
+      itemListElement: MONTHLY_PLANS.map((plan, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: plan.name,
+        url: absoluteUrl(`/plans/monthly/${plan.slug}`),
+      })),
+    },
+  ];
 
   const handleGetStarted = (plan) => {
     const target = `/checkout/monthly/${plan.slug}`;
@@ -26,6 +48,18 @@ const MonthlyPlans = () => {
 
   return (
     <div className="min-h-screen bg-surface-50">
+      <Seo
+        title="Monthly Website Maintenance Plans | SkyWorld Ventures"
+        description="Compare SkyWorld Ventures monthly maintenance plans for website updates, monitoring, support, analytics, and local growth improvements."
+        path="/plans/monthly"
+        keywords={[
+          'monthly website maintenance',
+          'website support plans',
+          'website update service',
+          'monthly maintenance plans',
+        ]}
+        structuredData={monthlyPlansStructuredData}
+      />
       {/* Hero */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-sky-500/[0.05] to-indigo-500/[0.05]" />
