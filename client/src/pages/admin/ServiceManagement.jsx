@@ -68,7 +68,7 @@ const EMPTY_FORM = {
   basePrice: '',
   offerPercent: '',
   sortOrder: '',
-  delivery: ''
+  delivery: '',
   bestFor: '',
   popular: false,
   highlights: '',
