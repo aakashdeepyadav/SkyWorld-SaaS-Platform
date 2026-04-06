@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { api } from '../../services/api';
+import AuthLayout from './AuthLayout';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -59,145 +60,107 @@ const ResetPassword = () => {
 
   if (!isValid) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-6 bg-gray-50">
-        <div className="w-full max-w-md text-center">
+      <AuthLayout
+        heading="Something went wrong"
+        subtext="The reset link appears to be invalid or expired."
+      >
+        <div className="text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Invalid Reset Link</h2>
-          <p className="text-gray-600 mb-6">
+          <h2>Invalid Reset Link</h2>
+          <p className="text-gray-600 mt-2 mb-6">
             This password reset link is invalid or has expired.
           </p>
           <Link
             to="/forgot-password"
-            className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            className="inline-flex items-center px-5 py-2.5 btn-primary rounded-xl"
           >
             Request New Reset Link
           </Link>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-6 bg-gray-50">
-        <div className="w-full max-w-md text-center">
+      <AuthLayout
+        heading="All set!"
+        subtext="Your password has been updated. Redirecting you to login."
+      >
+        <div className="text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Password Reset!</h2>
-          <p className="text-gray-600 mb-6">
+          <h2>Password Reset!</h2>
+          <p className="text-gray-600 mt-2 mb-6">
             Your password has been successfully reset. You will be redirected to login shortly.
           </p>
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mx-auto"></div>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left — Brand panel */}
-      <div className="hidden lg:flex lg:w-[45%] bg-surface-900 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 30% 80%, rgba(14,165,233,.08) 0%, transparent 60%)' }} />
-        <div className="absolute top-0 right-0 w-80 h-80" style={{ background: 'radial-gradient(circle, rgba(14,165,233,.05) 0%, transparent 70%)' }} />
-        <div className="flex flex-col justify-between p-12 xl:p-16 w-full relative z-10">
-          <div className="flex items-center">
-            <img src="/wordmark_logo_white_fullname.png" alt="SkyWorld Ventures" className="h-9 w-auto object-contain" />
-          </div>
+    <AuthLayout
+      heading={<>Create your new<br />password</>}
+      subtext="Choose a strong password for your SkyWorld account."
+      footerText="Remember your password?"
+      footerLink="/login"
+      footerLabel="Sign in"
+    >
+      <h2>Reset Password</h2>
+      <p>Enter your new password below.</p>
 
-          <div>
-            <h1 className="text-3xl xl:text-4xl font-bold text-white leading-snug">
-              Create your new
-              <br />
-              password
-            </h1>
-            <p className="text-gray-400 mt-4 max-w-sm leading-relaxed">
-              Choose a strong password for your SkyWorld account.
-            </p>
-          </div>
-
-          <p className="text-gray-600 text-sm">&copy; 2026 SkyWorld Ventures</p>
-        </div>
-      </div>
-
-      {/* Right — Form */}
-      <div className="flex-1 flex items-center justify-center px-6 sm:px-12 bg-white">
-        <div className="w-full max-w-sm">
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center mb-10">
-            <img src="/wordmark_logo_coloured_.png" alt="SkyWorld" className="h-7 w-auto object-contain" />
-          </div>
-
-          <h2 className="text-2xl font-bold text-gray-900">Reset Password</h2>
-          <p className="mt-1.5 text-sm text-gray-500">
-            Enter your new password below.
+      <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="password">New Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            required
+            className="input-field mt-1"
+            placeholder="Enter new password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Must be at least 8 characters with uppercase, lowercase, number, and special character
           </p>
-
-          <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                New Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="input-field"
-                placeholder="Enter new password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Must be at least 8 characters with uppercase, lowercase, number, and special character
-              </p>
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm New Password
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="input-field"
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading || !password || !confirmPassword}
-              className="w-full btn-primary py-2.5 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-            >
-              {loading ? 'Resetting...' : 'Reset Password'}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500">
-              Remember your password?{' '}
-              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
-                Sign in
-              </Link>
-            </p>
-          </div>
         </div>
-      </div>
-    </div>
+
+        <div>
+          <label htmlFor="confirmPassword">Confirm New Password</label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            required
+            className="input-field mt-1"
+            placeholder="Confirm new password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading || !password || !confirmPassword}
+          className="w-full btn-primary py-2.5 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+        >
+          {loading ? 'Resetting...' : 'Reset Password'}
+        </button>
+      </form>
+    </AuthLayout>
   );
 };
 

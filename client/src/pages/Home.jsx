@@ -9,6 +9,7 @@ import {
   buildOrganizationSchema,
   buildWebsiteSchema,
 } from '../components/seo/Seo';
+import './PremiumHome.css';
 
 /* ─── Scroll-triggered entrance ─── */
 const FadeIn = ({ children, className = '', delay = 0, as: Tag = 'div' }) => {
@@ -120,6 +121,13 @@ const ICONS = {
       d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z"
     />
   ),
+  star: (
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.562.562 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
+    />
+  ),
 };
 
 const Icon = ({ name, size = 22, strokeWidth = 1.5, className = '' }) => (
@@ -141,24 +149,490 @@ const STEPS = [
   {
     n: '01',
     t: 'Brief',
-    d: 'Tell us what you need. We scope, price, and assign your project — usually within a day.',
+    d: 'Share your vision. We scope, price, and assign your dedicated team within 24 hours.',
   },
   {
     n: '02',
     t: 'Build',
-    d: 'Track milestones live. Chat with our team, review work, and iterate in real-time.',
+    d: 'Track milestones in real-time. Review work, iterate with direct feedback loops.',
   },
   {
     n: '03',
-    t: 'Ship',
-    d: 'Production-ready delivery with full handover. You pay only on approval.',
+    t: 'Launch',
+    d: 'Production-ready delivery with full handover and documentation. Pay only on approval.',
   },
 ];
+
+/* ─── Portfolio projects ─── */
+const PROJECTS = [
+  {
+    title: 'Spice Garden — Restaurant Platform',
+    desc: 'Full-stack ordering system with digital menu in ₹, table reservations, and Google Business integration for an Indian restaurant.',
+    img: '/portfolio-restaurant.png',
+    tags: ['Web Development', 'Branding', 'SEO'],
+  },
+  {
+    title: 'MedCare Plus — Clinic Suite',
+    desc: 'Patient portal with appointment booking, doctor profiles across specialties, and integrated health service management.',
+    img: '/portfolio-medical.png',
+    tags: ['App Development', 'UI/UX Design'],
+  },
+  {
+    title: 'Desi Threads — Fashion E-Commerce',
+    desc: 'Modern e-commerce storefront for Indo-western fashion with catalog, cart, ₹ pricing, and payment gateway integration.',
+    img: '/portfolio-ecommerce.png',
+    tags: ['Web Development', 'E-Commerce'],
+  },
+  {
+    title: 'GharDekho — Real Estate Portal',
+    desc: 'Property listing platform with city-based search, ₹ Lakhs/Cr pricing, map integration, and mobile-first design for Indian buyers.',
+    img: '/portfolio-realestate.png',
+    tags: ['Full Stack', 'App Development'],
+  },
+];
+
+/* ─── Testimonials ─── */
+const TESTIMONIALS = [
+  {
+    quote: 'SkyWorld delivered our website faster than we expected. The quality of design and the attention to detail was impressive. Our online bookings increased by 40% in the first month.',
+    name: 'Priya Sharma',
+    role: 'Owner, Saffron Kitchen',
+    initials: 'PS',
+  },
+  {
+    quote: 'Professional, responsive, and genuinely invested in our success. The combo package saved us time and money while giving us everything we needed to launch our clinic online.',
+    name: 'Dr. Rahul Mehta',
+    role: 'Founder, MedCare Clinic',
+    initials: 'RM',
+  },
+  {
+    quote: 'The monthly maintenance plan has been a game-changer. We never worry about our site going down or falling behind on updates. Highly recommended for any growing business.',
+    name: 'Ankit Verma',
+    role: 'CEO, UrbanNest Properties',
+    initials: 'AV',
+  },
+];
+
+/* ─── Marquee items ─── */
+const MARQUEE_ITEMS = [
+  'Restaurants', 'Healthcare', 'E-Commerce', 'Real Estate',
+  'Education', 'SaaS Products', 'Startups', 'Small Business',
+  'Local Services', 'Professional Services', 'Hospitality', 'Retail',
+];
+
+/* ─── Social SVGs ─── */
+const SocialIcons = {
+  linkedin: <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />,
+  youtube: <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.546 12 3.546 12 3.546s-7.505 0-9.377.504A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.504 9.376.504 9.376.504s7.505 0 9.377-.504a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />,
+  instagram: <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />,
+  twitter: <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />,
+  facebook: <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />,
+};
+
+const SocialLink = ({ href, label, icon, size = 17 }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label}>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">{icon}</svg>
+  </a>
+);
+
+/* ─── SkyWorld Immersive Hero Canvas ─── */
+const SkyWorldCanvas = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animId;
+    let mouse = { x: -1000, y: -1000 };
+    let smoothMouse = { x: -1000, y: -1000 };
+    let stars = [];
+    let shootingStars = [];
+    let globeAngle = 0;
+    let time = 0;
+
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      ctx.scale(dpr, dpr);
+      initStars();
+    };
+
+    /* ── Deep-space star field ── */
+    const initStars = () => {
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      const count = Math.min(280, Math.floor((w * h) / 3200));
+      stars = [];
+      for (let i = 0; i < count; i++) {
+        const z = Math.random();
+        stars.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          z,
+          size: 0.3 + z * 2.2,
+          twinkleSpeed: 0.01 + Math.random() * 0.03,
+          twinklePhase: Math.random() * Math.PI * 2,
+          color: z > 0.85
+            ? { r: 56, g: 189, b: 248 }    // bright sky-blue stars
+            : z > 0.7
+            ? { r: 125, g: 211, b: 252 }   // lighter blue
+            : z > 0.5
+            ? { r: 199, g: 210, b: 254 }   // lavender
+            : { r: 220, g: 230, b: 245 },  // white-ish
+        });
+      }
+    };
+
+    /* ── Shooting star spawner ── */
+    const spawnShootingStar = (w, h) => {
+      if (shootingStars.length >= 3) return;
+      shootingStars.push({
+        x: Math.random() * w * 0.7,
+        y: Math.random() * h * 0.4,
+        vx: 4 + Math.random() * 6,
+        vy: 2 + Math.random() * 3,
+        life: 1,
+        decay: 0.012 + Math.random() * 0.01,
+        len: 40 + Math.random() * 60,
+      });
+    };
+
+    /* ── Globe wireframe geometry ── */
+    const projectPoint = (lat, lon, radius, cx, cy, angle) => {
+      const phi = (lat * Math.PI) / 180;
+      const theta = ((lon + angle) * Math.PI) / 180;
+      const x3d = radius * Math.cos(phi) * Math.sin(theta);
+      const y3d = -radius * Math.sin(phi);
+      const z3d = radius * Math.cos(phi) * Math.cos(theta);
+      // Simple perspective
+      const perspective = 600;
+      const scale = perspective / (perspective + z3d);
+      return {
+        x: cx + x3d * scale,
+        y: cy + y3d * scale,
+        z: z3d,
+        scale,
+      };
+    };
+
+    const drawGlobe = (w, h) => {
+      const isMobile = w < 600;
+      const radius = isMobile ? Math.min(w * 0.32, 130) : Math.min(w * 0.22, 240);
+      const cx = isMobile ? w * 0.5 : w * 0.72;
+      const cy = h * 0.48;
+
+      // Glow behind globe
+      const glowGrd = ctx.createRadialGradient(cx, cy, radius * 0.2, cx, cy, radius * 1.8);
+      glowGrd.addColorStop(0, 'rgba(0,191,255,.06)');
+      glowGrd.addColorStop(0.3, 'rgba(14,165,233,.03)');
+      glowGrd.addColorStop(0.6, 'rgba(99,102,241,.015)');
+      glowGrd.addColorStop(1, 'transparent');
+      ctx.fillStyle = glowGrd;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius * 1.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Latitude lines
+      for (let lat = -75; lat <= 75; lat += 15) {
+        ctx.beginPath();
+        let started = false;
+        for (let lon = 0; lon <= 360; lon += 3) {
+          const p = projectPoint(lat, lon, radius, cx, cy, globeAngle);
+          if (p.z < -radius * 0.15) continue;
+          const alpha = 0.04 + (p.z / radius) * 0.08;
+          if (!started) {
+            ctx.moveTo(p.x, p.y);
+            started = true;
+          } else {
+            ctx.lineTo(p.x, p.y);
+          }
+          ctx.strokeStyle = `rgba(56,189,248,${alpha})`;
+        }
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+
+      // Longitude lines
+      for (let lon = 0; lon < 360; lon += 20) {
+        ctx.beginPath();
+        let started = false;
+        for (let lat = -90; lat <= 90; lat += 3) {
+          const p = projectPoint(lat, lon, radius, cx, cy, globeAngle);
+          if (p.z < -radius * 0.15) continue;
+          if (!started) {
+            ctx.moveTo(p.x, p.y);
+            started = true;
+          } else {
+            ctx.lineTo(p.x, p.y);
+          }
+        }
+        ctx.strokeStyle = 'rgba(56,189,248,.05)';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+
+      // Highlighted meridians — thicker, brighter
+      [0, 90, 180, 270].forEach((lon) => {
+        ctx.beginPath();
+        let started = false;
+        for (let lat = -90; lat <= 90; lat += 2) {
+          const p = projectPoint(lat, lon, radius, cx, cy, globeAngle);
+          if (p.z < -radius * 0.1) continue;
+          const alpha = 0.06 + (p.z / radius) * 0.12;
+          if (!started) {
+            ctx.moveTo(p.x, p.y);
+            started = true;
+          } else {
+            ctx.lineTo(p.x, p.y);
+          }
+          ctx.strokeStyle = `rgba(0,191,255,${alpha})`;
+        }
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+
+      // Equator — most prominent
+      ctx.beginPath();
+      let eqStarted = false;
+      for (let lon = 0; lon <= 360; lon += 2) {
+        const p = projectPoint(0, lon, radius, cx, cy, globeAngle);
+        if (p.z < -radius * 0.1) continue;
+        const alpha = 0.1 + (p.z / radius) * 0.2;
+        if (!eqStarted) {
+          ctx.moveTo(p.x, p.y);
+          eqStarted = true;
+        } else {
+          ctx.lineTo(p.x, p.y);
+        }
+        ctx.strokeStyle = `rgba(0,191,255,${alpha})`;
+      }
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Glowing dots at intersections
+      for (let lat = -60; lat <= 60; lat += 30) {
+        for (let lon = 0; lon < 360; lon += 40) {
+          const p = projectPoint(lat, lon, radius, cx, cy, globeAngle);
+          if (p.z < 0) continue;
+          const alpha = (p.z / radius) * 0.5;
+          const dotRadius = 1 + p.scale * 1.5;
+
+          // Glow
+          const dg = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, dotRadius * 4);
+          dg.addColorStop(0, `rgba(56,189,248,${alpha * 0.4})`);
+          dg.addColorStop(1, 'transparent');
+          ctx.fillStyle = dg;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, dotRadius * 4, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Core
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, dotRadius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(125,211,252,${alpha})`;
+          ctx.fill();
+        }
+      }
+
+      // Orbiting ring around globe
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, radius * 1.35, radius * 0.35, -0.35, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(0,191,255,.04)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Orbiting dot on the ring
+      const orbitAngle = time * 0.4;
+      const orbitX = cx + radius * 1.35 * Math.cos(orbitAngle) * Math.cos(-0.35) - radius * 0.35 * Math.sin(orbitAngle) * Math.sin(-0.35);
+      const orbitY = cy + radius * 1.35 * Math.cos(orbitAngle) * Math.sin(-0.35) + radius * 0.35 * Math.sin(orbitAngle) * Math.cos(-0.35);
+      const og = ctx.createRadialGradient(orbitX, orbitY, 0, orbitX, orbitY, 12);
+      og.addColorStop(0, 'rgba(0,191,255,.8)');
+      og.addColorStop(0.3, 'rgba(56,189,248,.3)');
+      og.addColorStop(1, 'transparent');
+      ctx.fillStyle = og;
+      ctx.beginPath();
+      ctx.arc(orbitX, orbitY, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(orbitX, orbitY, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#7dd3fc';
+      ctx.fill();
+    };
+
+    const draw = () => {
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      ctx.clearRect(0, 0, w, h);
+      time += 0.016;
+      globeAngle += 0.15;
+
+      // Smooth mouse
+      smoothMouse.x += (mouse.x - smoothMouse.x) * 0.06;
+      smoothMouse.y += (mouse.y - smoothMouse.y) * 0.06;
+
+      /* ── Aurora / horizon glow at bottom ── */
+      const auroraY = h * 0.85;
+      const ag = ctx.createRadialGradient(w * 0.5, auroraY, 0, w * 0.5, auroraY, w * 0.6);
+      ag.addColorStop(0, `rgba(0,191,255,${0.04 + Math.sin(time * 0.5) * 0.015})`);
+      ag.addColorStop(0.3, `rgba(14,165,233,${0.025 + Math.sin(time * 0.3) * 0.01})`);
+      ag.addColorStop(0.6, 'rgba(99,102,241,.01)');
+      ag.addColorStop(1, 'transparent');
+      ctx.fillStyle = ag;
+      ctx.fillRect(0, 0, w, h);
+
+      // Secondary aurora pulse
+      const ag2 = ctx.createRadialGradient(w * 0.3, auroraY, 0, w * 0.3, auroraY, w * 0.35);
+      ag2.addColorStop(0, `rgba(99,102,241,${0.02 + Math.sin(time * 0.7 + 1) * 0.01})`);
+      ag2.addColorStop(1, 'transparent');
+      ctx.fillStyle = ag2;
+      ctx.fillRect(0, 0, w, h);
+
+      /* ── Mouse spotlight ── */
+      if (mouse.x > 0 && mouse.y > 0) {
+        const mg = ctx.createRadialGradient(smoothMouse.x, smoothMouse.y, 0, smoothMouse.x, smoothMouse.y, 250);
+        mg.addColorStop(0, 'rgba(56,189,248,.04)');
+        mg.addColorStop(0.5, 'rgba(99,102,241,.02)');
+        mg.addColorStop(1, 'transparent');
+        ctx.fillStyle = mg;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      /* ── Stars with twinkling ── */
+      stars.forEach(s => {
+        s.twinklePhase += s.twinkleSpeed;
+        const twinkle = 0.3 + Math.sin(s.twinklePhase) * 0.7;
+        const alpha = (0.15 + s.z * 0.65) * Math.max(0.1, twinkle);
+
+        // Mouse interaction — subtle push
+        let sx = s.x, sy = s.y;
+        if (mouse.x > 0 && mouse.y > 0) {
+          const dx = s.x - smoothMouse.x;
+          const dy = s.y - smoothMouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150 && dist > 0) {
+            const force = (150 - dist) / 150;
+            sx += (dx / dist) * force * 8 * s.z;
+            sy += (dy / dist) * force * 8 * s.z;
+          }
+        }
+
+        // Glow for brighter stars
+        if (s.z > 0.5) {
+          const glowR = s.size * (3 + s.z * 3);
+          const sg = ctx.createRadialGradient(sx, sy, 0, sx, sy, glowR);
+          sg.addColorStop(0, `rgba(${s.color.r},${s.color.g},${s.color.b},${alpha * 0.15})`);
+          sg.addColorStop(1, 'transparent');
+          ctx.fillStyle = sg;
+          ctx.beginPath();
+          ctx.arc(sx, sy, glowR, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Star cross-sparkle for very bright ones
+        if (s.z > 0.88 && twinkle > 0.8) {
+          ctx.strokeStyle = `rgba(${s.color.r},${s.color.g},${s.color.b},${alpha * 0.3})`;
+          ctx.lineWidth = 0.5;
+          const sLen = s.size * 4;
+          ctx.beginPath();
+          ctx.moveTo(sx - sLen, sy); ctx.lineTo(sx + sLen, sy);
+          ctx.moveTo(sx, sy - sLen); ctx.lineTo(sx, sy + sLen);
+          ctx.stroke();
+        }
+
+        // Core dot
+        ctx.beginPath();
+        ctx.arc(sx, sy, s.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${s.color.r},${s.color.g},${s.color.b},${alpha})`;
+        ctx.fill();
+      });
+
+      /* ── Mouse-star connection lines ── */
+      if (mouse.x > 0 && mouse.y > 0) {
+        stars.forEach(s => {
+          if (s.z < 0.4) return;
+          const dx = s.x - smoothMouse.x;
+          const dy = s.y - smoothMouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 180) {
+            const opacity = (1 - dist / 180) * 0.08 * s.z;
+            ctx.beginPath();
+            ctx.moveTo(s.x, s.y);
+            ctx.lineTo(smoothMouse.x, smoothMouse.y);
+            ctx.strokeStyle = `rgba(56,189,248,${opacity})`;
+            ctx.lineWidth = 0.3;
+            ctx.stroke();
+          }
+        });
+      }
+
+      /* ── Shooting stars ── */
+      if (Math.random() < 0.008) spawnShootingStar(w, h);
+      shootingStars = shootingStars.filter(ss => ss.life > 0);
+      shootingStars.forEach(ss => {
+        ss.x += ss.vx;
+        ss.y += ss.vy;
+        ss.life -= ss.decay;
+
+        const tailX = ss.x - ss.vx * ss.len * 0.15;
+        const tailY = ss.y - ss.vy * ss.len * 0.15;
+        const grad = ctx.createLinearGradient(tailX, tailY, ss.x, ss.y);
+        grad.addColorStop(0, 'transparent');
+        grad.addColorStop(0.5, `rgba(125,211,252,${ss.life * 0.15})`);
+        grad.addColorStop(1, `rgba(255,255,255,${ss.life * 0.6})`);
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(ss.x, ss.y);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Head glow
+        const hg = ctx.createRadialGradient(ss.x, ss.y, 0, ss.x, ss.y, 6);
+        hg.addColorStop(0, `rgba(255,255,255,${ss.life * 0.6})`);
+        hg.addColorStop(1, 'transparent');
+        ctx.fillStyle = hg;
+        ctx.beginPath();
+        ctx.arc(ss.x, ss.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      /* ── Wireframe Globe ── */
+      drawGlobe(w, h);
+
+      animId = requestAnimationFrame(draw);
+    };
+
+    const onMouse = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    };
+    const onLeave = () => { mouse.x = -1000; mouse.y = -1000; };
+
+    resize();
+    animId = requestAnimationFrame(draw);
+    window.addEventListener('resize', resize);
+    canvas.addEventListener('mousemove', onMouse);
+    canvas.addEventListener('mouseleave', onLeave);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+      canvas.removeEventListener('mousemove', onMouse);
+      canvas.removeEventListener('mouseleave', onLeave);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="hp-hero__canvas" />;
+};
 
 const Home = () => {
   const { PLAN_CATALOG, COMBO_PACKAGES, MONTHLY_PLANS, CATEGORY_ORDER } = useCatalog();
   const [scrolled, setScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState('web-development');
+  const [scrollProgress, setScrollProgress] = useState(0);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const authed = Boolean(user);
@@ -169,7 +643,11 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 30);
+    const fn = () => {
+      setScrolled(window.scrollY > 30);
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0);
+    };
     window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);
   }, []);
@@ -206,6 +684,10 @@ const Home = () => {
         ]}
         structuredData={homeStructuredData}
       />
+
+      {/* ═══ SCROLL PROGRESS ═══ */}
+      <div className="hp-progress" style={{ transform: `scaleX(${scrollProgress / 100})` }} />
+
       {/* ═══ NAV ═══ */}
       <nav className={`hp-nav ${scrolled ? 'hp-nav--s' : ''}`}>
         <div className="hp-nav__in">
@@ -259,56 +741,47 @@ const Home = () => {
         </div>
       </nav>
 
-      {/* ── HERO ── */}
+      {/* ═══ HERO ═══ */}
       <header className="hp-hero">
-        {/* Dot grid pattern */}
-        <div className="hp-hero__dots" />
-        {/* Soft brand-colored radial behind text */}
-        <div className="hp-hero__glow" />
+        <SkyWorldCanvas />
+        <div className="hp-hero__atmosphere" />
+        <div className="hp-hero__horizon" />
+        <div className="hp-hero__orb hp-hero__orb--1" />
+        <div className="hp-hero__orb hp-hero__orb--2" />
 
-        <div className="hp-hero__content">
+        <div className="hp-hero__center">
           <h1 className="hp-hero__h1">
-            <span className="hp-hero__ln" style={{ animationDelay: '.2s' }}>
-              We design &amp; build
-            </span>
-            <br />
-            <span className="hp-hero__ln" style={{ animationDelay: '.34s' }}>
-              digital products that
-            </span>
-            <br />
-            <span className="hp-hero__ln hp-hero__ln--em" style={{ animationDelay: '.48s' }}>
-              people love.
-            </span>
+            We build products that <span className="hp-hero__h1-sky">drive</span> <span className="hp-hero__h1-world">growth.</span>
           </h1>
 
-          <div className="hp-hero__btns" style={{ animationDelay: '.76s' }}>
+          <p className="hp-hero__sub">
+            Websites, branding, and apps — with transparent pricing and milestone delivery.
+          </p>
+
+          <div className="hp-hero__btns">
             {authed ? (
               <>
-                <Link
-                  to={`/dashboard/${user?.role || 'client'}`}
-                  className="hp-btn hp-btn--primary"
-                >
+                <Link to={`/dashboard/${user?.role || 'client'}`} className="hp-btn hp-btn--primary hp-btn--lg">
                   Open Dashboard <span className="hp-btn__arr">&rarr;</span>
                 </Link>
-                <Link to="/services/web-development" className="hp-btn hp-btn--ghost">
+                <Link to="/services/web-development" className="hp-btn hp-btn--dark-ghost hp-btn--lg">
                   Browse Services
                 </Link>
               </>
             ) : (
               <>
-                <Link to="/register" className="hp-btn hp-btn--primary">
+                <Link to="/register" className="hp-btn hp-btn--primary hp-btn--lg">
                   Start a project <span className="hp-btn__arr">&rarr;</span>
                 </Link>
-                <Link to="/login" className="hp-btn hp-btn--ghost">
-                  Log in
+                <Link to="/contact" className="hp-btn hp-btn--dark-ghost hp-btn--lg">
+                  Book a free call
                 </Link>
               </>
             )}
           </div>
         </div>
 
-        {/* Stats row anchored to bottom */}
-        <div className="hp-hero__stats" style={{ animationDelay: '.9s' }}>
+        <div className="hp-hero__stats">
           {[
             { v: 150, s: '+', l: 'Projects' },
             { v: 80, s: '+', l: 'Clients' },
@@ -325,12 +798,29 @@ const Home = () => {
         </div>
       </header>
 
+      {/* ═══ LOGO MARQUEE ═══ */}
+      <section className="hp-marquee">
+        <div className="hp-marquee__label">Industries We Serve</div>
+        <div className="hp-marquee__track">
+          {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
+            <span key={i} className="hp-marquee__item">
+              <span className="hp-marquee__dot" />
+              {item}
+            </span>
+          ))}
+        </div>
+      </section>
+
       {/* ═══ SERVICES ═══ */}
       <section className="hp-svc">
         <div className="hp-wrap">
           <FadeIn>
             <div className="hp-svc__header">
-              <h2 className="hp-sect-h">What we do</h2>
+              <span className="hp-sect-label">Services</span>
+              <h2 className="hp-sect-h">What we build</h2>
+              <p className="hp-sect-sub">
+                End-to-end digital solutions for businesses ready to grow — from first pixel to final deploy.
+              </p>
             </div>
           </FadeIn>
 
@@ -344,11 +834,16 @@ const Home = () => {
                     to={`/services/${slug}`}
                     className="hp-svc__card"
                     style={{ '--c': cat.color, '--g': cat.gradientCSS }}
+                    onMouseMove={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      e.currentTarget.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+                      e.currentTarget.style.setProperty('--my', `${e.clientY - rect.top}px`);
+                    }}
                   >
                     <div className="hp-svc__bar" />
                     <div className="hp-svc__top">
                       <div className="hp-svc__icon">
-                        <Icon name={cat.icon} size={20} />
+                        <Icon name={cat.icon} size={22} />
                       </div>
                       <Icon name="arrow" size={16} strokeWidth={2} className="hp-svc__arr" />
                     </div>
@@ -368,21 +863,115 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ═══ HOW IT WORKS — editorial style ═══ */}
+      {/* ═══ PORTFOLIO SHOWCASE ═══ */}
+      <section className="hp-portfolio">
+        <div className="hp-wrap">
+          <div className="hp-portfolio__header">
+            <FadeIn>
+              <div>
+                <span className="hp-sect-label">Portfolio</span>
+                <h2 className="hp-sect-h">Selected work</h2>
+                <p className="hp-sect-sub">
+                  Recent projects delivered for businesses across industries — each one built to perform.
+                </p>
+              </div>
+            </FadeIn>
+            <FadeIn delay={100}>
+              <Link to="/services/web-development" className="hp-btn hp-btn--ghost">
+                View All Services <span className="hp-btn__arr">&rarr;</span>
+              </Link>
+            </FadeIn>
+          </div>
+
+          <div className="hp-portfolio__grid">
+            {PROJECTS.map((p, i) => (
+              <FadeIn key={p.title} delay={i * 100}>
+                <div className="hp-portfolio__card">
+                  <img src={p.img} alt={p.title} className="hp-portfolio__img" loading="lazy" />
+                  <div className="hp-portfolio__info">
+                    <h3 className="hp-portfolio__title">{p.title}</h3>
+                    <p className="hp-portfolio__desc">{p.desc}</p>
+                    <div className="hp-portfolio__tags">
+                      {p.tags.map((tag) => (
+                        <span key={tag} className="hp-portfolio__tag">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ HOW IT WORKS ═══ */}
       <section className="hp-proc">
         <div className="hp-wrap">
           <FadeIn>
-            <h2 className="hp-sect-h">How it works</h2>
+            <span className="hp-sect-label" style={{ justifyContent: 'center' }}>Process</span>
+            <h2 className="hp-sect-h">How we work</h2>
+            <p className="hp-proc__sub">Three clear phases from idea to production. No surprises.</p>
           </FadeIn>
 
-          <div className="hp-proc__grid">
+          <div className="hp-proc__timeline">
+            {/* Horizontal animated connector */}
+            <div className="hp-proc__connector">
+              <div className="hp-proc__connector-line" />
+              <div className="hp-proc__connector-glow" />
+              <div className="hp-proc__connector-dot" />
+            </div>
+
             {STEPS.map((s, i) => (
-              <FadeIn key={s.n} delay={i * 120}>
-                <div className="hp-proc__item">
-                  <span className="hp-proc__num">{s.n}</span>
-                  <div>
-                    <h3 className="hp-proc__title">{s.t}</h3>
-                    <p className="hp-proc__desc">{s.d}</p>
+              <FadeIn key={s.n} delay={i * 180}>
+                <div className={`hp-proc__card hp-proc__card--${s.n}`}>
+                  {/* Ring indicator */}
+                  <div className="hp-proc__indicator">
+                    <div className="hp-proc__ring">
+                      <svg viewBox="0 0 64 64" className="hp-proc__ring-svg">
+                        <circle cx="32" cy="32" r="28" className="hp-proc__ring-bg" />
+                        <circle cx="32" cy="32" r="28" className="hp-proc__ring-fill" />
+                      </svg>
+                      <span className="hp-proc__num">{s.n}</span>
+                    </div>
+                  </div>
+
+                  {/* Icon */}
+                  <div className="hp-proc__icon">
+                    {i === 0 && (
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                        <path d="M8 9h8M8 13h5" />
+                      </svg>
+                    )}
+                    {i === 1 && (
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" />
+                        <path d="M8 21h8M12 17v4" />
+                        <path d="M7 8h2M7 12h4" />
+                        <circle cx="16" cy="10" r="2" />
+                      </svg>
+                    )}
+                    {i === 2 && (
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                      </svg>
+                    )}
+                  </div>
+
+                  <h3 className="hp-proc__title">{s.t}</h3>
+                  <p className="hp-proc__desc">{s.d}</p>
+
+                  <div className="hp-proc__tags">
+                    {i === 0 && ['Free consultation', '24hr response'].map(t => (
+                      <span key={t} className="hp-proc__tag">{t}</span>
+                    ))}
+                    {i === 1 && ['Live preview', 'Unlimited revisions'].map(t => (
+                      <span key={t} className="hp-proc__tag">{t}</span>
+                    ))}
+                    {i === 2 && ['Full handover', 'Pay on approval'].map(t => (
+                      <span key={t} className="hp-proc__tag">{t}</span>
+                    ))}
                   </div>
                 </div>
               </FadeIn>
@@ -395,10 +984,10 @@ const Home = () => {
       <section id="pricing" className="hp-pricing">
         <div className="hp-wrap">
           <FadeIn>
+            <span className="hp-sect-label">Pricing</span>
             <h2 className="hp-sect-h">Transparent, fixed-price plans</h2>
           </FadeIn>
 
-          {/* Segmented tabs */}
           <FadeIn>
             <div className="hp-tabs">
               {CATEGORY_ORDER.map((slug) => {
@@ -408,7 +997,6 @@ const Home = () => {
                     key={slug}
                     className={`hp-tab ${activeTab === slug ? 'hp-tab--on' : ''}`}
                     onClick={() => setActiveTab(slug)}
-                    style={{ '--tc': `rgb(${cat.color})` }}
                   >
                     <Icon name={cat.icon} size={15} strokeWidth={2} />
                     {cat.name}
@@ -418,7 +1006,6 @@ const Home = () => {
             </div>
           </FadeIn>
 
-          {/* Plan cards */}
           <div className="hp-plans" key={activeTab}>
             {activeCatalog?.plans.map((plan, i) => (
               <FadeIn key={plan.slug} delay={i * 70}>
@@ -430,13 +1017,10 @@ const Home = () => {
                   <h3 className="hp-plan__name">{plan.name}</h3>
                   <p className="hp-plan__for">{plan.bestFor}</p>
 
-                  {/* Highlight badges */}
                   {plan.highlights?.length > 0 && (
                     <div className="hp-plan__highlights">
                       {plan.highlights.map((h) => (
-                        <span key={h} className="hp-plan__hl">
-                          {h}
-                        </span>
+                        <span key={h} className="hp-plan__hl">{h}</span>
                       ))}
                     </div>
                   )}
@@ -462,7 +1046,6 @@ const Home = () => {
                     ))}
                   </ul>
 
-                  {/* Support line */}
                   {plan.support && (
                     <div className="hp-plan__support">
                       <Icon name="sparkle" size={13} strokeWidth={2} />
@@ -480,7 +1063,6 @@ const Home = () => {
               </FadeIn>
             ))}
 
-            {/* Custom plan — hidden for web-development (already has 3 plans) */}
             {activeTab !== 'web-development' && (
               <FadeIn delay={(activeCatalog?.plans.length || 0) * 70}>
                 <div
@@ -498,22 +1080,10 @@ const Home = () => {
                     </span>
                   </div>
                   <ul className="hp-plan__list">
-                    <li>
-                      <Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" />
-                      Custom design &amp; architecture
-                    </li>
-                    <li>
-                      <Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" />
-                      Dedicated project manager
-                    </li>
-                    <li>
-                      <Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" />
-                      Milestone-based billing
-                    </li>
-                    <li>
-                      <Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" />
-                      Priority support
-                    </li>
+                    <li><Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" /> Custom design &amp; architecture</li>
+                    <li><Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" /> Dedicated project manager</li>
+                    <li><Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" /> Milestone-based billing</li>
+                    <li><Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" /> Priority support</li>
                   </ul>
                   <Link
                     to={authed ? `/request?service=${activeTab}` : '/register'}
@@ -532,6 +1102,7 @@ const Home = () => {
       <section className="hp-combos">
         <div className="hp-wrap">
           <FadeIn>
+            <span className="hp-sect-label">Packages</span>
             <h2 className="hp-sect-h">Bundle &amp; save</h2>
           </FadeIn>
 
@@ -579,11 +1150,44 @@ const Home = () => {
         </div>
       </section>
 
+      {/* ═══ TESTIMONIALS ═══ */}
+      <section className="hp-testi">
+        <div className="hp-wrap">
+          <FadeIn>
+            <div className="hp-testi__header">
+              <span className="hp-sect-label" style={{ justifyContent: 'center' }}>Testimonials</span>
+              <h2 className="hp-sect-h">What our clients say</h2>
+              <p className="hp-sect-sub">
+                Real feedback from businesses we’ve helped grow online.
+              </p>
+            </div>
+          </FadeIn>
+
+          <div className="hp-testi__grid">
+            {TESTIMONIALS.map((t, i) => (
+              <FadeIn key={t.name} delay={i * 100}>
+                <div className="hp-testi__card">
+                  <p className="hp-testi__quote">{t.quote}</p>
+                  <div className="hp-testi__author">
+                    <div className="hp-testi__avatar">{t.initials}</div>
+                    <div>
+                      <div className="hp-testi__name">{t.name}</div>
+                      <div className="hp-testi__role">{t.role}</div>
+                    </div>
+                  </div>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ═══ MONTHLY PLANS ═══ */}
       <section className="hp-monthly">
         <div className="hp-wrap">
           <FadeIn>
-            <h2 className="hp-monthly__h2">Keep your site running smoothly</h2>
+            <span className="hp-sect-label" style={{ '--sky-deep': 'rgba(0,191,255,.7)' }}>Ongoing Support</span>
+            <h2 className="hp-monthly__h2">Keep everything running smoothly</h2>
             <Link
               to="/plans/monthly"
               style={{
@@ -592,9 +1196,10 @@ const Home = () => {
                 gap: 6,
                 fontSize: 13,
                 fontWeight: 600,
-                marginTop: 8,
+                marginTop: 12,
+                color: 'rgba(0,191,255,.6)',
+                textDecoration: 'none',
               }}
-              className="text-sky-600 hover:underline"
             >
               Compare all plans <span>&rarr;</span>
             </Link>
@@ -607,13 +1212,10 @@ const Home = () => {
                   {plan.popular && <span className="hp-mplan__badge">Best Value</span>}
                   <h3 className="hp-mplan__name">{plan.name}</h3>
 
-                  {/* Highlight badges */}
                   {plan.highlights?.length > 0 && (
                     <div className="hp-mplan__highlights">
                       {plan.highlights.map((h) => (
-                        <span key={h} className="hp-mplan__hl">
-                          {h}
-                        </span>
+                        <span key={h} className="hp-mplan__hl">{h}</span>
                       ))}
                     </div>
                   )}
@@ -649,22 +1251,17 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ═══ CTA — gradient banner, split layout ═══ */}
+      {/* ═══ CTA ═══ */}
       <section className="hp-cta">
         <div className="hp-wrap">
           <FadeIn>
             <div className="hp-cta__inner">
-              <div className="hp-cta__text">
-                <h2 className="hp-cta__h2">
-                  Ready to take your
-                  <br />
-                  business online?
-                </h2>
-                <p className="hp-cta__sub">
-                  Plans starting at {formatINR(2499)}. No upfront fees — pay 50% advance, rest on
-                  approval.
-                </p>
-              </div>
+              <h2 className="hp-cta__h2">
+                Ready to get<br />started?
+              </h2>
+              <p className="hp-cta__sub">
+                Plans from {formatINR(2499)}. Pay 50% to start, rest on your approval. No lock-ins.
+              </p>
               <div className="hp-cta__actions">
                 {authed ? (
                   <Link
@@ -678,7 +1275,7 @@ const Home = () => {
                     Create your account <span className="hp-btn__arr">&rarr;</span>
                   </Link>
                 )}
-                <Link to="/contact" className="hp-btn hp-btn--ghost hp-btn--lg">
+                <Link to="/contact" className="hp-btn hp-btn--dark-ghost hp-btn--lg">
                   Get in touch
                 </Link>
               </div>
@@ -687,785 +1284,81 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ═══ FOOTER ═══ */}
+      {/* ═══ MEGA FOOTER ═══ */}
       <footer className="hp-ft">
-        <div className="hp-wrap hp-ft__inner">
-          <div className="hp-ft__left">
-            <img
-              src="/wordmark_logo_white_fullname.png"
-              alt="SkyWorld Ventures"
-              className="hp-ft__logo"
-            />
-            <span className="hp-ft__copy">&copy; 2026 SkyWorld Ventures</span>
+        <div className="hp-wrap">
+          <div className="hp-ft__top">
+            <div className="hp-ft__grid">
+              <div className="hp-ft__brand-col">
+                <img src="/wordmark_logo_white_fullname.png" alt="SkyWorld Ventures" className="hp-ft__logo" />
+                <p className="hp-ft__desc">
+                  Professional web development, branding, and app services for businesses that mean business.
+                </p>
+                <div className="hp-ft__social">
+                  <SocialLink href="https://www.linkedin.com/in/skyworld-ventures/" label="LinkedIn" icon={SocialIcons.linkedin} />
+                  <SocialLink href="https://www.youtube.com/@SkyWorldVentures" label="YouTube" icon={SocialIcons.youtube} size={18} />
+                  <SocialLink href="https://www.instagram.com/skyworld.ventures/" label="Instagram" icon={SocialIcons.instagram} />
+                  <SocialLink href="https://x.com/SkyWorldVenture" label="X (Twitter)" icon={SocialIcons.twitter} size={16} />
+                  <SocialLink href="https://www.facebook.com/profile.php?id=61585059613967" label="Facebook" icon={SocialIcons.facebook} />
+                </div>
+              </div>
+
+              <div>
+                <h4 className="hp-ft__col-title">Services</h4>
+                <ul className="hp-ft__col-links">
+                  <li><Link to="/services/web-development">Web Development</Link></li>
+                  <li><Link to="/services/branding-design">Branding &amp; Design</Link></li>
+                  <li><Link to="/services/app-development">App Development</Link></li>
+                  <li><Link to="/plans/monthly">Monthly Plans</Link></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="hp-ft__col-title">Company</h4>
+                <ul className="hp-ft__col-links">
+                  <li><Link to="/faq">FAQ</Link></li>
+                  <li><Link to="/contact">Contact</Link></li>
+                  <li><Link to="/privacy">Privacy Policy</Link></li>
+                  <li><Link to="/terms">Terms of Service</Link></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="hp-ft__col-title">Get in Touch</h4>
+                <ul className="hp-ft__col-links">
+                  <li><a href="mailto:support@skyworld.buzz">support@skyworld.buzz</a></li>
+                  <li><a href="https://wa.me/918837679889" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
+                </ul>
+              </div>
+            </div>
           </div>
-          <div className="hp-ft__social">
-            <a
-              href="https://www.linkedin.com/in/skyworld-ventures/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-              </svg>
-            </a>
-            <a
-              href="https://www.youtube.com/@SkyWorldVentures"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="YouTube"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.546 12 3.546 12 3.546s-7.505 0-9.377.504A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.504 9.376.504 9.376.504s7.505 0 9.377-.504a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-              </svg>
-            </a>
-            <a
-              href="https://www.instagram.com/skyworld.ventures/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-              </svg>
-            </a>
-            <a
-              href="https://x.com/SkyWorldVenture"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="X (Twitter)"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-            </a>
-            <a
-              href="https://www.facebook.com/profile.php?id=61585059613967"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-              </svg>
-            </a>
-          </div>
-          <div className="hp-ft__links">
-            <Link to="/faq">FAQ</Link>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms</Link>
-            <Link to="/contact">Contact</Link>
+
+          <div className="hp-ft__bottom">
+            <span className="hp-ft__copy">&copy; 2026 SkyWorld Ventures. All rights reserved.</span>
+            <div className="hp-ft__bottom-links">
+              <Link to="/privacy">Privacy</Link>
+              <Link to="/terms">Terms</Link>
+              <Link to="/faq">FAQ</Link>
+            </div>
           </div>
         </div>
       </footer>
 
-      {/* ═════════════ STYLES ═════════════ */}
-      <style>{`
-/* ── Tokens ── */
-.hp {
-  --sky: #37bbec;
-  --sky-deep: #249fce;
-  --sky-glow: rgba(55,187,236,.16);
-  --indigo: #6366f1;
-  --dark: #0f172a;
-  --dark-2: #1e293b;
-  --slate: #334155;
-  --muted: #64748b;
-  --faint: #94a3b8;
-  --border: rgba(0,0,0,.06);
-  --bg: #ffffff;
-  --bg-off: #f8fafc;
-  --card: #ffffff;
-  --radius: 12px;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--dark);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-}
-
-/* ── Fade-in util ── */
-._fi {
-  opacity: 0;
-  transform: translateY(18px);
-  filter: blur(4px);
-  transition: opacity .6s cubic-bezier(.25,.46,.45,.94),
-              transform .6s cubic-bezier(.25,.46,.45,.94),
-              filter .6s cubic-bezier(.25,.46,.45,.94);
-}
-._fi._fi-in { opacity: 1; transform: none; filter: none; }
-
-/* ══════════════════════════════════════════
-   NAV
-   ══════════════════════════════════════════ */
-.hp-nav {
-  position: fixed; inset: 0 0 auto; z-index: 100;
-  transition: background .3s, box-shadow .3s, backdrop-filter .3s;
-}
-.hp-nav--s {
-  background: rgba(255,255,255,.82);
-  backdrop-filter: blur(24px) saturate(1.8);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
-  box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 4px 20px rgba(0,0,0,.03);
-}
-.hp-nav__in {
-  max-width: 1120px; margin: 0 auto; padding: 0 24px;
-  height: 60px; display: flex; align-items: center; justify-content: space-between;
-}
-.hp-nav__brand { display: flex; align-items: center; text-decoration: none; }
-.hp-nav__logo { height: 26px; width: auto; object-fit: contain; transition: opacity .3s; }
-.hp-nav__r { display: flex; align-items: center; gap: 8px; }
-.hp-nav__link {
-  font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: 8px;
-  text-decoration: none; color: rgba(255,255,255,.5); transition: color .2s;
-}
-.hp-nav__link:hover { color: rgba(255,255,255,.9); }
-.hp-nav__link--dark { color: #64748b; }
-.hp-nav__link--dark:hover { color: #0f172a; }
-.hp-nav__cta {
-  font-size: 13px; font-weight: 600; color: #fff; background: var(--sky);
-  border: none; cursor: pointer; padding: 8px 18px; border-radius: 8px;
-  text-decoration: none; transition: background .2s, transform .15s, box-shadow .2s;
-  position: relative; overflow: hidden;
-}
-.hp-nav__cta:hover { background: var(--sky-deep); transform: translateY(-1px); box-shadow: 0 4px 16px var(--sky-glow); }
-
-/* ══════════════════════════════════════════
-   BUTTONS
-   ══════════════════════════════════════════ */
-.hp-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 14px; font-weight: 600; padding: 12px 24px; border-radius: var(--radius);
-  text-decoration: none; cursor: pointer; border: none; transition: all .2s;
-}
-.hp-btn--primary { color: #fff; background: var(--sky); position: relative; overflow: hidden; }
-.hp-btn--primary:hover {
-  background: var(--sky-deep); transform: translateY(-1px);
-  box-shadow: 0 4px 20px var(--sky-glow);
-}
-.hp-btn--ghost {
-  color: rgba(255,255,255,.4); background: transparent;
-  border: 1px solid rgba(255,255,255,.1);
-}
-.hp-btn--ghost:hover { color: #fff; border-color: rgba(255,255,255,.25); }
-.hp-btn--lg { padding: 14px 28px; font-size: 15px; }
-.hp-btn__arr { display: inline-block; transition: transform .2s; margin-left: 2px; }
-.hp-btn:hover .hp-btn__arr { transform: translateX(3px); }
-
-/* ══════════════════════════════════════════
-   SHARED
-   ══════════════════════════════════════════ */
-.hp-wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
-.hp-sect-h {
-  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-  font-weight: 700; letter-spacing: -.035em; line-height: 1.1;
-  color: var(--dark); margin: 0;
-}
-.hp-sect-sub {
-  font-size: 16px; line-height: 1.7; color: var(--muted);
-  margin-top: 14px; max-width: 520px; display: none;
-}
-
-/* ══════════════════════════════════════════
-   HERO
-   ══════════════════════════════════════════ */
-.hp-hero {
-  position: relative; background: var(--dark);
-  min-height: 100vh; display: flex; flex-direction: column;
-  align-items: center;
-  padding: 80px 24px 0; overflow: hidden;
-}
-
-/* Dot grid */
-.hp-hero__dots {
-  position: absolute; inset: 0; pointer-events: none;
-  background-image: radial-gradient(rgba(148,163,184,.07) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 0%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 0%, transparent 75%);
-}
-
-/* Soft radial glow */
-.hp-hero__glow {
-  position: absolute; width: 700px; height: 700px;
-  top: 50%; left: 50%; transform: translate(-50%, -55%);
-  background: radial-gradient(circle, rgba(55,187,236,.06) 0%, transparent 65%);
-  pointer-events: none;
-}
-
-/* Content wrapper */
-.hp-hero__content {
-  position: relative; z-index: 1;
-  display: flex; flex-direction: column; align-items: center;
-  text-align: center; max-width: 900px;
-  margin-top: auto;
-}
-
-/* Pill badge */
-.hp-hero__pill {
-  display: inline-block;
-  font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--sky); border: 1px solid rgba(55,187,236,.25);
-  padding: 6px 20px; border-radius: 50px; margin: 0 0 32px;
-  animation: _heroIn .6s cubic-bezier(.25,.46,.45,.94) both;
-}
-
-/* Heading & line animation */
-.hp-hero__h1 {
-  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
-  font-weight: 800; letter-spacing: -.04em; line-height: 1.12;
-  color: #f1f5f9; margin: 0;
-}
-.hp-hero__ln {
-  display: inline-block;
-  animation: _heroIn .65s cubic-bezier(.25,.46,.45,.94) both;
-}
-.hp-hero__ln--em {
-  color: var(--sky);
-}
-
-@keyframes _heroIn {
-  from { opacity: 0; transform: translateY(22px); filter: blur(4px); }
-  to   { opacity: 1; transform: none; filter: none; }
-}
-
-/* Subtitle */
-.hp-hero__sub {
-  font-size: 16px; line-height: 1.75; color: rgba(148,163,184,.55);
-  margin: 28px auto 0; max-width: 520px;
-  animation: _heroIn .6s cubic-bezier(.25,.46,.45,.94) both;
-}
-
-/* Buttons */
-.hp-hero__btns {
-  display: flex; gap: 14px; margin-top: 36px; justify-content: center;
-  animation: _heroIn .6s cubic-bezier(.25,.46,.45,.94) both;
-}
-
-/* Stats bar — anchored to bottom */
-.hp-hero__stats {
-  position: relative; z-index: 1;
-  display: flex; width: min(85%, 840px);
-  margin-top: 56px; margin-bottom: 48px; padding: 40px 0 0;
-  border-top: 1px solid rgba(148,163,184,.08);
-  animation: _heroIn .6s cubic-bezier(.25,.46,.45,.94) both;
-}
-.hp-st { flex: 1; text-align: center; position: relative; }
-.hp-st:not(:last-child)::after {
-  content: ''; position: absolute; right: 0; top: 10%; height: 80%;
-  width: 1px; background: rgba(148,163,184,.08);
-}
-.hp-st__v {
-  display: block; font-size: clamp(1.3rem, 2.5vw, 1.8rem); font-weight: 800;
-  color: #f1f5f9; letter-spacing: -.02em; font-variant-numeric: tabular-nums;
-}
-.hp-st__l {
-  display: block; font-size: 11px; font-weight: 600;
-  color: rgba(148,163,184,.28); letter-spacing: .08em; text-transform: uppercase;
-  margin-top: 4px;
-}
-
-/* ══════════════════════════════════════════
-   SERVICES
-   ══════════════════════════════════════════ */
-.hp-svc {
-  padding: 120px 0; background: var(--bg-off); position: relative; overflow: hidden;
-}
-.hp-svc::before {
-  content: ''; position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(55,187,236,.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(55,187,236,.025) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: linear-gradient(180deg, transparent 5%, rgba(0,0,0,.5) 40%, rgba(0,0,0,.5) 60%, transparent 95%);
-  -webkit-mask-image: linear-gradient(180deg, transparent 5%, rgba(0,0,0,.5) 40%, rgba(0,0,0,.5) 60%, transparent 95%);
-  pointer-events: none;
-}
-.hp-svc__header { max-width: 520px; margin-bottom: 52px; }
-.hp-svc__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.hp-svc__grid > ._fi { display: flex; }
-.hp-svc__grid > ._fi > * { flex: 1; }
-.hp-svc__card {
-  position: relative; display: flex; flex-direction: column;
-  padding: 32px 28px 28px; background: var(--card); text-decoration: none; color: inherit;
-  border-radius: 14px; border: 1px solid var(--border); overflow: hidden;
-  transition: transform .35s cubic-bezier(.25,.46,.45,.94), box-shadow .35s, border-color .35s;
-}
-.hp-svc__card::after {
-  content: ''; position: absolute; inset: 0; opacity: 0;
-  background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), rgba(var(--c),.06), transparent 40%);
-  transition: opacity .35s;
-}
-.hp-svc__card:hover::after { opacity: 1; }
-.hp-svc__card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 50px -14px rgba(var(--c),.14), 0 0 40px -12px rgba(var(--c),.08);
-  border-color: rgba(var(--c),.18);
-}
-.hp-svc__bar {
-  position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: var(--g); opacity: 0; transition: opacity .3s;
-}
-.hp-svc__card:hover .hp-svc__bar { opacity: 1; }
-.hp-svc__top {
-  display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px;
-}
-.hp-svc__icon {
-  width: 42px; height: 42px; border-radius: 10px; background: var(--g); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  transition: transform .35s cubic-bezier(.25,.46,.45,.94), box-shadow .35s;
-}
-.hp-svc__card:hover .hp-svc__icon {
-  transform: scale(1.08) rotate(-3deg);
-  box-shadow: 0 4px 16px rgba(var(--c),.2);
-}
-.hp-svc__arr { color: rgba(var(--c),.2); transition: color .3s, transform .3s; }
-.hp-svc__card:hover .hp-svc__arr { color: rgb(var(--c)); transform: translate(2px,-2px); }
-.hp-svc__name {
-  font-size: 17px; font-weight: 650; letter-spacing: -.01em;
-  color: var(--dark); margin-bottom: 6px;
-}
-.hp-svc__tagline {
-  font-size: 14px; line-height: 1.6; color: var(--muted);
-  flex: 1; margin-bottom: 22px;
-}
-.hp-svc__foot {
-  display: flex; align-items: center; justify-content: space-between;
-  padding-top: 16px; border-top: 1px solid var(--border);
-}
-.hp-svc__from { font-size: 14px; font-weight: 700; color: var(--dark); }
-.hp-svc__count { font-size: 12px; color: var(--faint); font-weight: 500; }
-
-/* ══════════════════════════════════════════
-   PROCESS — large ghost numbers
-   ══════════════════════════════════════════ */
-.hp-proc {
-  padding: 100px 0; background: var(--bg);
-  border-top: none; position: relative;
-}
-.hp-proc::after {
-  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: min(80%, 900px); height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(55,187,236,.2), var(--sky), rgba(55,187,236,.2), transparent);
-}
-.hp-proc .hp-sect-h { margin-bottom: 48px; }
-.hp-proc__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; position: relative; }
-.hp-proc__item { display: flex; gap: 16px; position: relative; }
-.hp-proc__num {
-  font-size: 52px; font-weight: 800; letter-spacing: -.05em; line-height: 1;
-  color: rgba(55,187,236,.1); flex-shrink: 0; font-variant-numeric: tabular-nums;
-  transition: color .4s;
-}
-.hp-proc__item:hover .hp-proc__num { color: rgba(55,187,236,.2); }
-.hp-proc__title {
-  font-size: 16px; font-weight: 650; color: var(--dark);
-  margin-bottom: 6px; padding-top: 6px;
-}
-.hp-proc__desc { font-size: 14px; line-height: 1.65; color: var(--muted); }
-
-/* ══════════════════════════════════════════
-   PRICING — segmented tabs
-   ══════════════════════════════════════════ */
-.hp-pricing {
-  padding: 120px 0; background: var(--bg-off); position: relative; overflow: hidden;
-}
-
-.hp-pricing .hp-sect-sub { margin-bottom: 0; }
-
-.hp-tabs {
-  display: inline-flex; gap: 4px; margin-top: 36px;
-  background: rgba(0,0,0,.04); padding: 4px; border-radius: 12px;
-}
-.hp-tab {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 13px; font-weight: 600; padding: 10px 18px; border-radius: 10px;
-  border: none; background: transparent; color: var(--muted); cursor: pointer;
-  transition: all .25s cubic-bezier(.25,.46,.45,.94);
-}
-.hp-tab:hover { color: var(--dark); background: rgba(0,0,0,.02); }
-.hp-tab--on {
-  background: var(--card); color: var(--dark);
-  box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 2px 12px rgba(0,0,0,.03);
-  transform: scale(1.02);
-}
-.hp-tab--on svg { color: var(--tc); }
-
-.hp-plans {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
-  gap: 18px; margin-top: 28px;
-}
-.hp-plans > ._fi { display: flex; }
-.hp-plans > ._fi > * { flex: 1; }
-.hp-plan {
-  position: relative; display: flex; flex-direction: column;
-  padding: 30px 26px 26px; background: var(--card);
-  border: 1px solid var(--border); border-radius: 14px;
-  transition: transform .35s cubic-bezier(.25,.46,.45,.94), box-shadow .35s, border-color .35s;
-}
-.hp-plan:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 44px rgba(0,0,0,.06), 0 0 30px -10px rgba(var(--c),.08);
-}
-.hp-plan--pop {
-  border-color: rgba(var(--c),.25);
-  box-shadow: 0 0 0 1px rgba(var(--c),.06);
-  position: relative;
-}
-.hp-plan--pop::before {
-  content: ''; position: absolute; inset: -1px; border-radius: 14px;
-  background: linear-gradient(135deg, rgba(var(--c),.15), transparent 50%, rgba(var(--c),.1));
-  z-index: -1; opacity: 0; transition: opacity .4s;
-}
-.hp-plan--pop:hover::before { opacity: 1; }
-.hp-plan--pop:hover {
-  box-shadow: 0 0 0 1px rgba(var(--c),.1), 0 16px 48px rgba(var(--c),.12), 0 0 60px -20px rgba(var(--c),.15);
-}
-.hp-plan--custom { border-style: dashed; }
-.hp-plan__badge {
-  position: absolute; top: 14px; right: 14px;
-  font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-  color: rgb(var(--c)); background: rgba(var(--c),.08);
-  padding: 4px 10px; border-radius: 6px;
-}
-.hp-plan__name {
-  font-size: 17px; font-weight: 700; color: var(--dark); letter-spacing: -.01em;
-}
-.hp-plan__for {
-  font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.5;
-}
-.hp-plan__pricing {
-  margin: 18px 0; padding-bottom: 18px; border-bottom: 1px solid var(--border);
-}
-.hp-plan__amount {
-  font-size: 28px; font-weight: 800; color: var(--dark); letter-spacing: -.03em;
-}
-.hp-plan__was {
-  font-size: 16px; color: var(--faint); text-decoration: line-through; margin-right: 4px;
-}
-.hp-plan__off {
-  display: inline-block; font-size: 11px; font-weight: 700; color: #059669;
-  background: #ecfdf5; padding: 1px 6px; border-radius: 4px; margin-left: 6px;
-  vertical-align: middle;
-}
-.hp-plan__delivery {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 12px; color: var(--faint); margin-top: 4px;
-}
-.hp-plan__list { list-style: none; padding: 0; margin: 0 0 24px; flex: 1; }
-.hp-plan__list li {
-  display: flex; align-items: flex-start; gap: 8px;
-  font-size: 13px; color: var(--slate); padding: 4px 0; line-height: 1.5;
-}
-.hp-plan__ck { color: #10b981; flex-shrink: 0; margin-top: 2px; }
-.hp-plan__highlights {
-  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
-}
-.hp-plan__hl {
-  font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
-  color: rgb(var(--c)); background: rgba(var(--c),.07);
-  padding: 3px 8px; border-radius: 5px; white-space: nowrap;
-}
-.hp-plan__support {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600; color: #10b981;
-  background: rgba(16,185,129,.06); border-radius: 8px;
-  padding: 8px 12px; margin-bottom: 14px;
-}
-.hp-plan__cta {
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  width: 100%; padding: 11px; border-radius: 10px;
-  font-size: 14px; font-weight: 600; text-decoration: none;
-  border: 1px solid var(--border); color: var(--dark); background: var(--card);
-  cursor: pointer; transition: all .2s;
-}
-.hp-plan__cta:hover { border-color: rgba(var(--c),.35); color: rgb(var(--c)); }
-.hp-plan__cta--pop { background: var(--g); color: #fff; border: none; position: relative; overflow: hidden; }
-.hp-plan__cta--pop:hover {
-  box-shadow: 0 4px 18px rgba(var(--c),.25); transform: translateY(-1px);
-}
-
-/* ══════════════════════════════════════════
-   COMBOS
-   ══════════════════════════════════════════ */
-.hp-combos {
-  padding: 120px 0; background: var(--bg);
-  border-top: none;
-  position: relative; overflow: hidden;
-}
-.hp-combos > .hp-wrap::before {
-  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: min(80%, 900px); height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(55,187,236,.2), var(--sky), rgba(55,187,236,.2), transparent);
-}
-
-.hp-combos .hp-sect-sub { margin-bottom: 0; }
-.hp-combos__grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px;
-}
-.hp-combos__grid > ._fi { display: flex; }
-.hp-combos__grid > ._fi > * { flex: 1; }
-.hp-combo {
-  position: relative; display: flex; flex-direction: column;
-  padding: 30px 26px 26px; background: var(--card);
-  border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
-  transition: transform .35s cubic-bezier(.25,.46,.45,.94), box-shadow .35s;
-}
-.hp-combo::after {
-  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-  background: var(--g, linear-gradient(135deg, var(--sky), var(--indigo)));
-  opacity: 0; transition: opacity .35s;
-}
-.hp-combo:hover::after { opacity: 1; }
-.hp-combo:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 18px 50px rgba(var(--c),.1), 0 0 30px -10px rgba(var(--c),.06);
-}
-.hp-combo__save {
-  display: inline-flex; align-self: flex-start;
-  font-size: 11px; font-weight: 700; letter-spacing: .03em;
-  color: #fff; background: linear-gradient(135deg, #10b981, #059669);
-  padding: 4px 11px; border-radius: 6px; margin-bottom: 16px;
-}
-.hp-combo__name { font-size: 18px; font-weight: 700; color: var(--dark); }
-.hp-combo__tagline {
-  font-size: 13px; color: var(--muted); margin-top: 4px;
-  line-height: 1.5; margin-bottom: 18px;
-}
-.hp-combo__prices {
-  display: flex; align-items: baseline; gap: 10px; margin-bottom: 18px;
-}
-.hp-combo__was { font-size: 15px; color: var(--faint); text-decoration: line-through; }
-.hp-combo__now {
-  font-size: 26px; font-weight: 800; color: var(--dark); letter-spacing: -.03em;
-}
-.hp-combo__offer {
-  font-size: 11px; font-weight: 700; color: #059669;
-  background: #ecfdf5; padding: 1px 6px; border-radius: 4px;
-}
-.hp-combo__list { list-style: none; padding: 0; margin: 0 0 18px; flex: 1; }
-.hp-combo__list li {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 13px; color: var(--slate); padding: 4px 0;
-}
-.hp-combo__ck { color: #10b981; flex-shrink: 0; }
-.hp-combo__star { color: var(--sky); flex-shrink: 0; }
-.hp-combo__meta {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  font-size: 12px; color: var(--faint); margin-bottom: 18px;
-}
-.hp-combo__meta span { display: flex; align-items: center; gap: 4px; }
-.hp-combo__dot { color: var(--faint); }
-.hp-combo__cta {
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  width: 100%; padding: 11px; border-radius: 10px;
-  font-size: 14px; font-weight: 600; text-decoration: none;
-  background: var(--dark); color: #fff; cursor: pointer;
-  transition: all .25s cubic-bezier(.25,.46,.45,.94); border: none;
-  position: relative; overflow: hidden;
-}
-.hp-combo__cta:hover {
-  background: var(--dark-2); transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(0,0,0,.12);
-}
-
-/* ══════════════════════════════════════════
-   MONTHLY PLANS
-   ══════════════════════════════════════════ */
-.hp-monthly {
-  padding: 120px 0; background: var(--dark); position: relative; overflow: hidden;
-}
-.hp-monthly::before {
-  content: ''; position: absolute; inset: 0;
-  background-image: radial-gradient(rgba(55,187,236,.045) 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, black 0%, transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, black 0%, transparent 70%);
-  pointer-events: none;
-}
-.hp-monthly__h2 {
-  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-  font-weight: 700; letter-spacing: -.035em; line-height: 1.1;
-  color: #f1f5f9; margin: 0;
-}
-.hp-monthly__sub {
-  font-size: 16px; color: rgba(148,163,184,.45);
-  margin-top: 14px; line-height: 1.7; max-width: 520px;
-}
-.hp-monthly__grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px;
-}
-.hp-monthly__grid > ._fi { display: flex; }
-.hp-monthly__grid > ._fi > * { flex: 1; }
-.hp-mplan {
-  display: flex; flex-direction: column;
-  padding: 30px 26px; background: rgba(30,41,59,.45);
-  border: 1px solid rgba(255,255,255,.05); border-radius: 14px;
-  backdrop-filter: blur(10px); position: relative; overflow: hidden;
-  transition: transform .35s cubic-bezier(.25,.46,.45,.94), box-shadow .35s, border-color .35s;
-}
-.hp-mplan::after {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, var(--sky), var(--sky-deep));
-  opacity: 0; transition: opacity .35s;
-}
-.hp-mplan:hover::after { opacity: 1; }
-.hp-mplan:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 44px rgba(0,0,0,.3), 0 0 40px -12px rgba(55,187,236,.08);
-  border-color: rgba(55,187,236,.12);
-}
-.hp-mplan--pop { border-color: rgba(55,187,236,.25); }
-.hp-mplan__badge {
-  position: absolute; top: 14px; right: 14px;
-  font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-  color: var(--sky); background: rgba(55,187,236,.1);
-  padding: 4px 10px; border-radius: 6px;
-}
-.hp-mplan__name {
-  font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 12px;
-}
-.hp-mplan__price {
-  display: flex; align-items: baseline; gap: 2px; margin-bottom: 22px;
-}
-.hp-mplan__amt {
-  font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -.03em;
-}
-.hp-mplan__was {
-  font-size: 15px; color: rgba(148,163,184,.5); text-decoration: line-through; margin-right: 4px;
-}
-.hp-mplan__off {
-  display: inline-block; font-size: 10px; font-weight: 700; color: #34d399;
-  background: rgba(16,185,129,.15); padding: 1px 6px; border-radius: 4px; margin-left: 6px;
-}
-.hp-mplan__per { font-size: 14px; color: rgba(148,163,184,.35); }
-.hp-mplan__list { list-style: none; padding: 0; margin: 0 0 24px; flex: 1; }
-.hp-mplan__list li {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 13px; color: #94a3b8; padding: 4px 0;
-}
-.hp-mplan__ck { color: #10b981; flex-shrink: 0; }
-.hp-mplan__cta {
-  display: flex; align-items: center; justify-content: center;
-  width: 100%; padding: 11px; border-radius: 10px;
-  font-size: 14px; font-weight: 600; text-decoration: none;
-  border: 1px solid rgba(255,255,255,.07); color: rgba(255,255,255,.45);
-  background: transparent; cursor: pointer; transition: all .2s;
-}
-.hp-mplan__cta:hover { border-color: rgba(55,187,236,.3); color: #fff; }
-.hp-mplan__cta--pop {
-  background: var(--sky);
-  color: #fff; border: none;
-}
-.hp-mplan__cta--pop:hover { background: var(--sky-deep); box-shadow: 0 4px 18px rgba(55,187,236,.3); }
-
-/* ── Monthly plan highlight badges ── */
-.hp-mplan__highlights { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 4px; }
-.hp-mplan__hl {
-  font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
-  color: var(--sky); background: rgba(55,187,236,.08);
-  padding: 2px 7px; border-radius: 4px; white-space: nowrap;
-}
-
-/* ══════════════════════════════════════════
-   CTA — gradient banner
-   ══════════════════════════════════════════ */
-.hp-cta {
-  padding: 100px 0; position: relative; overflow: hidden;
-  background: linear-gradient(145deg, #0c4a6e 0%, var(--dark) 100%);
-}
-.hp-cta > .hp-wrap { position: relative; z-index: 1; }
-
-.hp-cta__inner {
-  display: flex; align-items: center; justify-content: space-between; gap: 48px;
-}
-.hp-cta__text { flex: 1; }
-.hp-cta__h2 {
-  font-size: clamp(1.75rem, 3.8vw, 2.6rem);
-  font-weight: 700; letter-spacing: -.03em; line-height: 1.15;
-  color: #f1f5f9; margin: 0;
-}
-.hp-cta__sub {
-  font-size: 15px; line-height: 1.65;
-  color: rgba(148,163,184,.45); margin-top: 12px;
-}
-.hp-cta__actions { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
-.hp-cta .hp-btn--ghost {
-  color: rgba(148,163,184,.45); border-color: rgba(255,255,255,.08);
-}
-.hp-cta .hp-btn--ghost:hover { color: #fff; border-color: rgba(255,255,255,.2); }
-
-/* ══════════════════════════════════════════
-   FOOTER
-   ══════════════════════════════════════════ */
-.hp-ft {
-  background: var(--dark); border-top: 1px solid rgba(255,255,255,.04); padding: 28px 0;
-}
-.hp-ft__inner {
-  display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: 16px;
-}
-.hp-ft__left { display: flex; align-items: center; gap: 10px; }
-.hp-ft__logo { height: 22px; width: auto; opacity: .4; }
-.hp-ft__copy { font-size: 12px; color: rgba(148,163,184,.22); }
-.hp-ft__links { display: flex; gap: 24px; }
-.hp-ft__links a {
-  font-size: 12px; color: rgba(148,163,184,.28);
-  text-decoration: none; transition: color .2s;
-}
-.hp-ft__links a:hover { color: rgba(255,255,255,.55); }
-.hp-ft__social { display: flex; align-items: center; gap: 16px; }
-.hp-ft__social a {
-  color: rgba(148,163,184,.28); transition: color .2s;
-  display: flex; align-items: center;
-}
-.hp-ft__social a:hover { color: rgba(255,255,255,.6); }
-
-/* ══════════════════════════════════════════
-   RESPONSIVE
-   ══════════════════════════════════════════ */
-@media (max-width: 960px) {
-  .hp-svc__grid { grid-template-columns: 1fr 1fr; }
-  .hp-combos__grid { grid-template-columns: 1fr 1fr; }
-  .hp-monthly__grid { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 768px) {
-  .hp-hero { min-height: 100vh; padding: 100px 20px 0; }
-  .hp-hero__content { text-align: center; }
-  .hp-hero__stats { flex-wrap: wrap; gap: 16px; width: 100%; }
-  .hp-st { flex: 1 0 40%; }
-  .hp-st:not(:last-child)::after { display: none; }
-  .hp-hero__btns { flex-direction: column; align-items: stretch; }
-  .hp-svc__grid { grid-template-columns: 1fr; }
-  .hp-proc__grid { grid-template-columns: 1fr; gap: 20px; }
-  .hp-plans { grid-template-columns: 1fr; }
-  .hp-combos__grid { grid-template-columns: 1fr; }
-  .hp-monthly__grid { grid-template-columns: 1fr; }
-  .hp-tabs { flex-wrap: wrap; }
-  .hp-cta__inner { flex-direction: column; text-align: center; }
-  .hp-cta__actions { align-items: center; }
-  .hp-btn { justify-content: center; }
-  .hp-ft__inner { flex-direction: column; text-align: center; }
-}
-@media (max-width: 480px) {
-  .hp-hero__h1 { font-size: 2rem; }
-  .hp-hero__stats { flex-direction: column; gap: 12px; width: 100%; }
-  .hp-st { flex: none; }
-  .hp-hero__pill { font-size: 10px; padding: 5px 16px; margin-bottom: 24px; }
-  .hp-svc { padding: 80px 0; }
-  .hp-pricing { padding: 80px 0; }
-  .hp-combos { padding: 80px 0; }
-  .hp-monthly { padding: 80px 0; }
-  .hp-proc { padding: 70px 0; }
-  .hp-cta { padding: 70px 0; }
-  .hp-svc__card { padding: 26px 22px 24px; }
-  .hp-plan { padding: 24px 20px 22px; }
-  .hp-combo { padding: 24px 20px 22px; }
-}
-
-
-      `}</style>
+      {/* ═══ FLOATING WHATSAPP WIDGET ═══ */}
+      <div className="hp-wa">
+        <div className="hp-wa__pulse" />
+        <a
+          href="https://wa.me/918837679889?text=Hi%20SkyWorld%2C%20I%27m%20interested%20in%20your%20services."
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hp-wa__btn"
+          aria-label="Chat on WhatsApp"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+          </svg>
+        </a>
+      </div>
     </div>
   );
 };

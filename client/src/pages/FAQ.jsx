@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Seo, buildBreadcrumbSchema, buildFaqSchema } from '../components/seo/Seo';
 
@@ -56,7 +57,58 @@ const FAQ_ITEMS = [
   },
 ];
 
+const AccordionItem = ({ item, isOpen, toggle }) => (
+  <div
+    style={{
+      background: isOpen ? '#fff' : '#fff',
+      borderRadius: 16,
+      border: `1px solid ${isOpen ? 'rgba(0,191,255,.2)' : 'rgba(0,0,0,.06)'}`,
+      overflow: 'hidden',
+      transition: 'all .3s cubic-bezier(.16,1,.3,1)',
+      boxShadow: isOpen ? '0 8px 32px rgba(0,191,255,.06)' : '0 2px 8px rgba(0,0,0,.02)',
+    }}
+  >
+    <button
+      onClick={toggle}
+      style={{
+        width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+        padding: '20px 24px', textAlign: 'left',
+      }}
+    >
+      <span style={{ fontSize: 15, fontWeight: 700, color: '#0b1120', lineHeight: 1.4 }}>{item.q}</span>
+      <span
+        style={{
+          width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+          background: isOpen ? 'linear-gradient(135deg, #0891b2, #00bfff)' : '#f1f5f9',
+          color: isOpen ? '#fff' : '#64748b',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 16, fontWeight: 700, transition: 'all .3s',
+          transform: isOpen ? 'rotate(45deg)' : 'none',
+        }}
+      >
+        +
+      </span>
+    </button>
+    <div
+      style={{
+        maxHeight: isOpen ? 300 : 0,
+        opacity: isOpen ? 1 : 0,
+        overflow: 'hidden',
+        transition: 'max-height .4s cubic-bezier(.16,1,.3,1), opacity .3s',
+      }}
+    >
+      <p style={{ padding: '0 24px 20px', fontSize: 14, lineHeight: 1.7, color: '#64748b', margin: 0 }}>
+        {item.a}
+      </p>
+    </div>
+  </div>
+);
+
 const FAQ = () => {
+  const [openIdx, setOpenIdx] = useState(null);
+  const [search, setSearch] = useState('');
+
   const faqStructuredData = [
     buildBreadcrumbSchema([
       { name: 'Home', path: '/' },
@@ -65,51 +117,102 @@ const FAQ = () => {
     buildFaqSchema(FAQ_ITEMS),
   ];
 
+  const filtered = search.trim()
+    ? FAQ_ITEMS.filter(
+        (item) =>
+          item.q.toLowerCase().includes(search.toLowerCase()) ||
+          item.a.toLowerCase().includes(search.toLowerCase())
+      )
+    : FAQ_ITEMS;
+
   return (
-    <div className="min-h-screen bg-surface-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: "'Inter', system-ui, sans-serif" }}>
       <Seo
         title="FAQ | SkyWorld Ventures"
         description="Find answers about SkyWorld Ventures pricing, website packages, combo offers, monthly maintenance plans, payments, revisions, meetings, and support."
         path="/faq"
-        keywords={[
-          'SkyWorld FAQ',
-          'website pricing FAQ',
-          'combo package FAQ',
-          'monthly plan FAQ',
-        ]}
+        keywords={['SkyWorld FAQ', 'website pricing FAQ', 'combo package FAQ', 'monthly plan FAQ']}
         structuredData={faqStructuredData}
       />
 
-      <div className="max-w-3xl mx-auto card sm:p-12 animate-fade-in">
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: '56px 24px 80px' }}>
         <Link
           to="/"
-          className="text-primary-500 hover:text-primary-600 text-sm font-medium mb-6 inline-flex items-center"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#0891b2', textDecoration: 'none', marginBottom: 32 }}
         >
           &larr; Back to Home
         </Link>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Frequently Asked Questions</h1>
-        <p className="text-sm text-gray-500 mb-8">Last updated: March 7, 2026</p>
+        <div style={{ marginBottom: 48 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#0891b2', marginBottom: 16 }}>
+            <span style={{ width: 24, height: 2, background: 'linear-gradient(90deg, #0891b2, #6366f1)', borderRadius: 2 }} />
+            Support
+          </span>
+          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, color: '#0b1120', letterSpacing: '-.03em', lineHeight: 1.1, margin: '0 0 12px' }}>
+            Frequently Asked Questions
+          </h1>
+          <p style={{ fontSize: 16, color: '#64748b', lineHeight: 1.6, marginBottom: 28 }}>
+            Everything you need to know about our services and how we work.
+          </p>
 
-        <div className="space-y-3">
-          {FAQ_ITEMS.map((item) => (
-            <details
-              key={item.q}
-              className="group rounded-xl border border-gray-200 bg-white p-4 open:border-primary-200:border-primary-500/30 open:bg-primary-50/20:bg-primary-500/5"
+          {/* Search */}
+          <div style={{ position: 'relative', maxWidth: 420 }}>
+            <svg
+              width="18" height="18" fill="none" stroke="#94a3b8" strokeWidth="2" viewBox="0 0 24 24"
+              style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }}
             >
-              <summary className="cursor-pointer list-none text-sm sm:text-base font-semibold text-gray-900 flex items-center justify-between gap-3">
-                <span>{item.q}</span>
-                <span className="text-primary-500 transition-transform group-open:rotate-45">+</span>
-              </summary>
-              <p className="mt-3 text-sm text-gray-600 leading-relaxed">{item.a}</p>
-            </details>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search questions..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                width: '100%', height: 48, paddingLeft: 44, paddingRight: 16,
+                borderRadius: 12, border: '1px solid rgba(0,0,0,.08)',
+                background: '#fff', fontSize: 14, color: '#0b1120',
+                outline: 'none', transition: 'border-color .2s',
+              }}
+              onFocus={(e) => (e.target.style.borderColor = 'rgba(0,191,255,.4)')}
+              onBlur={(e) => (e.target.style.borderColor = 'rgba(0,0,0,.08)')}
+            />
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {filtered.length === 0 && (
+            <p style={{ fontSize: 14, color: '#94a3b8', textAlign: 'center', padding: 32 }}>
+              No questions match your search.
+            </p>
+          )}
+          {filtered.map((item, i) => (
+            <AccordionItem
+              key={item.q}
+              item={item}
+              isOpen={openIdx === i}
+              toggle={() => setOpenIdx(openIdx === i ? null : i)}
+            />
           ))}
         </div>
 
-        <div className="mt-10 text-sm text-gray-500">
-          Still need help?{' '}
-          <a href="mailto:support@skyworld.buzz" className="text-primary-500 hover:underline">
-            Contact support
+        <div style={{ marginTop: 48, padding: '24px 28px', background: '#fff', borderRadius: 16, border: '1px solid rgba(0,0,0,.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+          <div>
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#0b1120', margin: '0 0 4px' }}>Still have questions?</p>
+            <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>We&apos;re here to help. Reach out anytime.</p>
+          </div>
+          <a
+            href="mailto:support@skyworld.buzz"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '10px 24px', borderRadius: 10,
+              background: 'linear-gradient(135deg, #0891b2, #00bfff)', color: '#fff',
+              fontSize: 14, fontWeight: 700, textDecoration: 'none',
+              boxShadow: '0 4px 16px rgba(0,191,255,.18)',
+              transition: 'transform .2s, box-shadow .2s',
+            }}
+          >
+            Contact Support &rarr;
           </a>
         </div>
       </div>

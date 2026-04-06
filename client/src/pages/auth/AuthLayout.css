@@ -1,0 +1,204 @@
+/* ══════════════════════════════════════════
+   AUTH LAYOUT — Premium SkyWorld Theme
+   ══════════════════════════════════════════ */
+
+.auth-page {
+  display:flex; min-height:100vh; font-family:'Inter',system-ui,sans-serif;
+}
+
+/* ── Brand Panel (Left) ── */
+.auth-brand {
+  display:none; position:relative; overflow:hidden;
+  width:45%; flex-shrink:0;
+  background:linear-gradient(145deg, #020810 0%, #0a1628 50%, #071020 100%);
+}
+@media (min-width:1024px) {
+  .auth-brand { display:flex; }
+}
+
+/* Star-dot pattern */
+.auth-brand__dots {
+  position:absolute; inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size:28px 28px;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 50%, black, transparent 70%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 50%, black, transparent 70%);
+}
+
+/* Radial glows */
+.auth-brand__glow {
+  position:absolute; border-radius:50%; filter:blur(100px); pointer-events:none;
+}
+.auth-brand__glow--1 {
+  width:500px; height:500px;
+  bottom:-150px; left:-100px;
+  background:radial-gradient(circle, rgba(0,191,255,.06), transparent 60%);
+}
+.auth-brand__glow--2 {
+  width:400px; height:400px;
+  top:-100px; right:-80px;
+  background:radial-gradient(circle, rgba(99,102,241,.05), transparent 60%);
+}
+
+/* Floating orbs */
+.auth-brand__orb {
+  position:absolute; border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle, rgba(0,191,255,.08), transparent 60%);
+  animation:auth-orb-float 12s ease-in-out infinite;
+}
+.auth-brand__orb--1 {
+  width:180px; height:180px; top:15%; left:10%;
+  animation-delay:0s; animation-duration:14s;
+}
+.auth-brand__orb--2 {
+  width:120px; height:120px; bottom:25%; right:15%;
+  background:radial-gradient(circle, rgba(99,102,241,.06), transparent 60%);
+  animation-delay:-5s; animation-duration:11s;
+}
+.auth-brand__orb--3 {
+  width:80px; height:80px; top:60%; left:50%;
+  background:radial-gradient(circle, rgba(16,185,129,.05), transparent 60%);
+  animation-delay:-8s; animation-duration:16s;
+}
+
+@keyframes auth-orb-float {
+  0%, 100% { transform:translate(0, 0) scale(1); }
+  25% { transform:translate(15px, -20px) scale(1.05); }
+  50% { transform:translate(-10px, 15px) scale(0.95); }
+  75% { transform:translate(20px, 10px) scale(1.03); }
+}
+
+/* Globe silhouette */
+.auth-brand__globe {
+  position:absolute; width:340px; height:340px;
+  bottom:8%; right:-40px;
+  opacity:.4;
+  animation:auth-globe-spin 60s linear infinite;
+  pointer-events:none;
+}
+@keyframes auth-globe-spin {
+  0%   { transform:rotate(0deg); }
+  100% { transform:rotate(360deg); }
+}
+
+/* Content container */
+.auth-brand__content {
+  display:flex; flex-direction:column; justify-content:space-between;
+  padding:48px 56px; width:100%; position:relative; z-index:10;
+}
+
+/* Logo */
+.auth-brand__logo {
+  display:inline-flex; width:fit-content;
+  transition:opacity .3s;
+}
+.auth-brand__logo:hover { opacity:.8; }
+.auth-brand__logo img { height:36px; width:auto; object-fit:contain; }
+
+/* Copy */
+.auth-brand__copy { max-width:360px; }
+.auth-brand__h1 {
+  font-size:clamp(1.8rem, 2.5vw, 2.4rem); font-weight:800;
+  color:#e2e8f0; line-height:1.2; letter-spacing:-.03em;
+}
+.auth-brand__sub {
+  font-size:15px; line-height:1.7; color:rgba(148,163,184,.5);
+  margin-top:16px; font-weight:450;
+}
+
+/* Footer */
+.auth-brand__footer {
+  display:flex; flex-direction:column; gap:12px;
+  color:rgba(100,116,139,.5); font-size:13px;
+}
+.auth-brand__trust {
+  display:flex; align-items:center; gap:6px;
+  font-size:11px; letter-spacing:.03em; text-transform:uppercase; font-weight:600;
+  color:rgba(0,191,255,.35);
+}
+
+/* ── Form Panel (Right) ── */
+.auth-form {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  padding:32px 24px; background:#fff;
+  position:relative;
+}
+.auth-form::before {
+  content:''; position:absolute; top:0; left:0; bottom:0; width:1px;
+  background:linear-gradient(180deg, transparent, rgba(0,191,255,.08), rgba(0,191,255,.12), rgba(0,191,255,.08), transparent);
+}
+
+.auth-form__inner { width:100%; max-width:380px; }
+
+/* Mobile logo */
+.auth-form__mobile-logo {
+  display:flex; margin-bottom:40px;
+}
+@media (min-width:1024px) {
+  .auth-form__mobile-logo { display:none; }
+}
+.auth-form__mobile-logo img { height:28px; width:auto; object-fit:contain; }
+
+/* Form headings */
+.auth-form__inner h2 {
+  font-size:24px; font-weight:800; color:#0f172a;
+  letter-spacing:-.03em;
+}
+.auth-form__inner h2 + p {
+  margin-top:6px; font-size:14px; color:#94a3b8; font-weight:450;
+}
+
+/* Input overrides for auth pages */
+.auth-form .input-field {
+  border-color:#e2e8f0; background:#fafbfc;
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+}
+.auth-form .input-field:focus {
+  background:#fff;
+  border-color:#38bdf8;
+  box-shadow:0 0 0 3px rgba(56,189,248,.1);
+}
+
+/* Primary button override */
+.auth-form .btn-primary {
+  background:linear-gradient(135deg, #0284c7, #0ea5e9);
+  border:none; border-radius:12px; font-weight:700;
+  box-shadow:0 2px 8px rgba(14,165,233,.2);
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+}
+.auth-form .btn-primary:hover {
+  background:linear-gradient(135deg, #0369a1, #0284c7);
+  box-shadow:0 4px 16px rgba(14,165,233,.3);
+  transform:translateY(-1px);
+}
+
+/* Google button override */
+.auth-form button[type="button"] {
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+}
+
+/* Divider */
+.auth-form .relative.my-5 div:first-child div { border-color:#f1f5f9; }
+
+/* Switch link */
+.auth-form__switch {
+  margin-top:32px; text-align:center;
+  font-size:14px; color:#94a3b8;
+}
+.auth-form__switch-link {
+  font-weight:600; color:#0284c7;
+  transition:color .2s;
+}
+.auth-form__switch-link:hover { color:#0369a1; }
+
+/* Label refinement */
+.auth-form label {
+  font-size:13px; font-weight:600; color:#475569;
+  letter-spacing:.01em;
+}
+.auth-form a.text-primary-600 {
+  color:#0284c7;
+}
+.auth-form a.text-primary-600:hover {
+  color:#0369a1;
+}
