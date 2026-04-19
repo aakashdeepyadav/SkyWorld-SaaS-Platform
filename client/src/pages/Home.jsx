@@ -247,7 +247,6 @@ const SkyWorldCanvas = () => {
     let mouse = { x: -1000, y: -1000 };
     let smoothMouse = { x: -1000, y: -1000 };
     let stars = [];
-    let shootingStars = [];
     let globeAngle = 0;
     let time = 0;
 
@@ -263,7 +262,7 @@ const SkyWorldCanvas = () => {
     const initStars = () => {
       const w = canvas.offsetWidth;
       const h = canvas.offsetHeight;
-      const count = Math.min(280, Math.floor((w * h) / 3200));
+      const count = Math.min(160, Math.floor((w * h) / 5000));
       stars = [];
       for (let i = 0; i < count; i++) {
         const z = Math.random();
@@ -285,19 +284,6 @@ const SkyWorldCanvas = () => {
       }
     };
 
-    /* ── Shooting star spawner ── */
-    const spawnShootingStar = (w, h) => {
-      if (shootingStars.length >= 3) return;
-      shootingStars.push({
-        x: Math.random() * w * 0.7,
-        y: Math.random() * h * 0.4,
-        vx: 4 + Math.random() * 6,
-        vy: 2 + Math.random() * 3,
-        life: 1,
-        decay: 0.012 + Math.random() * 0.01,
-        len: 40 + Math.random() * 60,
-      });
-    };
 
     /* ── Globe wireframe geometry ── */
     const projectPoint = (lat, lon, radius, cx, cy, angle) => {
@@ -548,55 +534,6 @@ const SkyWorldCanvas = () => {
         ctx.fill();
       });
 
-      /* ── Mouse-star connection lines ── */
-      if (mouse.x > 0 && mouse.y > 0) {
-        stars.forEach(s => {
-          if (s.z < 0.4) return;
-          const dx = s.x - smoothMouse.x;
-          const dy = s.y - smoothMouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 180) {
-            const opacity = (1 - dist / 180) * 0.08 * s.z;
-            ctx.beginPath();
-            ctx.moveTo(s.x, s.y);
-            ctx.lineTo(smoothMouse.x, smoothMouse.y);
-            ctx.strokeStyle = `rgba(56,189,248,${opacity})`;
-            ctx.lineWidth = 0.3;
-            ctx.stroke();
-          }
-        });
-      }
-
-      /* ── Shooting stars ── */
-      if (Math.random() < 0.008) spawnShootingStar(w, h);
-      shootingStars = shootingStars.filter(ss => ss.life > 0);
-      shootingStars.forEach(ss => {
-        ss.x += ss.vx;
-        ss.y += ss.vy;
-        ss.life -= ss.decay;
-
-        const tailX = ss.x - ss.vx * ss.len * 0.15;
-        const tailY = ss.y - ss.vy * ss.len * 0.15;
-        const grad = ctx.createLinearGradient(tailX, tailY, ss.x, ss.y);
-        grad.addColorStop(0, 'transparent');
-        grad.addColorStop(0.5, `rgba(125,211,252,${ss.life * 0.15})`);
-        grad.addColorStop(1, `rgba(255,255,255,${ss.life * 0.6})`);
-        ctx.beginPath();
-        ctx.moveTo(tailX, tailY);
-        ctx.lineTo(ss.x, ss.y);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Head glow
-        const hg = ctx.createRadialGradient(ss.x, ss.y, 0, ss.x, ss.y, 6);
-        hg.addColorStop(0, `rgba(255,255,255,${ss.life * 0.6})`);
-        hg.addColorStop(1, 'transparent');
-        ctx.fillStyle = hg;
-        ctx.beginPath();
-        ctx.arc(ss.x, ss.y, 6, 0, Math.PI * 2);
-        ctx.fill();
-      });
 
       /* ── Wireframe Globe ── */
       drawGlobe(w, h);
@@ -744,18 +681,17 @@ const Home = () => {
       {/* ═══ HERO ═══ */}
       <header className="hp-hero">
         <SkyWorldCanvas />
-        <div className="hp-hero__atmosphere" />
-        <div className="hp-hero__horizon" />
-        <div className="hp-hero__orb hp-hero__orb--1" />
-        <div className="hp-hero__orb hp-hero__orb--2" />
+        <div className="hp-hero__grain" />
 
-        <div className="hp-hero__center">
+        <div className="hp-hero__inner">
+
           <h1 className="hp-hero__h1">
-            We build products that <span className="hp-hero__h1-sky">drive</span> <span className="hp-hero__h1-world">growth.</span>
+            We build products<br />
+            that <span className="hp-hero__h1-accent">drive growth.</span>
           </h1>
 
           <p className="hp-hero__sub">
-            Websites, branding, and apps — with transparent pricing and milestone delivery.
+            Websites · Branding · Apps — transparent pricing, milestone delivery.
           </p>
 
           <div className="hp-hero__btns">
@@ -779,9 +715,18 @@ const Home = () => {
               </>
             )}
           </div>
+
+          <div className="hp-hero__proof">
+            <div className="hp-hero__proof-faces">
+              {['PS', 'RM', 'AV'].map((initials, i) => (
+                <span key={i} className="hp-hero__proof-face">{initials}</span>
+              ))}
+            </div>
+            <span className="hp-hero__proof-text">80+ happy clients</span>
+          </div>
         </div>
 
-        <div className="hp-hero__stats">
+        <div className="hp-hero__stats-bar">
           {[
             { v: 150, s: '+', l: 'Projects' },
             { v: 80, s: '+', l: 'Clients' },
@@ -796,6 +741,8 @@ const Home = () => {
             </div>
           ))}
         </div>
+
+        <div className="hp-hero__edge" />
       </header>
 
       {/* ═══ LOGO MARQUEE ═══ */}
