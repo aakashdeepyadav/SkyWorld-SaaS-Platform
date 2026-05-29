@@ -58,8 +58,8 @@ A **production-grade SaaS platform** where clients can request, track, and pay f
 ### 1. Install
 
 ```bash
-git clone https://github.com/skyworld-ventures/SkyWorld-Web.git
-cd SkyWorld-Web
+git clone https://github.com/aakashdeepyadav/SkyWorld-SaaS-Platform.git
+cd SkyWorld-SaaS-Platform
 npm run install-all
 ```
 
