@@ -1,61 +1,84 @@
 <div align="center">
-  <img src="client/public/logo.png" alt="SkyWorld" width="64" height="64" />
-  <h1>SkyWorld</h1>
-  <p><strong>Premium digital studio — apps, websites & brands.</strong></p>
+  <img src="client/public/logo.png" alt="SkyWorld logo" width="72" height="72" />
+
+# SkyWorld
+
+**A production-ready workspace for digital service delivery.**
+
+Clients discover services, submit requests, make payments, and track delivery in one place. Teams manage projects, milestones, files, messages, meetings, and operational analytics from role-based dashboards.
 
   <p>
-    <img src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white" alt="React" />
-    <img src="https://img.shields.io/badge/Node.js-Express-339933?logo=node.js&logoColor=white" alt="Node" />
-    <img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white" alt="Mongo" />
-    <img src="https://img.shields.io/badge/Tailwind-3.3-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind" />
-    <img src="https://img.shields.io/badge/License-MIT-blue" alt="License" />
+    <a href="https://github.com/aakashdeepyadav/SkyWorld-SaaS-Platform"><img src="https://img.shields.io/badge/stack-MERN-0f172a" alt="MERN stack" /></a>
+    <a href="./docs/SECURITY.md"><img src="https://img.shields.io/badge/security-documented-0ea5e9" alt="Security documented" /></a>
+    <a href="./server/__tests__"><img src="https://img.shields.io/badge/tests-Vitest-6e9f18" alt="Vitest tests" /></a>
+    <img src="https://img.shields.io/badge/license-MIT-2563eb" alt="MIT license" />
   </p>
 </div>
 
----
+## Overview
 
-## What is SkyWorld?
+SkyWorld is a full-stack SaaS platform for a digital studio. It provides a complete workflow from service discovery to project delivery, with separate experiences for clients, developers, and administrators.
 
-A **production-grade SaaS platform** where clients can request, track, and pay for digital services — app development, web development, and branding & design. Built on the MERN stack with role-based dashboards, milestone tracking, Razorpay payments, Cloudinary file management, and email notifications.
+### What it includes
 
-### Core Features
+- Service catalog for web, app, branding, maintenance, and add-on work
+- Structured and custom service requests
+- Project workspaces with milestones, progress, assignment, files, and messaging
+- Razorpay payment verification and invoice generation
+- Google OAuth sign-in and optional Google Calendar / Google Meet integration
+- Email OTP verification, password reset, notifications, and document delivery
+- Admin analytics, audit logging, user management, and service management
+- Security controls including HTTP-only JWT cookies, CSRF protection, rate limiting, Helmet, input validation, and MongoDB query sanitization
 
-- 🛒 **Service Catalog** — Three categories with configurable pricing
-- 📋 **Service & Custom Requests** — Structured or freeform project briefs
-- 📊 **Project Dashboard** — Milestone tracking, progress bars, developer assignment
-- 💳 **Razorpay Payments** — Order creation, verification, auto-invoicing
-- 💬 **Messaging** — Per-project chat between clients & developers
-- 📁 **File Uploads** — Cloudinary-backed with MIME validation
-- 🔐 **Auth** — Email/password + OTP verification + Google OAuth
-- 🛡️ **Security** — Helmet, CSRF, rate limiting, mongo-sanitize, account lockout
+## Product Flow
 
----
+```mermaid
+flowchart LR
+    A[Client discovers a service] --> B[Submits a request]
+    B --> C[Payment and verification]
+    C --> D[Project workspace]
+    D --> E[Milestones and files]
+    D --> F[Messages and meetings]
+    E --> G[Delivery]
+    H[Admin] --> B
+    H --> D
+    I[Developer] --> D
+```
 
-## Tech Stack
+## Technology
 
-| Layer        | Technologies                                                    |
-| ------------ | --------------------------------------------------------------- |
-| **Frontend** | React 18, Vite 5, Tailwind CSS 3.3, React Query, React Router 6 |
-| **Backend**  | Node.js, Express 4, Mongoose 8, JWT (HTTP-only cookies)         |
-| **Database** | MongoDB Atlas                                                   |
-| **Payments** | Razorpay                                                        |
-| **Storage**  | Cloudinary                                                      |
-| **Email**    | Nodemailer + Brevo SMTP                                         |
-| **Deploy**   | Vercel (frontend) + Render (backend)                            |
+| Area           | Tools                                                     |
+| -------------- | --------------------------------------------------------- |
+| Frontend       | React 18, Vite 5, React Router, Tailwind CSS, React Query |
+| Backend        | Node.js, Express, Mongoose, Socket.IO                     |
+| Database       | MongoDB Atlas or MongoDB 7 via Docker                     |
+| Authentication | JWT HTTP-only cookies, Google OAuth, OTP, optional 2FA    |
+| Payments       | Razorpay                                                  |
+| Storage        | Cloudinary                                                |
+| Email          | Brevo SMTP, Nodemailer, Resend, MailerSend                |
+| Deployment     | Vercel frontend, Render backend, Docker alternative       |
+| Testing        | Vitest and Supertest                                      |
 
----
+## Repository Layout
+
+```text
+client/                 React SPA and Vite build
+server/                 Express API, services, models, and tests
+docs/                   Architecture, API, security, deployment, and user docs
+Dockerfile              Full-stack production container
+docker-compose.yml      Local MongoDB, Redis, and server stack
+render.yaml             Render backend service definition
+```
 
 ## Quick Start
 
-### Prerequisites
+### Requirements
 
-- Node.js 18+
-- MongoDB Atlas cluster (or local MongoDB)
-- Google OAuth credentials (optional, for social login)
-- Razorpay account (optional, for payments)
-- Cloudinary account (optional, for file uploads)
+- Node.js 18 or newer
+- npm
+- MongoDB Atlas, or Docker Desktop for the local database stack
 
-### 1. Install
+### Install
 
 ```bash
 git clone https://github.com/aakashdeepyadav/SkyWorld-SaaS-Platform.git
@@ -63,174 +86,127 @@ cd SkyWorld-SaaS-Platform
 npm run install-all
 ```
 
-### 2. Configure
+### Configure
 
-Copy the example env files and fill in your credentials:
+Create local environment files from the templates:
 
 ```bash
 cp server/.env.example server/.env
 cp client/.env.example client/.env
 ```
 
-**Server** (`server/.env`):
+At minimum, configure these values for local development:
 
 ```env
+# server/.env
 NODE_ENV=development
 PORT=5000
-MONGODB_URI=mongodb+srv://...
-JWT_ACCESS_SECRET=your-access-secret
-JWT_REFRESH_SECRET=your-refresh-secret
-JWT_ACCESS_EXPIRY=15m
-JWT_REFRESH_EXPIRY=7d
+MONGODB_URI=mongodb://localhost:27017/skyworld
+JWT_ACCESS_SECRET=replace-with-a-long-random-value
+JWT_REFRESH_SECRET=replace-with-a-different-long-random-value
 FRONTEND_URL=http://localhost:5173
-```
 
-**Client** (`client/.env`):
-
-```env
+# client/.env
 VITE_API_URL=http://localhost:5000/api
 ```
 
-### 3. Run
+Google OAuth, Razorpay, Cloudinary, and email integrations are optional for basic startup but required for their respective workflows. See the complete variable list in [server/.env.example](./server/.env.example) and [client/.env.example](./client/.env.example).
+
+### Run
 
 ```bash
 npm run dev
 ```
 
-This starts both the Express server (`:5000`) and Vite dev server (`:5173`) concurrently.
-
----
-
-## Project Structure
-
-```
-SkyWorld/
-├── client/                   # React SPA (Vite)
-│   ├── src/
-│   │   ├── pages/            # 28 page components
-│   │   │   ├── auth/         # Login, Register, OAuth, Password Reset
-│   │   │   ├── admin/        # Admin Dashboard, User & Service Management
-│   │   │   ├── client/       # Client Dashboard
-│   │   │   ├── developer/    # Developer Dashboard
-│   │   │   ├── requests/     # Service & Custom Requests
-│   │   │   ├── projects/     # Project List & Detail
-│   │   │   ├── payments/     # Payment List
-│   │   │   └── checkout/     # Razorpay Checkout
-│   │   ├── components/       # ProtectedRoute, RoleRoute, Layout
-│   │   ├── context/          # AuthContext (auth state management)
-│   │   ├── services/         # Axios instance + token refresh interceptor
-│   │   └── utils/            # Currency formatting
-│   ├── tailwind.config.js    # Brand colors, fonts, animations
-│   └── vercel.json           # Vercel deployment config
-│
-├── server/                   # Express API
-│   ├── models/               # 9 Mongoose models
-│   ├── controllers/          # 10 controllers
-│   ├── routes/               # 10 route files
-│   ├── middleware/            # Auth, RBAC, rate limiting, CSRF, validation, uploads
-│   ├── services/             # Auth, Email, Cloudinary service layers
-│   ├── config/               # Database, Cloudinary, env validation
-│   └── utils/                # Constants, Logger
-│
-├── docs/                     # Architecture, API, Database, Security, SRS docs
-└── render.yaml               # Render deployment config
-```
-
----
-
-## User Roles
-
-| Role          | Access                                                      | Assignment        |
-| ------------- | ----------------------------------------------------------- | ----------------- |
-| **Client**    | Request services, track projects, make payments, chat       | Default on signup |
-| **Developer** | View assigned projects, update progress, chat               | Assigned by admin |
-| **Admin**     | Full access — users, services, requests, projects, payments | Manual            |
-
----
-
-## API Overview
-
-All endpoints prefixed with `/api`. See [docs/API.md](./docs/API.md) for full reference.
-
-| Resource           | Endpoints | Description                                 |
-| ------------------ | --------- | ------------------------------------------- |
-| `/auth`            | 10        | Register, login, OAuth, OTP, password reset |
-| `/users`           | 8         | User management, profile, avatar            |
-| `/services`        | 5         | Service catalog CRUD                        |
-| `/requests`        | 5         | Service request lifecycle                   |
-| `/custom-requests` | 4         | Custom request + quoting                    |
-| `/projects`        | 5         | Project management                          |
-| `/payments`        | 4         | Razorpay orders & verification              |
-| `/messages`        | 3         | Per-project messaging                       |
-| `/files`           | 3         | Cloudinary file management                  |
-| `/admin/stats`     | 1         | Platform analytics                          |
-
----
-
-## Security
-
-| Measure            | Detail                                                 |
-| ------------------ | ------------------------------------------------------ |
-| Password hashing   | bcrypt (cost 12)                                       |
-| Account lockout    | 5 failed attempts → 30min lock                         |
-| JWT                | Short access (15m) + refresh (7d) in HTTP-only cookies |
-| CSRF               | Origin/referrer header validation                      |
-| Rate limiting      | Per-endpoint (auth: 5/15min, global: 200/15min)        |
-| Input sanitization | express-validator + mongo-sanitize                     |
-| File validation    | MIME whitelist, size limits, no SVG (XSS risk)         |
-| Audit trail        | Action logging with 90-day TTL auto-cleanup            |
-
----
-
-## Deployment
-
-### Frontend → Vercel
-
-Deployed automatically from the `client/` directory. Config in `client/vercel.json`.
-
-### Backend → Render
-
-Deployed via `render.yaml`. Free tier web service in Oregon region.
-
-### Docker (alternative)
-
-```bash
-cd client
-docker build -t skyworld-client .
-docker run -p 80:80 skyworld-client
-```
-
----
-
-## Documentation
-
-| Document                                       | Description                |
-| ---------------------------------------------- | -------------------------- |
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | System architecture        |
-| [docs/API.md](./docs/API.md)                   | API endpoint reference     |
-| [docs/DATABASE.md](./docs/DATABASE.md)         | Database schema            |
-| [docs/SECURITY.md](./docs/SECURITY.md)         | Security details           |
-| [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)     | Deployment guide           |
-| [docs/SRS.md](./docs/SRS.md)                   | Software Requirements Spec |
-| [docs/RBAC_FLOW.md](./docs/RBAC_FLOW.md)       | Role-based access flow     |
-| [docs/UI_UX_DESIGN.md](./docs/UI_UX_DESIGN.md) | UI/UX design docs          |
-| [docs/USER_MANUAL.md](./docs/USER_MANUAL.md)   | End-user manual            |
-
----
+The frontend runs at `http://localhost:5173` and the API runs at `http://localhost:5000`.
 
 ## Scripts
 
-```bash
-npm run dev          # Start both server & client
-npm run server       # Server only (nodemon)
-npm run client       # Client only (Vite HMR)
-npm run build        # Production build (client)
-npm run install-all  # Install all dependencies
-npm start            # Production server
+| Command                           | Purpose                                       |
+| --------------------------------- | --------------------------------------------- |
+| `npm run dev`                     | Start frontend and backend together           |
+| `npm run client`                  | Start the Vite development server             |
+| `npm run server`                  | Start the API with Nodemon                    |
+| `npm run build`                   | Generate SEO assets and build the frontend    |
+| `npm run install-all`             | Install root, server, and client dependencies |
+| `npm start`                       | Start the production API                      |
+| `cd server && npm test`           | Run backend tests once                        |
+| `cd server && npm run test:watch` | Run backend tests in watch mode               |
+
+## Production Deployment
+
+The recommended deployment is **Vercel for the client** and **Render for the API**.
+
+### Frontend on Vercel
+
+1. Import the repository into Vercel.
+2. Set the project root directory to `client`.
+3. Use build command `npm run build` and output directory `dist`.
+4. Configure `VITE_API_URL`, `VITE_GOOGLE_CLIENT_ID`, and `VITE_GOOGLE_REDIRECT_URI` in the Vercel project settings.
+5. Deploy from the production branch.
+
+The SPA rewrites and API proxy are defined in [client/vercel.json](./client/vercel.json).
+
+### Backend on Render
+
+1. Create a Render Web Service connected to the repository.
+2. Set the root directory to `server`.
+3. Use `npm install` as the build command and `node index.js` as the start command.
+4. Add the production secrets and service credentials from [server/.env.example](./server/.env.example).
+5. Set `FRONTEND_URL` to the exact HTTPS frontend origin.
+
+The service definition is available in [render.yaml](./render.yaml). Never commit production secrets or place `GOOGLE_CLIENT_SECRET` in frontend variables.
+
+### Google OAuth checklist
+
+Use the exact same callback URL in Google Cloud Console, the client environment, and the server environment:
+
+```text
+https://your-domain.com/auth/google/callback
 ```
 
----
+Also register the production frontend origin as an authorized JavaScript origin. Details are in [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md).
+
+### Docker
+
+Build and run the full-stack production image:
+
+```bash
+docker build -t skyworld .
+docker run --env-file .env -p 5000:5000 skyworld
+```
+
+For local MongoDB and Redis services:
+
+```bash
+docker compose up --build
+```
+
+## Security
+
+Security decisions and operational guidance are documented in [docs/SECURITY.md](./docs/SECURITY.md). Before production launch, verify HTTPS, CORS origins, JWT secrets, database access, payment webhooks, email credentials, upload limits, and monitoring configuration.
+
+## Documentation
+
+| Guide                                  | Description                                 |
+| -------------------------------------- | ------------------------------------------- |
+| [Architecture](./docs/ARCHITECTURE.md) | System boundaries and major components      |
+| [API reference](./docs/API.md)         | API routes and request contracts            |
+| [Database](./docs/DATABASE.md)         | Models, relationships, and indexes          |
+| [Deployment](./docs/DEPLOYMENT.md)     | Hosting and production setup                |
+| [Security](./docs/SECURITY.md)         | Security controls and operational checklist |
+| [RBAC flow](./docs/RBAC_FLOW.md)       | Client, developer, and admin permissions    |
+| [UI/UX design](./docs/UI_UX_DESIGN.md) | Interface direction and design decisions    |
+| [User manual](./docs/USER_MANUAL.md)   | End-user workflows                          |
+| [SRS](./docs/SRS.md)                   | Product requirements                        |
+
+## Contributing
+
+1. Create a feature branch from `develop`.
+2. Make a focused change and add or update tests where behavior changes.
+3. Run `npm run build` and `cd server && npm test` before opening a pull request.
+4. Open a pull request with a short description, screenshots for UI changes, and deployment notes when relevant.
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
+This project is released under the MIT License.
