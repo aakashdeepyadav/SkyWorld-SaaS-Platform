@@ -77,6 +77,22 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.03);
   }
 
+  .dark .service-plan-card .text-gray-900 {
+    color: #f8fafc;
+  }
+
+  .dark .service-plan-card .text-gray-700 {
+    color: #cbd5e1;
+  }
+
+  .dark .service-plan-card .text-gray-500 {
+    color: #94a3b8;
+  }
+
+  .dark .service-plan-card .text-gray-400 {
+    color: #94a3b8;
+  }
+
   .card-hover {
     @apply card hover:shadow-card-hover hover:-translate-y-0.5;
   }

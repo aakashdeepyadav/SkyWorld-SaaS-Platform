@@ -198,7 +198,7 @@ const ServiceDetail = () => {
             {catalog.plans.map((plan) => (
               <div
                 key={plan.slug}
-                className={`relative card overflow-hidden group flex flex-col ${
+                className={`relative card service-plan-card overflow-hidden group flex flex-col ${
                   plan.popular ? 'border-2 border-primary-200' : ''
                 }`}
               >
@@ -285,7 +285,7 @@ const ServiceDetail = () => {
             ))}
 
             {/* Custom Plan Card */}
-            <div className="card border-dashed flex flex-col group">
+            <div className="card service-plan-card border-dashed flex flex-col group">
               <div className="mb-5">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">Custom Plan</h3>
                 <p className="text-xs text-gray-400 mt-1">Beyond our fixed packages</p>
