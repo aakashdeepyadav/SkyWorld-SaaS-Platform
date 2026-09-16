@@ -77,20 +77,27 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.03);
   }
 
-  .dark .service-plan-card .text-gray-900 {
-    color: #f8fafc;
+  .dark .service-plan-card {
+    background: #263449;
+    border-color: rgba(148, 163, 184, 0.28);
+    color: #e2e8f0;
   }
 
-  .dark .service-plan-card .text-gray-700 {
-    color: #cbd5e1;
+  .dark .service-plan-card .text-gray-900,
+  .dark .service-plan-card .dark\:text-white {
+    color: #f8fafc !important;
   }
 
-  .dark .service-plan-card .text-gray-500 {
-    color: #94a3b8;
+  .dark .service-plan-card .text-gray-700,
+  .dark .service-plan-card .dark\:text-gray-300,
+  .dark .service-plan-card .dark\:text-gray-200 {
+    color: #dbeafe !important;
   }
 
-  .dark .service-plan-card .text-gray-400 {
-    color: #94a3b8;
+  .dark .service-plan-card .text-gray-500,
+  .dark .service-plan-card .text-gray-400,
+  .dark .service-plan-card .dark\:text-gray-400 {
+    color: #b6c5d8 !important;
   }
 
   .card-hover {
