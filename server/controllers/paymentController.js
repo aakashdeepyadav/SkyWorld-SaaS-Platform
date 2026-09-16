@@ -237,13 +237,7 @@ export const createRazorpayOrder = async (req, res, next) => {
 
     // ── Plan price validation (covers all tiers, not just 'starter') ──
     if (resolvedPlan && resolvedPlan !== 'custom' && resolvedServiceType) {
-      const categoryPrices = PLAN_PRICES[resolvedServiceType];
-      if (!categoryPrices || categoryPrices[resolvedPlan] === undefined) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid plan for selected service category'
-        });
-      }
+      const categoryPrices = PLAN_PRICES[resolvedServiceType] || {};
 
       // Virtual service types (combo, monthly, addon) have no Service document in DB
       const isVirtual = VIRTUAL_SERVICE_TYPES.includes(resolvedServiceType);
@@ -259,6 +253,9 @@ export const createRazorpayOrder = async (req, res, next) => {
           }
           starterService = await Service.findOne({
             _id: serviceId,
+            type: 'plan',
+            category: resolvedServiceType,
+            slug: resolvedPlan,
             isActive: true
           }).select('category basePrice offerPercent slug type');
 
@@ -312,6 +309,16 @@ export const createRazorpayOrder = async (req, res, next) => {
           slug: resolvedPlan,
           isActive: true,
         }).select('basePrice offerPercent slug type');
+      }
+
+      // Admin-created plans are not present in the legacy static price map.
+      // A missing database record is still invalid, while known legacy plans
+      // can use the static fallback for backwards compatibility.
+      if (!starterService && categoryPrices[resolvedPlan] === undefined) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid plan for selected service category'
+        });
       }
 
       // Use DB price with offer discount applied (falls back to PLAN_PRICES for safety)
