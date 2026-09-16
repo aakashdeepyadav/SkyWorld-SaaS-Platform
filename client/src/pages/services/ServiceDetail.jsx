@@ -73,10 +73,10 @@ const ServiceDetail = () => {
   /* ─── Not found ─── */
   if (!catalog) {
     return (
-      <div className="min-h-screen bg-surface-50 px-6 py-20">
+      <div className="min-h-screen bg-surface-50 dark:bg-surface-900 px-6 py-20">
         <div className="max-w-3xl mx-auto card text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Service not found</h1>
-          <p className="text-sm text-gray-500 mt-2">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Service not found</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             The service you are looking for does not exist.
           </p>
           <Link to="/" className="btn-primary mt-6 inline-flex">
@@ -136,7 +136,7 @@ const ServiceDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface-50">
+    <div className="min-h-screen bg-surface-50 dark:bg-surface-900">
       <Seo
         title={`${serviceName} Services & Pricing | SkyWorld Ventures`}
         description={`${serviceSubtitle} Compare ${catalog.plans.length} ${catalog.name.toLowerCase()} plans from ${formatINR(Math.min(...planPrices))} to ${formatINR(Math.max(...planPrices))}.`}
@@ -156,7 +156,7 @@ const ServiceDetail = () => {
         <div className="relative max-w-6xl mx-auto px-6 pt-10 pb-16">
           <Link
             to="/"
-            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700:text-gray-200 transition-colors mb-8"
+            className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-8"
           >
             <ArrowLeftIcon className="w-4 h-4 mr-1.5" /> Back to Home
           </Link>
@@ -168,10 +168,10 @@ const ServiceDetail = () => {
               <Icon className={`w-7 h-7 ${catalog.accentText}`} />
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
                 {serviceName}
               </h1>
-              <p className="text-gray-500 mt-2 max-w-2xl text-lg leading-relaxed">
+              <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-2xl text-lg leading-relaxed">
                 {serviceSubtitle}
               </p>
             </div>

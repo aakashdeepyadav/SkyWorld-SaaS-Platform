@@ -63,10 +63,12 @@ const PlanDetail = () => {
   /* Not found */
   if (!catalog || !plan) {
     return (
-      <div className="min-h-screen bg-surface-50 px-6 py-20">
+      <div className="min-h-screen bg-surface-50 dark:bg-surface-900 px-6 py-20">
         <div className="max-w-3xl mx-auto card text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Plan not found</h1>
-          <p className="text-sm text-gray-500 mt-2">The plan you are looking for does not exist.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Plan not found</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            The plan you are looking for does not exist.
+          </p>
           <Link to={slug ? `/services/${slug}` : '/'} className="btn-primary mt-6 inline-flex">
             Back to {catalog?.name || 'Home'}
           </Link>
@@ -108,7 +110,7 @@ const PlanDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface-50">
+    <div className="min-h-screen bg-surface-50 dark:bg-surface-900">
       <Seo
         title={`${plan.name} | ${catalog.name} Pricing | SkyWorld Ventures`}
         description={`${plan.name} is built for ${plan.bestFor.toLowerCase()}. View pricing, delivery timeline, included features, and payment breakdown from SkyWorld Ventures.`}
@@ -128,7 +130,7 @@ const PlanDetail = () => {
         <div className="relative max-w-4xl mx-auto px-6 pt-10 pb-14">
           <Link
             to={`/services/${slug}`}
-            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700:text-gray-200 transition-colors mb-8"
+            className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-8"
           >
             <ArrowLeftIcon className="w-4 h-4 mr-1.5" /> All {catalog.name} plans
           </Link>
@@ -148,11 +150,11 @@ const PlanDetail = () => {
                 >
                   <Icon className={`w-5 h-5 ${catalog.accentText}`} />
                 </div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
                   {plan.name}
                 </h1>
               </div>
-              <p className="text-sm text-gray-500 mt-1">{plan.bestFor}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{plan.bestFor}</p>
             </div>
 
             <div className="flex flex-col items-end">
@@ -162,16 +164,16 @@ const PlanDetail = () => {
                     {formatINR(plan.offerOriginalPrice)}
                   </span>
                 )}
-                <span className="text-4xl font-extrabold text-gray-900">
+                <span className="text-4xl font-extrabold text-gray-900 dark:text-white">
                   {formatINR(plan.price)}
                 </span>
                 {plan.offerPercent > 0 && (
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full">
                     {plan.offerPercent}% off
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-400 mt-1 flex items-center gap-1.5">
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1 flex items-center gap-1.5">
                 <ClockIcon className="w-4 h-4" /> Delivery in {plan.delivery}
               </p>
               <button
@@ -196,7 +198,9 @@ const PlanDetail = () => {
             </div>
             <div>
               <p className="text-xs text-gray-400 uppercase tracking-wider font-medium">Delivery</p>
-              <p className="text-sm font-semibold text-gray-900 mt-0.5">{plan.delivery}</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">
+                {plan.delivery}
+              </p>
             </div>
           </div>
           <div className="card flex items-center gap-4">
@@ -207,7 +211,7 @@ const PlanDetail = () => {
             </div>
             <div>
               <p className="text-xs text-gray-400 uppercase tracking-wider font-medium">Support</p>
-              <p className="text-sm font-semibold text-gray-900 mt-0.5">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">
                 {plan.support || 'Chat support'}
               </p>
             </div>
@@ -218,7 +222,7 @@ const PlanDetail = () => {
             </div>
             <div>
               <p className="text-xs text-gray-400 uppercase tracking-wider font-medium">Payment</p>
-              <p className="text-sm font-semibold text-gray-900 mt-0.5">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">
                 50% advance, rest on delivery
               </p>
             </div>
@@ -230,7 +234,9 @@ const PlanDetail = () => {
           <div className="card">
             <div className="flex items-center gap-2 mb-5">
               <SparklesIcon className="w-5 h-5 text-emerald-500" />
-              <h2 className="text-base font-bold text-gray-900">What&apos;s included</h2>
+              <h2 className="text-base font-bold text-gray-900 dark:text-white">
+                What&apos;s included
+              </h2>
             </div>
             <div className="grid sm:grid-cols-2 gap-3">
               {plan.features.map((f) => (
@@ -239,7 +245,7 @@ const PlanDetail = () => {
                     className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"
                     strokeWidth={3}
                   />
-                  <span className="text-gray-700">{f}</span>
+                  <span className="text-gray-700 dark:text-gray-300">{f}</span>
                 </div>
               ))}
             </div>
@@ -262,28 +268,36 @@ const PlanDetail = () => {
 
         {/* Pricing Breakdown */}
         <div className="card mb-12">
-          <h2 className="text-base font-bold text-gray-900 mb-4">Payment breakdown</h2>
+          <h2 className="text-base font-bold text-gray-900 dark:text-white mb-4">
+            Payment breakdown
+          </h2>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-4 rounded-xl bg-emerald-50 border border-emerald-100">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
                   <span className="text-white text-xs font-bold">1</span>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">50% Advance</p>
-                  <p className="text-[11px] text-gray-500">Pay now to start your project</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">50% Advance</p>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Pay now to start your project
+                  </p>
                 </div>
               </div>
               <span className="text-lg font-bold text-emerald-600">{formatINR(advanceAmount)}</span>
             </div>
-            <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-surface-700/70 border border-gray-100 dark:border-surface-600">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-gray-300 flex items-center justify-center">
                   <span className="text-white text-xs font-bold">2</span>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">50% on Delivery</p>
-                  <p className="text-[11px] text-gray-500">Pay after reviewing your project</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    50% on Delivery
+                  </p>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Pay after reviewing your project
+                  </p>
                 </div>
               </div>
               <span className="text-lg font-bold text-gray-400">
@@ -310,7 +324,9 @@ const PlanDetail = () => {
         {/* Other Plans */}
         {otherPlans.length > 0 && (
           <div>
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Other {catalog.name} plans</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+              Other {catalog.name} plans
+            </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               {otherPlans.map((op) => (
                 <Link
@@ -321,7 +337,7 @@ const PlanDetail = () => {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3
-                        className={`text-sm font-bold text-gray-900 group-hover:${catalog.accentText} transition-colors`}
+                        className={`text-sm font-bold text-gray-900 dark:text-white group-hover:${catalog.accentText} transition-colors`}
                       >
                         {op.name}
                       </h3>
@@ -343,7 +359,7 @@ const PlanDetail = () => {
                           {formatINR(op.offerOriginalPrice)}
                         </span>
                       )}
-                      <span className="text-lg font-extrabold text-gray-900">
+                      <span className="text-lg font-extrabold text-gray-900 dark:text-white">
                         {formatINR(op.price)}
                       </span>
                       {op.offerPercent > 0 && (
