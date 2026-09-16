@@ -63,7 +63,7 @@ const ServiceDetail = () => {
   const dbService = useMemo(
     () =>
       [...services]
-        .filter((item) => item.category === slug)
+        .filter((item) => item.category === slug && item.type === 'plan')
         .sort(
           (a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
         )[0],
@@ -113,7 +113,11 @@ const ServiceDetail = () => {
   /* ─── Checkout handler ─── */
   const handlePlanCheckout = (planSlug) => {
     const params = new URLSearchParams({ service: slug, plan: planSlug });
-    if (dbService?._id) params.set('serviceId', dbService._id);
+    const selectedService = services.find(
+      (item) =>
+        item.category === slug && item.type === 'plan' && item.slug === planSlug && item.isActive
+    );
+    if (selectedService?._id) params.set('serviceId', selectedService._id);
     const target = `/checkout?${params.toString()}`;
     if (!user) {
       navigate('/login', { state: { from: target } });
@@ -179,7 +183,7 @@ const ServiceDetail = () => {
         {/* ── Plan Cards ── */}
         <section>
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold text-gray-900">Choose your plan</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Choose your plan</h2>
           </div>
 
           <div
@@ -207,7 +211,7 @@ const ServiceDetail = () => {
                 )}
 
                 <div className="mb-5">
-                  <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">{plan.name}</h3>
                   <p className="text-xs text-gray-400 mt-1">{plan.bestFor}</p>
                 </div>
 
@@ -231,16 +235,16 @@ const ServiceDetail = () => {
                       {formatINR(plan.offerOriginalPrice)}
                     </span>
                   )}
-                  <span className="text-3xl font-extrabold text-gray-900">
+                  <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
                     {formatINR(plan.price)}
                   </span>
                   {plan.offerPercent > 0 && (
-                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded">
                       {plan.offerPercent}% off
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-500 flex items-center gap-1 mb-6">
+                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-6">
                   <ClockIcon className="w-3.5 h-3.5" /> Delivery in {plan.delivery}
                 </p>
 
@@ -252,16 +256,18 @@ const ServiceDetail = () => {
                         className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"
                         strokeWidth={3}
                       />
-                      <span className="text-gray-700">{item}</span>
+                      <span className="text-gray-700 dark:text-gray-300">{item}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Support info */}
                 {plan.support && (
-                  <div className="flex items-center gap-2 px-3 py-2.5 mb-4 rounded-lg bg-emerald-50">
-                    <SparklesIcon className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                    <span className="text-xs font-semibold text-emerald-700">{plan.support}</span>
+                  <div className="flex items-center gap-2 px-3 py-2.5 mb-4 rounded-lg bg-emerald-50 dark:bg-emerald-500/10">
+                    <SparklesIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                      {plan.support}
+                    </span>
                   </div>
                 )}
 
@@ -270,7 +276,7 @@ const ServiceDetail = () => {
                   className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 active:scale-[0.98] mt-auto text-center block ${
                     plan.popular
                       ? `text-white bg-[#37BBEC] hover:bg-[#2ea8d6] hover:shadow-lg hover:shadow-[#37BBEC]/25`
-                      : 'text-gray-700 bg-gray-100 hover:bg-gray-200:bg-surface-600'
+                      : 'text-gray-700 bg-gray-100 hover:bg-gray-200 dark:text-gray-200 dark:bg-surface-700 dark:hover:bg-surface-600'
                   }`}
                 >
                   View {plan.name}
@@ -281,14 +287,16 @@ const ServiceDetail = () => {
             {/* Custom Plan Card */}
             <div className="card border-dashed flex flex-col group">
               <div className="mb-5">
-                <h3 className="text-lg font-bold text-gray-900">Custom Plan</h3>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Custom Plan</h3>
                 <p className="text-xs text-gray-400 mt-1">Beyond our fixed packages</p>
               </div>
 
               <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-3xl font-extrabold text-gray-900">Tailored</span>
+                <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
+                  Tailored
+                </span>
               </div>
-              <p className="text-sm text-gray-500 flex items-center gap-1 mb-6">
+              <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-6">
                 <SparklesIcon className="w-3.5 h-3.5" /> Scope-based timeline
               </p>
 
@@ -304,14 +312,14 @@ const ServiceDetail = () => {
                       className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"
                       strokeWidth={3}
                     />
-                    <span className="text-gray-700">{item}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{item}</span>
                   </div>
                 ))}
               </div>
 
               <button
                 onClick={handleCustom}
-                className="w-full py-3 px-6 rounded-xl font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200:bg-surface-600 transition-all duration-200 active:scale-[0.98] mt-auto"
+                className="w-full py-3 px-6 rounded-xl font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 dark:text-gray-200 dark:bg-surface-700 dark:hover:bg-surface-600 transition-all duration-200 active:scale-[0.98] mt-auto"
               >
                 Request Custom Quote
               </button>

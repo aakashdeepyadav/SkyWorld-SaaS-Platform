@@ -194,19 +194,22 @@ const PROJECTS = [
 /* ─── Testimonials ─── */
 const TESTIMONIALS = [
   {
-    quote: 'SkyWorld delivered our website faster than we expected. The quality of design and the attention to detail was impressive. Our online bookings increased by 40% in the first month.',
+    quote:
+      'SkyWorld delivered our website faster than we expected. The quality of design and the attention to detail was impressive. Our online bookings increased by 40% in the first month.',
     name: 'Priya Sharma',
     role: 'Owner, Saffron Kitchen',
     initials: 'PS',
   },
   {
-    quote: 'Professional, responsive, and genuinely invested in our success. The combo package saved us time and money while giving us everything we needed to launch our clinic online.',
+    quote:
+      'Professional, responsive, and genuinely invested in our success. The combo package saved us time and money while giving us everything we needed to launch our clinic online.',
     name: 'Dr. Rahul Mehta',
     role: 'Founder, MedCare Clinic',
     initials: 'RM',
   },
   {
-    quote: 'The monthly maintenance plan has been a game-changer. We never worry about our site going down or falling behind on updates. Highly recommended for any growing business.',
+    quote:
+      'The monthly maintenance plan has been a game-changer. We never worry about our site going down or falling behind on updates. Highly recommended for any growing business.',
     name: 'Ankit Verma',
     role: 'CEO, UrbanNest Properties',
     initials: 'AV',
@@ -215,23 +218,44 @@ const TESTIMONIALS = [
 
 /* ─── Marquee items ─── */
 const MARQUEE_ITEMS = [
-  'Restaurants', 'Healthcare', 'E-Commerce', 'Real Estate',
-  'Education', 'SaaS Products', 'Startups', 'Small Business',
-  'Local Services', 'Professional Services', 'Hospitality', 'Retail',
+  'Restaurants',
+  'Healthcare',
+  'E-Commerce',
+  'Real Estate',
+  'Education',
+  'SaaS Products',
+  'Startups',
+  'Small Business',
+  'Local Services',
+  'Professional Services',
+  'Hospitality',
+  'Retail',
 ];
 
 /* ─── Social SVGs ─── */
 const SocialIcons = {
-  linkedin: <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />,
-  youtube: <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.546 12 3.546 12 3.546s-7.505 0-9.377.504A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.504 9.376.504 9.376.504s7.505 0 9.377-.504a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />,
-  instagram: <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />,
-  twitter: <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />,
-  facebook: <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />,
+  linkedin: (
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+  ),
+  youtube: (
+    <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.546 12 3.546 12 3.546s-7.505 0-9.377.504A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.504 9.376.504 9.376.504s7.505 0 9.377-.504a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+  ),
+  instagram: (
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+  ),
+  twitter: (
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  ),
+  facebook: (
+    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+  ),
 };
 
 const SocialLink = ({ href, label, icon, size = 17 }) => (
   <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label}>
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">{icon}</svg>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      {icon}
+    </svg>
   </a>
 );
 
@@ -273,17 +297,17 @@ const SkyWorldCanvas = () => {
           size: 0.3 + z * 2.2,
           twinkleSpeed: 0.01 + Math.random() * 0.03,
           twinklePhase: Math.random() * Math.PI * 2,
-          color: z > 0.85
-            ? { r: 56, g: 189, b: 248 }    // bright sky-blue stars
-            : z > 0.7
-            ? { r: 125, g: 211, b: 252 }   // lighter blue
-            : z > 0.5
-            ? { r: 199, g: 210, b: 254 }   // lavender
-            : { r: 220, g: 230, b: 245 },  // white-ish
+          color:
+            z > 0.85
+              ? { r: 56, g: 189, b: 248 } // bright sky-blue stars
+              : z > 0.7
+                ? { r: 125, g: 211, b: 252 } // lighter blue
+                : z > 0.5
+                  ? { r: 199, g: 210, b: 254 } // lavender
+                  : { r: 220, g: 230, b: 245 }, // white-ish
         });
       }
     };
-
 
     /* ── Globe wireframe geometry ── */
     const projectPoint = (lat, lon, radius, cx, cy, angle) => {
@@ -305,7 +329,7 @@ const SkyWorldCanvas = () => {
 
     const drawGlobe = (w, h) => {
       const isMobile = w < 600;
-      const radius = isMobile ? Math.min(w * 0.32, 130) : Math.min(w * 0.22, 240);
+      const radius = Math.max(1, isMobile ? Math.min(w * 0.32, 130) : Math.min(w * 0.22, 240));
       const cx = isMobile ? w * 0.5 : w * 0.72;
       const cy = h * 0.48;
 
@@ -431,8 +455,14 @@ const SkyWorldCanvas = () => {
 
       // Orbiting dot on the ring
       const orbitAngle = time * 0.4;
-      const orbitX = cx + radius * 1.35 * Math.cos(orbitAngle) * Math.cos(-0.35) - radius * 0.35 * Math.sin(orbitAngle) * Math.sin(-0.35);
-      const orbitY = cy + radius * 1.35 * Math.cos(orbitAngle) * Math.sin(-0.35) + radius * 0.35 * Math.sin(orbitAngle) * Math.cos(-0.35);
+      const orbitX =
+        cx +
+        radius * 1.35 * Math.cos(orbitAngle) * Math.cos(-0.35) -
+        radius * 0.35 * Math.sin(orbitAngle) * Math.sin(-0.35);
+      const orbitY =
+        cy +
+        radius * 1.35 * Math.cos(orbitAngle) * Math.sin(-0.35) +
+        radius * 0.35 * Math.sin(orbitAngle) * Math.cos(-0.35);
       const og = ctx.createRadialGradient(orbitX, orbitY, 0, orbitX, orbitY, 12);
       og.addColorStop(0, 'rgba(0,191,255,.8)');
       og.addColorStop(0.3, 'rgba(56,189,248,.3)');
@@ -477,7 +507,14 @@ const SkyWorldCanvas = () => {
 
       /* ── Mouse spotlight ── */
       if (mouse.x > 0 && mouse.y > 0) {
-        const mg = ctx.createRadialGradient(smoothMouse.x, smoothMouse.y, 0, smoothMouse.x, smoothMouse.y, 250);
+        const mg = ctx.createRadialGradient(
+          smoothMouse.x,
+          smoothMouse.y,
+          0,
+          smoothMouse.x,
+          smoothMouse.y,
+          250
+        );
         mg.addColorStop(0, 'rgba(56,189,248,.04)');
         mg.addColorStop(0.5, 'rgba(99,102,241,.02)');
         mg.addColorStop(1, 'transparent');
@@ -486,13 +523,14 @@ const SkyWorldCanvas = () => {
       }
 
       /* ── Stars with twinkling ── */
-      stars.forEach(s => {
+      stars.forEach((s) => {
         s.twinklePhase += s.twinkleSpeed;
         const twinkle = 0.3 + Math.sin(s.twinklePhase) * 0.7;
         const alpha = (0.15 + s.z * 0.65) * Math.max(0.1, twinkle);
 
         // Mouse interaction — subtle push
-        let sx = s.x, sy = s.y;
+        let sx = s.x,
+          sy = s.y;
         if (mouse.x > 0 && mouse.y > 0) {
           const dx = s.x - smoothMouse.x;
           const dy = s.y - smoothMouse.y;
@@ -522,8 +560,10 @@ const SkyWorldCanvas = () => {
           ctx.lineWidth = 0.5;
           const sLen = s.size * 4;
           ctx.beginPath();
-          ctx.moveTo(sx - sLen, sy); ctx.lineTo(sx + sLen, sy);
-          ctx.moveTo(sx, sy - sLen); ctx.lineTo(sx, sy + sLen);
+          ctx.moveTo(sx - sLen, sy);
+          ctx.lineTo(sx + sLen, sy);
+          ctx.moveTo(sx, sy - sLen);
+          ctx.lineTo(sx, sy + sLen);
           ctx.stroke();
         }
 
@@ -533,7 +573,6 @@ const SkyWorldCanvas = () => {
         ctx.fillStyle = `rgba(${s.color.r},${s.color.g},${s.color.b},${alpha})`;
         ctx.fill();
       });
-
 
       /* ── Wireframe Globe ── */
       drawGlobe(w, h);
@@ -546,7 +585,10 @@ const SkyWorldCanvas = () => {
       mouse.x = e.clientX - rect.left;
       mouse.y = e.clientY - rect.top;
     };
-    const onLeave = () => { mouse.x = -1000; mouse.y = -1000; };
+    const onLeave = () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    };
 
     resize();
     animId = requestAnimationFrame(draw);
@@ -684,9 +726,9 @@ const Home = () => {
         <div className="hp-hero__grain" />
 
         <div className="hp-hero__inner">
-
           <h1 className="hp-hero__h1">
-            We build products<br />
+            We build products
+            <br />
             that <span className="hp-hero__h1-accent">drive growth.</span>
           </h1>
 
@@ -697,10 +739,16 @@ const Home = () => {
           <div className="hp-hero__btns">
             {authed ? (
               <>
-                <Link to={`/dashboard/${user?.role || 'client'}`} className="hp-btn hp-btn--primary hp-btn--lg">
+                <Link
+                  to={`/dashboard/${user?.role || 'client'}`}
+                  className="hp-btn hp-btn--primary hp-btn--lg"
+                >
                   Open Dashboard <span className="hp-btn__arr">&rarr;</span>
                 </Link>
-                <Link to="/services/web-development" className="hp-btn hp-btn--dark-ghost hp-btn--lg">
+                <Link
+                  to="/services/web-development"
+                  className="hp-btn hp-btn--dark-ghost hp-btn--lg"
+                >
                   Browse Services
                 </Link>
               </>
@@ -719,7 +767,9 @@ const Home = () => {
           <div className="hp-hero__proof">
             <div className="hp-hero__proof-faces">
               {['PS', 'RM', 'AV'].map((initials, i) => (
-                <span key={i} className="hp-hero__proof-face">{initials}</span>
+                <span key={i} className="hp-hero__proof-face">
+                  {initials}
+                </span>
               ))}
             </div>
             <span className="hp-hero__proof-text">80+ happy clients</span>
@@ -766,7 +816,8 @@ const Home = () => {
               <span className="hp-sect-label">Services</span>
               <h2 className="hp-sect-h">What we build</h2>
               <p className="hp-sect-sub">
-                End-to-end digital solutions for businesses ready to grow — from first pixel to final deploy.
+                End-to-end digital solutions for businesses ready to grow — from first pixel to
+                final deploy.
               </p>
             </div>
           </FadeIn>
@@ -819,7 +870,8 @@ const Home = () => {
                 <span className="hp-sect-label">Portfolio</span>
                 <h2 className="hp-sect-h">Selected work</h2>
                 <p className="hp-sect-sub">
-                  Recent projects delivered for businesses across industries — each one built to perform.
+                  Recent projects delivered for businesses across industries — each one built to
+                  perform.
                 </p>
               </div>
             </FadeIn>
@@ -840,7 +892,9 @@ const Home = () => {
                     <p className="hp-portfolio__desc">{p.desc}</p>
                     <div className="hp-portfolio__tags">
                       {p.tags.map((tag) => (
-                        <span key={tag} className="hp-portfolio__tag">{tag}</span>
+                        <span key={tag} className="hp-portfolio__tag">
+                          {tag}
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -855,9 +909,13 @@ const Home = () => {
       <section className="hp-proc">
         <div className="hp-wrap">
           <FadeIn>
-            <span className="hp-sect-label" style={{ justifyContent: 'center' }}>Process</span>
+            <span className="hp-sect-label" style={{ justifyContent: 'center' }}>
+              Process
+            </span>
             <h2 className="hp-sect-h">How we work</h2>
-            <p className="hp-proc__sub">Three clear phases from idea to production. No surprises.</p>
+            <p className="hp-proc__sub">
+              Three clear phases from idea to production. No surprises.
+            </p>
           </FadeIn>
 
           <div className="hp-proc__timeline">
@@ -885,13 +943,31 @@ const Home = () => {
                   {/* Icon */}
                   <div className="hp-proc__icon">
                     {i === 0 && (
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
                         <path d="M8 9h8M8 13h5" />
                       </svg>
                     )}
                     {i === 1 && (
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <rect x="2" y="3" width="20" height="14" rx="2" />
                         <path d="M8 21h8M12 17v4" />
                         <path d="M7 8h2M7 12h4" />
@@ -899,7 +975,16 @@ const Home = () => {
                       </svg>
                     )}
                     {i === 2 && (
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
                         <polyline points="22 4 12 14.01 9 11.01" />
                       </svg>
@@ -910,15 +995,24 @@ const Home = () => {
                   <p className="hp-proc__desc">{s.d}</p>
 
                   <div className="hp-proc__tags">
-                    {i === 0 && ['Free consultation', '24hr response'].map(t => (
-                      <span key={t} className="hp-proc__tag">{t}</span>
-                    ))}
-                    {i === 1 && ['Live preview', 'Unlimited revisions'].map(t => (
-                      <span key={t} className="hp-proc__tag">{t}</span>
-                    ))}
-                    {i === 2 && ['Full handover', 'Pay on approval'].map(t => (
-                      <span key={t} className="hp-proc__tag">{t}</span>
-                    ))}
+                    {i === 0 &&
+                      ['Free consultation', '24hr response'].map((t) => (
+                        <span key={t} className="hp-proc__tag">
+                          {t}
+                        </span>
+                      ))}
+                    {i === 1 &&
+                      ['Live preview', 'Unlimited revisions'].map((t) => (
+                        <span key={t} className="hp-proc__tag">
+                          {t}
+                        </span>
+                      ))}
+                    {i === 2 &&
+                      ['Full handover', 'Pay on approval'].map((t) => (
+                        <span key={t} className="hp-proc__tag">
+                          {t}
+                        </span>
+                      ))}
                   </div>
                 </div>
               </FadeIn>
@@ -967,7 +1061,9 @@ const Home = () => {
                   {plan.highlights?.length > 0 && (
                     <div className="hp-plan__highlights">
                       {plan.highlights.map((h) => (
-                        <span key={h} className="hp-plan__hl">{h}</span>
+                        <span key={h} className="hp-plan__hl">
+                          {h}
+                        </span>
                       ))}
                     </div>
                   )}
@@ -1027,10 +1123,22 @@ const Home = () => {
                     </span>
                   </div>
                   <ul className="hp-plan__list">
-                    <li><Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" /> Custom design &amp; architecture</li>
-                    <li><Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" /> Dedicated project manager</li>
-                    <li><Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" /> Milestone-based billing</li>
-                    <li><Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" /> Priority support</li>
+                    <li>
+                      <Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" />{' '}
+                      Custom design &amp; architecture
+                    </li>
+                    <li>
+                      <Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" />{' '}
+                      Dedicated project manager
+                    </li>
+                    <li>
+                      <Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" />{' '}
+                      Milestone-based billing
+                    </li>
+                    <li>
+                      <Icon name="check" size={15} strokeWidth={2.5} className="hp-plan__ck" />{' '}
+                      Priority support
+                    </li>
                   </ul>
                   <Link
                     to={authed ? `/request?service=${activeTab}` : '/register'}
@@ -1102,11 +1210,11 @@ const Home = () => {
         <div className="hp-wrap">
           <FadeIn>
             <div className="hp-testi__header">
-              <span className="hp-sect-label" style={{ justifyContent: 'center' }}>Testimonials</span>
+              <span className="hp-sect-label" style={{ justifyContent: 'center' }}>
+                Testimonials
+              </span>
               <h2 className="hp-sect-h">What our clients say</h2>
-              <p className="hp-sect-sub">
-                Real feedback from businesses we’ve helped grow online.
-              </p>
+              <p className="hp-sect-sub">Real feedback from businesses we’ve helped grow online.</p>
             </div>
           </FadeIn>
 
@@ -1133,7 +1241,9 @@ const Home = () => {
       <section className="hp-monthly">
         <div className="hp-wrap">
           <FadeIn>
-            <span className="hp-sect-label" style={{ '--sky-deep': 'rgba(0,191,255,.7)' }}>Ongoing Support</span>
+            <span className="hp-sect-label" style={{ '--sky-deep': 'rgba(0,191,255,.7)' }}>
+              Ongoing Support
+            </span>
             <h2 className="hp-monthly__h2">Keep everything running smoothly</h2>
             <Link
               to="/plans/monthly"
@@ -1162,7 +1272,9 @@ const Home = () => {
                   {plan.highlights?.length > 0 && (
                     <div className="hp-mplan__highlights">
                       {plan.highlights.map((h) => (
-                        <span key={h} className="hp-mplan__hl">{h}</span>
+                        <span key={h} className="hp-mplan__hl">
+                          {h}
+                        </span>
                       ))}
                     </div>
                   )}
@@ -1204,7 +1316,9 @@ const Home = () => {
           <FadeIn>
             <div className="hp-cta__inner">
               <h2 className="hp-cta__h2">
-                Ready to get<br />started?
+                Ready to get
+                <br />
+                started?
               </h2>
               <p className="hp-cta__sub">
                 Plans from {formatINR(2499)}. Pay 50% to start, rest on your approval. No lock-ins.
@@ -1237,44 +1351,93 @@ const Home = () => {
           <div className="hp-ft__top">
             <div className="hp-ft__grid">
               <div className="hp-ft__brand-col">
-                <img src="/wordmark_logo_white_fullname.png" alt="SkyWorld Ventures" className="hp-ft__logo" />
+                <img
+                  src="/wordmark_logo_white_fullname.png"
+                  alt="SkyWorld Ventures"
+                  className="hp-ft__logo"
+                />
                 <p className="hp-ft__desc">
-                  Professional web development, branding, and app services for businesses that mean business.
+                  Professional web development, branding, and app services for businesses that mean
+                  business.
                 </p>
                 <div className="hp-ft__social">
-                  <SocialLink href="https://www.linkedin.com/in/skyworld-ventures/" label="LinkedIn" icon={SocialIcons.linkedin} />
-                  <SocialLink href="https://www.youtube.com/@SkyWorldVentures" label="YouTube" icon={SocialIcons.youtube} size={18} />
-                  <SocialLink href="https://www.instagram.com/skyworld.ventures/" label="Instagram" icon={SocialIcons.instagram} />
-                  <SocialLink href="https://x.com/SkyWorldVenture" label="X (Twitter)" icon={SocialIcons.twitter} size={16} />
-                  <SocialLink href="https://www.facebook.com/profile.php?id=61585059613967" label="Facebook" icon={SocialIcons.facebook} />
+                  <SocialLink
+                    href="https://www.linkedin.com/in/skyworld-ventures/"
+                    label="LinkedIn"
+                    icon={SocialIcons.linkedin}
+                  />
+                  <SocialLink
+                    href="https://www.youtube.com/@SkyWorldVentures"
+                    label="YouTube"
+                    icon={SocialIcons.youtube}
+                    size={18}
+                  />
+                  <SocialLink
+                    href="https://www.instagram.com/skyworld.ventures/"
+                    label="Instagram"
+                    icon={SocialIcons.instagram}
+                  />
+                  <SocialLink
+                    href="https://x.com/SkyWorldVenture"
+                    label="X (Twitter)"
+                    icon={SocialIcons.twitter}
+                    size={16}
+                  />
+                  <SocialLink
+                    href="https://www.facebook.com/profile.php?id=61585059613967"
+                    label="Facebook"
+                    icon={SocialIcons.facebook}
+                  />
                 </div>
               </div>
 
               <div>
                 <h4 className="hp-ft__col-title">Services</h4>
                 <ul className="hp-ft__col-links">
-                  <li><Link to="/services/web-development">Web Development</Link></li>
-                  <li><Link to="/services/branding-design">Branding &amp; Design</Link></li>
-                  <li><Link to="/services/app-development">App Development</Link></li>
-                  <li><Link to="/plans/monthly">Monthly Plans</Link></li>
+                  <li>
+                    <Link to="/services/web-development">Web Development</Link>
+                  </li>
+                  <li>
+                    <Link to="/services/branding-design">Branding &amp; Design</Link>
+                  </li>
+                  <li>
+                    <Link to="/services/app-development">App Development</Link>
+                  </li>
+                  <li>
+                    <Link to="/plans/monthly">Monthly Plans</Link>
+                  </li>
                 </ul>
               </div>
 
               <div>
                 <h4 className="hp-ft__col-title">Company</h4>
                 <ul className="hp-ft__col-links">
-                  <li><Link to="/faq">FAQ</Link></li>
-                  <li><Link to="/contact">Contact</Link></li>
-                  <li><Link to="/privacy">Privacy Policy</Link></li>
-                  <li><Link to="/terms">Terms of Service</Link></li>
+                  <li>
+                    <Link to="/faq">FAQ</Link>
+                  </li>
+                  <li>
+                    <Link to="/contact">Contact</Link>
+                  </li>
+                  <li>
+                    <Link to="/privacy">Privacy Policy</Link>
+                  </li>
+                  <li>
+                    <Link to="/terms">Terms of Service</Link>
+                  </li>
                 </ul>
               </div>
 
               <div>
                 <h4 className="hp-ft__col-title">Get in Touch</h4>
                 <ul className="hp-ft__col-links">
-                  <li><a href="mailto:support@skyworld.buzz">support@skyworld.buzz</a></li>
-                  <li><a href="https://wa.me/918837679889" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
+                  <li>
+                    <a href="mailto:support@skyworld.buzz">support@skyworld.buzz</a>
+                  </li>
+                  <li>
+                    <a href="https://wa.me/918837679889" target="_blank" rel="noopener noreferrer">
+                      WhatsApp
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>
